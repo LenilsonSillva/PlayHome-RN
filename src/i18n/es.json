@@ -1,0 +1,47 @@
+{
+  "home": {
+    "system_status": "SISTEMA DE MANDO ACTIVO",
+    "main_subtitle": "JOGOS ATIVOS",
+    "swipe_hint": "DESLIZA PARA SELECCIONAR OTROS JUEGOS",
+    "connect_btn": "CONECTAR SEÑAL",
+    "settings_title": "AJUSTES DEL SISTEMA",
+    "lang_label": "IDIOMA",
+    "back_btn": "CERRAR"
+  },
+  "games": {
+    "impostor_title": "IMPOSTOR",
+    "impostor_phase_header_title": "IMPOSTOR",
+    "impostor_phase_reveal": "REVELACION",
+    "impostor_phase_discussion": "DISCUSSION",
+    "impostor_phase_voting": "VOTACION",
+    "impostor_phase_elimination": "ELIMINACION",
+    "impostor_phase_result": "RESULTADO",
+    "impostor_reveal_swipe": "DESLIZE PARA REVELAR",
+    "impostor_reveal_revealNowBtn": "REVELAR AGORA",
+    "impostor_reveal_yourWord": "SUA PALAVRA É:",
+    "impostor_reveal_next": "PRÓXIMO",
+    "impostor_reveal_startMission": "INICIAR MISSÃO",
+    "impostor_reveal_youStart": "VOCÊ INICIA A PARTIDA!",
+    "impostor_reveal_youAre": "VOCÊ É O",
+    "impostor_reveal_yourWordIs": "SUA PALAVRA É",
+    "impostor_reveal_changeWord": "CAMBIAR PALAVRA",
+    "impostor_reveal_changeWord_sub": "NO CONOZCO ESA PALABRA",
+
+    "impostor_discuss_time": "TIEMPO TRANSCURRIDO",
+    "impostor_discuss_impostorsLeft": "IMPOSTORES VIVOS",
+    "impostor_discuss_impostor": "IMPOSTOR",
+    "impostor_discuss_impostors": "IMPOSTORES",
+    "impostor_discuss_whoStart": "QUIEN INICIA LA DISCUSION",
+    "impostor_discuss_subtitle": "Hablen y analicen las pistas de cada tripulante. El impostor está entre ustedes.",
+    "impostor_discuss_monitorTitle": "MONITOREO BIOMÉTRICO",
+    "impostor_discuss_isAlive": "SEÑAL ACTIVA",
+    "impostor_discuss_notAlive": "CONEXIÓN PERDIDA",
+    "impostor_discuss_score": "PUNTOS",
+    "impostor_discuss_startVote": "INICIAR VOTACIÓN",
+    "impostor_discuss_eliminate": "PULAR VOTACIÓN Y ELIMINAR",
+
+    "impostor_desc": "Un infiltrado sabotea la estación. Identifícalo antes de que la misión falle.",
+    "cripto_title": "CRIPTOGRAFÍA",
+    "cripto_desc": "Intercepción de datos detectada. Descifra los mensajes antes de que caiga la señal."
+  }
+}

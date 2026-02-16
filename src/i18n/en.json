@@ -1,0 +1,48 @@
+{
+  "home": {
+    "system_status": "COMMAND SYSTEM ACTIVE",
+    "main_subtitle": "ACTIVE GAMES",
+    "swipe_hint": "SWIPE TO SELECT OTHER GAMES",
+    "connect_btn": "CONNECT SIGNAL",
+    "settings_title": "SYSTEM ADJUSTMENTS",
+    "lang_label": "LANGUAGE",
+    "back_btn": "CLOSE"
+  },
+  "games": {
+    "impostor_title": "IMPOSTOR",
+    "impostor_phase_header_title": "IMPOSTOR",
+    "impostor_phase_reveal": "REVEAL",
+    "impostor_phase_discussion": "DISCUSS",
+    "impostor_phase_voting": "VOTING",
+    "impostor_phase_elimination": "ELIMINATION",
+    "impostor_phase_result": "RESULT",
+    "impostor_reveal_swipe": "SWIPE TO REVEAL",
+    "impostor_reveal_revealNowBtn": "REVEAL NOW",
+    "impostor_reveal_yourWord": "YOUR WORD IS:",
+    "impostor_reveal_next": "NEXT",
+    "impostor_reveal_startMission": "START MISSION",
+    "impostor_reveal_youStart": "YOU START THE MATCH!",
+    "impostor_reveal_youAre": "YOU ARE THE",
+    "impostor_reveal_yourWordIs": "YOUR WORD IS",
+    "impostor_reveal_changeWord": "CHANGE WORD",
+    "impostor_reveal_changeWord_sub": "I DONT'T KNOW THAT WORD",
+
+    "impostor_discuss_time": "TIME ELAPSED",
+    "impostor_discuss_impostorsLeft": "IMPOSTORS ALIVE",
+    "impostor_discuss_impostor": "IMPOSTOR",
+    "impostor_discuss_impostors": "IMPOSTORS",
+    "impostor_discuss_whoStart": "WHO STARTS THE DISCUSSION",
+    "impostor_discuss_subtitle": "Talk and analyze the clues of each crewmate. The impostor is among you.",
+    "impostor_discuss_monitorTitle": "BIOMETRIC MONITORING",
+    "impostor_discuss_isAlive": "SIGNAL ACTIVE",
+    "impostor_discuss_notAlive": "CONNECTION LOST",
+    "impostor_discuss_score": "SCORE",
+    "impostor_discuss_startVote": "START VOTING",
+    "impostor_discuss_eliminate": "SKIP VOTING AND ELIMINATE",
+
+
+    "impostor_desc": "An infiltrator sabotages the station. Identify them before the mission fails.",
+    "cripto_title": "CRYPTOGRAPHY",
+    "cripto_desc": "Data interception detected. Decipher messages before signal loss."
+  }
+}

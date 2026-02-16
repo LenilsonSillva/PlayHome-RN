@@ -1,0 +1,47 @@
+{
+  "home": {
+    "system_status": "SISTEMA DE COMANDO ATIVO",
+    "main_subtitle": "JOGOS ATIVOS",
+    "swipe_hint": "DESLIZE PARA OUTROS JOGOS",
+    "connect_btn": "INICIAR PROTOCOLO",
+    "settings_title": "AJUSTES",
+    "lang_label": "IDIOMA",
+    "back_btn": "FECHAR"
+  },
+  "games": {
+    "impostor_title": "IMPOSTOR",
+    "impostor_phase_header_title": "IMPOSTOR",
+    "impostor_phase_reveal": "REVELAÇÃO",
+    "impostor_phase_discussion": "DISCUSSÃO",
+    "impostor_phase_voting": "VOTAÇÃO",
+    "impostor_phase_elimination": "ELIMINAÇÃO",
+    "impostor_phase_result": "RESULTADO",
+    "impostor_reveal_swipe": "DESLIZE PARA REVELAR",
+    "impostor_reveal_revealNowBtn": "REVELAR AGORA",
+    "impostor_reveal_yourWord": "SUA PALAVRA É:",
+    "impostor_reveal_next": "PRÓXIMO",
+    "impostor_reveal_startMission": "INICIAR MISSÃO",
+    "impostor_reveal_youStart": "VOCÊ INICIA A PARTIDA!",
+    "impostor_reveal_youAre": "VOCÊ É O",
+    "impostor_reveal_yourWordIs": "SUA PALAVRA É",
+    "impostor_reveal_changeWord": "TROCAR PALAVRA",
+    "impostor_reveal_changeWord_sub": "NÃO CONHEÇO A PALAVRA",
+
+    "impostor_discuss_time": "TEMPO DECORRIDO",
+    "impostor_discuss_impostorsLeft": "AMEAÇAS VIVAS",
+    "impostor_discuss_impostor": "IMPOSTOR",
+    "impostor_discuss_impostors": "IMPOSTORES",
+    "impostor_discuss_whoStart": "INICIA A DISCUSSÃO",
+    "impostor_discuss_subtitle": "Debatam e analisem as dicas de cada tripulante. O infiltrado está entre vocês.",
+    "impostor_discuss_monitorTitle": "MONITORAMENTO BIOMÉTRICO",
+    "impostor_discuss_isAlive": "SINAL ATIVO",
+    "impostor_discuss_notAlive": "CONEXÃO PERDIDA",
+    "impostor_discuss_score": "PONTOS",
+    "impostor_discuss_startVote": "INICIAR VOTAÇÃO",
+    "impostor_discuss_eliminate": "PULAR VOTAÇÃO E ELIMINAR",
+
+    "impostor_desc": "Fique esperto! Todos os tripulantes recebem uma palavra, menos o impostor. Descubra quem está fingindo e ejete-o da nave.",
+    "cripto_title": "CRIPTOGRAFIA",
+    "cripto_desc": "Comunicação tática! Dê dicas precisas para a sua equipe descriptografar a palavra"
+  }
+}
