@@ -53,6 +53,8 @@ export const DiscussPhase = ({
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
+        {/* Espaço para evitar sobreposição com o header fixo */}
+        <View style={{ height: 130 }} />
         {/* 3 e 5. STATUS DO SISTEMA (Tempo e Impostores) */}
         <View style={styles.statusRow}>
           <View style={styles.statusCard}>
@@ -352,7 +354,7 @@ const styles = StyleSheet.create({
   },
   secondaryBtnText: {
     color: COLORS.textSecondary,
-    fontSize: 10,
-    textDecorationLine: "underline"
+    fontSize: 12,
+    textDecorationLine: "underline",
   }
 });

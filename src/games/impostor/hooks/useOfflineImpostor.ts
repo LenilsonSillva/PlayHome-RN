@@ -164,7 +164,7 @@ export function useOfflineImpostor(): UseOfflineImpostorReturn {
           return {
             ...p,
             score: (p.score || 0) + points,
-            globalScore: (p.score || 0) + points
+            globalScore: points
           };
         });
         return { ...prev, players: updatedWithScores, phase: "result" };

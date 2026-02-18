@@ -136,7 +136,9 @@ export const ImpostorGameScreen = ({ route }: any) => {
         onOpenSettings={() => {
           setOpenModal(true);
         }}
+        position="absolute"
       />
+      <View style={{flex: 1 }} >
       <SettingsModal
         visible={openModal}
         onClose={() => setOpenModal(false)}
@@ -210,6 +212,7 @@ export const ImpostorGameScreen = ({ route }: any) => {
           }}
         />
       )}
+      </View>
     </View>
   );
 };
@@ -217,7 +220,7 @@ export const ImpostorGameScreen = ({ route }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background
+    backgroundColor: COLORS.background,
   },
   titleContainer: {
     alignItems: "center"

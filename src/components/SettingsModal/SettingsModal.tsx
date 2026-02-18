@@ -120,9 +120,9 @@ export const SettingsModal = ({
                   >
                     <View>
                       <CustomText variant="h3" style={styles.whiteText}>
-                        REVER PALAVRA
+                        {t("games.impostor_discuss_reviewWord")}
                       </CustomText>
-                      <CustomText variant="hint">CLIQUE EM SEU NOME</CustomText>
+                      <CustomText variant="hint">{t("games.impostor_discuss_reviewClick")}</CustomText>
                     </View>
 
                     <View
@@ -158,7 +158,7 @@ export const SettingsModal = ({
                     <CustomText variant="h3" style={styles.whiteText}>
                       {t("home.lang_label")}
                     </CustomText>
-                    <CustomText variant="hint">SISTEMA DE TRADUÇÃO</CustomText>
+                    <CustomText variant="hint">{t("home.lang_sub_label")}</CustomText>
                   </View>
                   <View style={styles.badge}>
                     <CustomText variant="h3" style={{ color: COLORS.cyan }}>
@@ -173,9 +173,9 @@ export const SettingsModal = ({
                 >
                   <View>
                     <CustomText variant="h3" style={styles.whiteText}>
-                      AUDIO
+                      {t("home.settings_audioTitle")}
                     </CustomText>
-                    <CustomText variant="hint">EFEITOS DA ESTAÇÃO</CustomText>
+                    <CustomText variant="hint">{t("home.settings_audioSubTitle")}</CustomText>
                   </View>
 
                   <View

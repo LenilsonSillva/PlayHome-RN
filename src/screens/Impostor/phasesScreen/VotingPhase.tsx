@@ -11,6 +11,8 @@ import { CustomText } from "@/styles/customText";
 import { PlayerAvatar } from "@/games/common/components/PlayerAvatar";
 import { Cards } from "@/components/Cards/Cards";
 import { ImpostorGame, ImpostorPlayer } from "@/games/impostor/types/game";
+import { CircularTimer } from "@/components/Timer/CircularTimer";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   data: ImpostorGame;
@@ -19,13 +21,14 @@ interface Props {
 }
 
 export const VotingPhase = ({ data, voteEnded, currentVoteState }: Props) => {
+  const { t } = useTranslation();
   const alivePlayers = data.players.filter((p) => p.isAlive);
   const [currentVoterIdx, setCurrentVoterIdx] = useState(0);
   const [timeLeft, setTimeLeft] = useState(60);
   const [selectedTarget, setSelectedTarget] = useState<ImpostorPlayer | null>(
     null
   );
-  const [votedMap, setVotedMap] = useState<Record<string, string | null>>({}); // 🔥 Controle local
+  const [votedMap, setVotedMap] = useState<Record<string, string | null>>({});
 
   const currentVoter = alivePlayers[currentVoterIdx];
   const suspects = alivePlayers.filter((p) => p.id !== currentVoter.id);
@@ -51,7 +54,7 @@ export const VotingPhase = ({ data, voteEnded, currentVoteState }: Props) => {
       setCurrentVoterIdx((prev) => prev + 1);
       setTimeLeft(60);
     } else {
-      voteEnded(updatedMap); // 🔥 Envia o mapa completo e síncrono
+      voteEnded(updatedMap);
     }
   };
 
@@ -62,66 +65,76 @@ export const VotingPhase = ({ data, voteEnded, currentVoteState }: Props) => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <View style={styles.timerCircle}>
-            <CustomText
-              variant="h2"
-              style={{ color: timeLeft <= 10 ? COLORS.danger : COLORS.cyan }}
-            >
-              {timeLeft}s
-            </CustomText>
-          </View>
+          <CircularTimer timeLeft={timeLeft} totalTime={60} />
           <View style={styles.voterInfo}>
-            <CustomText variant="label">VOTANDO AGORA</CustomText>
+            <CustomText variant="label" style={{ color: COLORS.textSecondary }}>
+              {t("games.impostor_voting_titleVotingNow")}
+            </CustomText>
             <CustomText variant="h2" style={styles.voterName}>
               {currentVoter.name}
             </CustomText>
           </View>
+          <PlayerAvatar
+            emoji={currentVoter.emoji}
+            color={currentVoter.color}
+            size={50}
+          />
         </View>
 
-        <CustomText variant="h3" style={styles.instruction}>
-          SELECIONE O SUSPEITO:
-        </CustomText>
-
-        <View style={styles.grid}>
-          {suspects.map((player) => (
-            <TouchableOpacity
-              key={player.id}
-              style={styles.cardTouch}
-              onPress={() => setSelectedTarget(player)}
-            >
-              <Cards accentColor={player.color}>
-                <View style={styles.cardInner}>
-                  <PlayerAvatar
-                    emoji={player.emoji}
-                    color={player.color}
-                    size={45}
-                    hideScan
-                  />
-                  <CustomText
-                    variant="body"
-                    numberOfLines={1}
-                    style={styles.pName}
-                  >
-                    {player.name}
-                  </CustomText>
-                </View>
-              </Cards>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        <TouchableOpacity
-          style={styles.nullBtn}
-          onPress={() => handleConfirmVote(null)}
-        >
-          <CustomText variant="label" style={{ color: COLORS.textSecondary }}>
-            ABSTER-SE / VOTO NULO
+        <View style={styles.voteContent}>
+          <CustomText variant="h3" style={styles.instruction}>
+            {t("games.impostor_voting_selectSuspect")}
           </CustomText>
-        </TouchableOpacity>
+          <View style={styles.grid}>
+            {suspects.map((player) => (
+              <TouchableOpacity
+                key={player.id}
+                style={styles.cardTouch}
+                onPress={() => setSelectedTarget(player)}
+              >
+                <View
+                  style={[
+                    styles.cardContainer,
+                    { borderTopColor: player.color, borderTopWidth: 2 }
+                  ]}
+                >
+                  <View style={styles.cardInner}>
+                    <PlayerAvatar
+                      emoji={player.emoji}
+                      color={player.color}
+                      size={45}
+                      borderRadius={25}
+                    />
+                    <CustomText
+                      variant="h3"
+                      numberOfLines={1}
+                      style={styles.pName}
+                    >
+                      {player.name}
+                    </CustomText>
+                  </View>
+                  <View style={styles.targetMark}>
+                    <CustomText style={styles.targetText}>
+                      [ {t("games.impostor_voting_selectBtn")} ]
+                    </CustomText>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <TouchableOpacity
+            style={styles.nullBtn}
+            onPress={() => handleConfirmVote(null)}
+          >
+            <CustomText variant="label" style={{ color: COLORS.textSecondary }}>
+              {t("games.impostor_voting_skipBtn")}
+            </CustomText>
+          </TouchableOpacity>
+        </View>
 
         <View style={styles.statusSection}>
           <CustomText variant="label" style={styles.statusTitle}>
-            STATUS DA TRIPULAÇÃO
+            {t("games.impostor_voting_crewMateStatus")}
           </CustomText>
           <View style={styles.dotsRow}>
             {alivePlayers.map((p) => (
@@ -143,7 +156,7 @@ export const VotingPhase = ({ data, voteEnded, currentVoteState }: Props) => {
             <Cards accentColor={COLORS.danger}>
               <View style={styles.modalInner}>
                 <CustomText variant="label" style={{ color: COLORS.danger }}>
-                  CONFIRMAÇÃO DE VOTO
+                  {t("games.impostor_voting_confirmVote")}
                 </CustomText>
                 <View style={styles.targetPreview}>
                   <PlayerAvatar
@@ -151,14 +164,18 @@ export const VotingPhase = ({ data, voteEnded, currentVoteState }: Props) => {
                     color={selectedTarget?.color || ""}
                     size={70}
                   />
-                  <CustomText variant="h2">{selectedTarget?.name}</CustomText>
+                  <CustomText variant="h2">
+                    {selectedTarget?.name.toUpperCase()}
+                  </CustomText>
                 </View>
                 <View style={styles.modalActions}>
                   <TouchableOpacity
                     style={styles.cancel}
                     onPress={() => setSelectedTarget(null)}
                   >
-                    <CustomText variant="label">VOLTAR</CustomText>
+                    <CustomText variant="label">
+                      {t("games.impostor_voting_back")}
+                    </CustomText>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.confirm}
@@ -168,7 +185,7 @@ export const VotingPhase = ({ data, voteEnded, currentVoteState }: Props) => {
                       variant="label"
                       style={{ color: COLORS.background }}
                     >
-                      CONFIRMAR
+                      {t("games.impostor_voting_confirm")}
                     </CustomText>
                   </TouchableOpacity>
                 </View>
@@ -182,14 +199,23 @@ export const VotingPhase = ({ data, voteEnded, currentVoteState }: Props) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.background },
-  scroll: { padding: 25, paddingBottom: 50 },
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+    justifyContent: "space-between"
+  },
+  scroll: {
+    paddingInline: 15,
+    paddingBottom: 40,
+    minHeight: "100%",
+    justifyContent: "space-between",
+    paddingTop: 140
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 20,
-    marginBottom: 30,
-    backgroundColor: "rgba(255,255,255,0.03)",
+    gap: 15,
+    backgroundColor: COLORS.surface,
     padding: 20,
     borderRadius: 20
   },
@@ -207,17 +233,48 @@ const styles = StyleSheet.create({
   },
   voterInfo: { flex: 1 },
   voterName: { color: COLORS.cyan, textTransform: "uppercase" },
-  instruction: { marginBottom: 20, textAlign: "center", letterSpacing: 1 },
+  instruction: {
+    marginBottom: 20,
+    textAlign: "center",
+    letterSpacing: 1,
+    color: COLORS.textSecondary
+  },
+  voteContent: {
+    paddingTop: 30,
+    gap: 12,
+    alignItems: "center",
+    justifyContent: "center"
+  },
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
     gap: 12
   },
-  cardTouch: { width: "48%", height: 130 },
+  cardContainer: {
+    flex: 1,
+    backgroundColor: COLORS.surface,
+    borderRadius: 15,
+    alignItems: "center",
+    justifyContent: "space-evenly"
+  },
+  cardTouch: { width: "48%", height: 150 },
   cardInner: { alignItems: "center", gap: 8 },
-  pName: { fontWeight: "bold", textTransform: "uppercase" },
+  targetMark: {
+    borderTopWidth: 1,
+    borderTopColor: "rgba(255,255,255,0.1)",
+    width: "80%",
+    alignItems: "center",
+    paddingTop: 5
+  },
+  targetText: { fontSize: 10, color: COLORS.textSecondary, letterSpacing: 1 },
+  pName: {
+    fontWeight: "bold",
+    textTransform: "uppercase",
+    color: COLORS.textPrimary
+  },
   nullBtn: {
+    width: "100%",
     marginTop: 25,
     padding: 15,
     alignItems: "center",

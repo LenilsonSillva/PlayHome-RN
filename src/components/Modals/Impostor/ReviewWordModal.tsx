@@ -10,6 +10,7 @@ import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
 import { Cards } from "@/components/Cards/Cards";
 import { ImpostorPlayer } from "@/games/impostor/types/game";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   player: ImpostorPlayer | null;
@@ -17,6 +18,7 @@ interface Props {
 }
 
 export const ReviewWordModal = ({ player, onClose }: Props) => {
+  const {t} = useTranslation();
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -34,7 +36,7 @@ export const ReviewWordModal = ({ player, onClose }: Props) => {
           <Cards accentColor={player.color}>
             <View style={styles.content}>
               <CustomText variant="label" style={{ color: player.color }}>
-                ACESSO PRIVADO: {player.name}
+                {t("games.impostor_discuss__modalReview_title")} {player.name}
               </CustomText>
 
               {!show ? (
@@ -43,17 +45,17 @@ export const ReviewWordModal = ({ player, onClose }: Props) => {
                   onPress={() => setShow(true)}
                 >
                   <CustomText variant="h3" style={{ color: COLORS.background }}>
-                    DESCRIPTOGRAFAR SINAL
+                    {t("games.impostor_discuss__modalReview_unlockBtn")}
                   </CustomText>
                 </TouchableOpacity>
               ) : (
                 <View style={styles.wordBox}>
-                  <CustomText variant="hint">{player.isImpostor ? "VOCÊ É O " : "SUA PALAVRA É: "}</CustomText>
+                  <CustomText variant="hint">{player.isImpostor ? t("games.impostor_discuss__modalReview_youAre") : t("games.impostor_discuss__modalReview_yourWord")}</CustomText>
                   <CustomText
                     variant="h1"
                     style={{ color: player.isImpostor ? COLORS.danger : player.color, fontSize: 38, textAlign: "center" }}
                   >
-                    {player.isImpostor ? "IMPOSTOR" : player.word}
+                    {player.isImpostor ? t("games.impostor_discuss_impostor") : player.word}
                   </CustomText>
                   {player.isImpostor && player.hint && (
                     <CustomText variant="hint" style={styles.hintText}>
@@ -64,7 +66,7 @@ export const ReviewWordModal = ({ player, onClose }: Props) => {
               )}
 
               <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
-                <CustomText variant="label">FECHAR TERMINAL</CustomText>
+                <CustomText variant="label">{t("games.impostor_discuss__modalReview_closeBtn")}</CustomText>
               </TouchableOpacity>
             </View>
           </Cards>

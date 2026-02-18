@@ -28,7 +28,7 @@ const textStyles: Record<TextVariant, TextStyle> = StyleSheet.create({
   h1: { fontSize: 36, fontWeight: '900', color: COLORS.textPrimary, letterSpacing: -1 },
   h2: { fontSize: 28, fontWeight: '800', color: COLORS.textPrimary },
   h3: { fontSize: 20, fontWeight: '700', color: COLORS.textPrimary },
-  body: { fontSize: 16, color: COLORS.textSecondary, lineHeight: 22 },
+  body: { fontSize: 16, color: COLORS.textSecondary },
   label: { fontSize: 12, fontWeight: '800', color: COLORS.cyan, textTransform: 'uppercase', letterSpacing: 2 },
   hint: { fontSize: 14, color: COLORS.amber, fontStyle: 'italic' }
 });

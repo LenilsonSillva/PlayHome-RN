@@ -1,16 +1,25 @@
 import React, { useState, useMemo } from "react";
-import { View, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Platform,
+  Text
+} from "react-native";
 import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
 import { Cards } from "@/components/Cards/Cards";
 import { ImpostorPlayer } from "@/games/impostor/types/game";
 import { PlayerAvatar } from "@/games/common/components/PlayerAvatar";
+import { LinearGradient } from "expo-linear-gradient";
+import { useTranslation } from "react-i18next";
 
 interface Props {
-  player: ImpostorPlayer | null; // Null se for empate
+  player: ImpostorPlayer | null;
   allPlayers: ImpostorPlayer[];
   votes: Record<string, string | null>;
-  wasVoting: boolean; // Identifica se veio da votação ou eliminação direta
+  wasVoting: boolean;
   onNext: () => void;
 }
 
@@ -21,28 +30,27 @@ export const EliminatedReport = ({
   wasVoting,
   onNext
 }: Props) => {
+  const {t} = useTranslation();
   const [showLogs, setShowLogs] = useState(false);
-
-  // Dados fictícios baseados no jogador
-  const roles = [
-    "Engenheiro de Dobra",
-    "Pesquisador Biológico",
-    "Piloto Estelar",
-    "Técnico de O2",
-    "Cientista de Dados"
-  ];
-  const playerRole = player
-    ? player.isImpostor
-      ? "IMPOSTOR"
-      : roles[player.name.length % roles.length]
-    : "";
   const date = new Date().toLocaleDateString();
   const time = new Date().toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit"
   });
 
-  // Cálculo das estatísticas do gráfico
+  const roles = [
+    t("games.impostor_eliminated_function1"),
+    t("games.impostor_eliminated_function2"),
+    t("games.impostor_eliminated_function3"),
+    t("games.impostor_eliminated_function4"),
+    t("games.impostor_eliminated_function5")
+  ];
+  const playerRole = player
+    ? player.isImpostor
+      ? t("games.impostor_eliminated_impostor")
+      : roles[player.name.length % roles.length]
+    : "";
+
   const voteStats = useMemo(() => {
     const stats: Record<string, number> = {};
     allPlayers.forEach((p) => (stats[p.id] = 0));
@@ -52,6 +60,7 @@ export const EliminatedReport = ({
     return stats;
   }, [votes, allPlayers]);
 
+  const totalVotes = Object.keys(votes).length || 1;
   const totalVotesNull = Object.values(votes).filter((v) => v === null).length;
 
   return (
@@ -60,7 +69,7 @@ export const EliminatedReport = ({
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* 1. SE HOUVER ELIMINADO: MOSTRA O CRACHÁ (BADGE) */}
+        <View style={{ height: 130 }} />
         {player ? (
           <View style={styles.badgeWrapper}>
             <Cards accentColor={player.color}>
@@ -85,7 +94,7 @@ export const EliminatedReport = ({
                 <View style={styles.infoSection}>
                   <View>
                     <CustomText variant="label" style={styles.smallLabel}>
-                      NOME
+                      {t("games.impostor_eliminated_name")}
                     </CustomText>
                     <CustomText variant="h3" numberOfLines={1}>
                       {player.name.toUpperCase()}
@@ -94,7 +103,7 @@ export const EliminatedReport = ({
 
                   <View>
                     <CustomText variant="label" style={styles.smallLabel}>
-                      FUNÇÃO
+                      {t("games.impostor_eliminated_function")}
                     </CustomText>
                     <CustomText
                       variant="body"
@@ -114,7 +123,7 @@ export const EliminatedReport = ({
 
                   <View>
                     <CustomText variant="label" style={styles.smallLabel}>
-                      REGISTRO / STATUS
+                      {t("games.impostor_eliminated_status")}
                     </CustomText>
                     <CustomText variant="body" style={styles.infoText}>
                       {date} | {time}
@@ -124,7 +133,7 @@ export const EliminatedReport = ({
               </View>
 
               <View style={styles.stamp}>
-                <CustomText style={styles.stampText}>ELIMINADO</CustomText>
+                <CustomText style={styles.stampText}>{t("games.impostor_eliminated_eliminated")}</CustomText>
               </View>
             </Cards>
           </View>
@@ -133,123 +142,129 @@ export const EliminatedReport = ({
           <View style={styles.tieWrapper}>
             <Cards accentColor={COLORS.cyan}>
               <View style={styles.tieContent}>
-                <CustomText style={{ fontSize: 50 }}>⚖️</CustomText>
+                <Text style={{ fontSize: 40 }}>⚖️</Text>
                 <CustomText variant="h2" style={styles.tieTitle}>
-                  EMPATE DETECTADO
+                  {t("games.impostor_eliminated_tie")}
                 </CustomText>
                 <CustomText variant="body" style={styles.tieSubtitle}>
-                  Nenhum tripulante foi ejetado. O sistema de votação não obteve
-                  maioria absoluta ou o host optou por pular.
+                  {t("games.impostor_eliminated_tieText")}
                 </CustomText>
               </View>
             </Cards>
           </View>
         )}
 
-        {/* 3. GRÁFICO DE VOTAÇÃO (Apenas se wasVoting for true) */}
         {wasVoting && (
-          <View style={styles.statsSection}>
-            <CustomText variant="label" style={styles.statsTitle}>
-              RESULTADO DA INTERCEPTAÇÃO
-            </CustomText>
-
-            {allPlayers.map((p) => {
-              const voteShare =
-                (voteStats[p.id] || 0) / (Object.keys(votes).length || 1);
-              return (
-                <View key={p.id} style={styles.graphRow}>
-                  <CustomText style={styles.graphName} numberOfLines={1}>
-                    {p.name}
-                  </CustomText>
-                  <View style={styles.barWrapper}>
-                    <View
-                      style={[
-                        styles.barFill,
-                        {
-                          width: `${voteShare * 100}%`,
-                          backgroundColor: p.color
-                        }
-                      ]}
-                    />
-                  </View>
-                  <CustomText style={styles.graphValue}>
-                    {voteStats[p.id]}
-                  </CustomText>
-                </View>
-              );
-            })}
-
-            <View
-              style={[
-                styles.graphRow,
-                {
-                  marginTop: 5,
-                  paddingTop: 10,
-                  borderTopWidth: 1,
-                  borderTopColor: "rgba(255,255,255,0.2)"
-                }
-              ]}
-            >
-              <CustomText style={styles.graphName} numberOfLines={1}>
-                NULO
-              </CustomText>
-              <View style={styles.barWrapper}>
-                <View
-                  style={[
-                    styles.barFill,
-                    {
-                      width: `${((totalVotesNull || 0) / (Object.keys(votes).length || 1)) * 100}%`,
-                      backgroundColor: "rgba(255,255,255,0.2)"
-                    }
-                  ]}
-                />
-              </View>
-              <CustomText style={styles.graphValue}>
-                {totalVotesNull || 0}
+          <View style={styles.statsHUD}>
+            <View style={styles.sectionHeader}>
+              <View style={styles.dot} />
+              <CustomText variant="label" style={styles.sectionTitle}>
+                {t("games.impostor_eliminated_chartTitle")}
               </CustomText>
             </View>
 
-            {/* 4. LOGS DO SISTEMA */}
+            <View style={styles.graphBox}>
+              {allPlayers.map((p) => {
+                const count = voteStats[p.id] || 0;
+                const width = (count / totalVotes) * 100;
+                return (
+                  <View key={p.id} style={styles.barRow}>
+                    <View style={styles.barInfo}>
+                      <CustomText style={styles.barName}>{p.name}</CustomText>
+                      <CustomText style={styles.barPercent}>
+                        {Math.round(width)}% {count === 0 ? null : count === 1 ? `(${count} ${t("games.impostor_eliminated_votes")})` : `(${count} ${t("games.impostor_eliminated_votes")}s)`}
+                      </CustomText>
+                    </View>
+                    <View style={styles.barTrack}>
+                      <LinearGradient
+                        start={{ x: 1, y: 0 }}
+                        end={{ x: -1, y: 0 }}
+                        colors={[p.color, "transparent"]}
+                        style={[styles.barFill, { width: `${width}%` }]}
+                      />
+                    </View>
+                  </View>
+                );
+              })}
+
+              <View style={[styles.barRow, styles.nullRow]}>
+                <View style={styles.barInfo}>
+                  <CustomText style={styles.nullName}>
+                    {t("games.impostor_eliminated_nullVotes")}
+                  </CustomText>
+                  <CustomText style={styles.barPercent}>
+                    {Math.round((totalVotesNull / totalVotes) * 100)}%
+                  </CustomText>
+                </View>
+                <View style={styles.barTrack}>
+                  <View
+                    style={[
+                      styles.barFill,
+                      {
+                        width: `${(totalVotesNull / totalVotes) * 100}%`,
+                        backgroundColor: "#475569"
+                      }
+                    ]}
+                  />
+                </View>
+              </View>
+            </View>
+
             <TouchableOpacity
-              style={styles.logToggle}
+              style={styles.terminalBtn}
               onPress={() => setShowLogs(!showLogs)}
             >
-              <CustomText variant="label" style={{ color: COLORS.cyan }}>
-                {showLogs ? "OCULTAR LOGS DE SISTEMA" : "VER LOGS DE SISTEMA"}
+              <CustomText variant="label" style={styles.terminalBtnText}>
+                {showLogs
+                  ? "[-] " + t("games.impostor_eliminated_closeLogsAccess")
+                  : "[+] " + t("games.impostor_eliminated_logsAccess")}
               </CustomText>
             </TouchableOpacity>
 
             {showLogs && (
-              <View style={styles.logsContainer}>
-                {Object.entries(votes).map(([voterId, votedId]) => {
-                  const voter = allPlayers.find((ap) => ap.id === voterId);
-                  const target = allPlayers.find((ap) => ap.id === votedId);
-                  return (
-                    <CustomText key={voterId} style={styles.logEntry}>
-                      {`> ${voter?.name || "??"} VOTOU EM ${target?.name || "NULO"}`}
-                    </CustomText>
-                  );
-                })}
+              <View style={styles.terminal}>
+                <ScrollView nestedScrollEnabled style={styles.terminalScroll}>
+                  {Object.entries(votes).map(([voterId, votedId], idx) => {
+                    const voter = allPlayers.find((ap) => ap.id === voterId);
+                    const target = allPlayers.find((ap) => ap.id === votedId);
+                    return (
+                      <CustomText key={voterId} style={styles.terminalLine}>
+                        <CustomText style={styles.terminalTime}>
+                          [{idx + 1}]:{" "}
+                        </CustomText>
+                        {t("games.impostor_eliminated_crew")+":"} {voter?.name.toUpperCase()} {"->"} {t("games.impostor_eliminated_target")+":"}{" "}
+                        {target?.name.toUpperCase() || t("games.impostor_eliminated_null")}
+                      </CustomText>
+                    );
+                  })}
+                  <CustomText style={styles.terminalEnd}>
+                    {t("games.impostor_eliminated_endTransmission")}
+                  </CustomText>
+                </ScrollView>
               </View>
             )}
           </View>
         )}
       </ScrollView>
-      <TouchableOpacity style={styles.nextBtn} onPress={onNext}>
-        <CustomText variant="h3" style={{ color: COLORS.background }}>
-          CONTINUAR MISSÃO
-        </CustomText>
-      </TouchableOpacity>
+
+      <View style={styles.footerNav}>
+        <TouchableOpacity
+          style={styles.nextBtn}
+          onPress={onNext}
+          activeOpacity={0.8}
+        >
+          <CustomText variant="h3" style={styles.nextBtnText}>
+            {t("games.impostor_eliminated_returnBtn")}
+          </CustomText>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
-  scrollContent: { paddingVertical: 25, alignItems: "center", flex: 1 },
-  header: { alignItems: "center", marginBottom: 30 },
-  headerLabel: { color: COLORS.danger, letterSpacing: 2 },
-  title: { color: "#FFF" },
+  scrollContent: { paddingBottom: 150, alignContent: "center", justifyContent: "center", minHeight: "100%" },
 
   // Estilos do Crachá
   badgeWrapper: { height: 280, width: "100%", maxWidth: 450, marginBottom: 40 },
@@ -283,7 +298,6 @@ const styles = StyleSheet.create({
     fontWeight: "900",
     marginTop: 2
   },
-
   // Estilos do Carimbo
   stamp: {
     position: "absolute",
@@ -303,7 +317,6 @@ const styles = StyleSheet.create({
     fontSize: 22,
     letterSpacing: 2
   },
-
   // Estilos de Empate
   tieWrapper: { height: 240, width: "100%", maxWidth: 450, marginBottom: 40 },
   tieContent: {
@@ -321,70 +334,101 @@ const styles = StyleSheet.create({
     lineHeight: 20
   },
 
-  // Estilos das Estatísticas (Gráfico)
-  statsSection: { width: "100%", maxWidth: 450, marginBottom: 40, padding: 20 },
-  statsTitle: { color: COLORS.cyan, marginBottom: 15, fontSize: 10 },
-  graphRow: {
+  // Stats HUD
+  statsHUD: { width: "100%", marginTop: 10, paddingHorizontal: 20 },
+  sectionHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 10,
-    gap: 10
+    gap: 10,
+    marginBottom: 20
   },
-  graphName: {
-    width: 80,
-    fontSize: 12,
+  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: COLORS.cyan },
+  sectionTitle: { color: COLORS.cyan, fontSize: 12 },
+
+  graphBox: {
+    backgroundColor: "rgba(255,255,255,0.02)",
+    padding: 20,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.05)"
+  },
+  barRow: { marginBottom: 18 },
+  barInfo: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 6,
+  },
+  barName: {
+    fontSize: 14,
+    fontWeight: "bold",
     color: COLORS.textSecondary,
-    fontWeight: "bold"
+    textTransform: "uppercase"
   },
-  barWrapper: {
-    flex: 1,
-    height: 8,
+  barPercent: { fontSize: 13, color: COLORS.cyan, fontFamily: "monospace" },
+  barTrack: {
+    height: 6,
     backgroundColor: "rgba(255,255,255,0.05)",
-    borderRadius: 4,
+    borderRadius: 3,
     overflow: "hidden"
   },
-  barFill: { height: "100%", borderRadius: 4 },
-  graphValue: {
-    width: 20,
-    textAlign: "right",
-    fontSize: 12,
-    color: "#FFF",
-    fontWeight: "bold"
-  },
+  barFill: { height: "100%", borderRadius: 3 },
 
-  // Logs
-  logToggle: {
-    marginTop: 20,
+  nullRow: { marginTop: 10, opacity: 0.6 },
+  nullName: { fontSize: 10, color: COLORS.textMuted },
+
+  // Terminal
+  terminalBtn: {
+    marginTop: 25,
     padding: 15,
     alignItems: "center",
     borderStyle: "dashed",
     borderWidth: 1,
-    borderColor: COLORS.textSecondary,
+    borderColor: "rgba(0, 242, 255, 0.3)",
     borderRadius: 12
   },
-  logsContainer: {
+  terminalBtnText: { color: COLORS.cyan, fontSize: 10 },
+  terminal: {
     marginTop: 15,
-    padding: 15,
     backgroundColor: "#000",
-    borderRadius: 10,
-    borderLeftWidth: 3,
-    borderLeftColor: COLORS.cyan
+    borderRadius: 12,
+    padding: 15,
+    borderLeftWidth: 4,
+    borderLeftColor: COLORS.cyan,
+    height: 200
   },
-  logEntry: {
+  terminalScroll: { flex: 1 },
+  terminalLine: {
     color: COLORS.success,
-    fontFamily: "monospace",
+    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
     fontSize: 11,
-    marginBottom: 5
+    marginBottom: 6
+  },
+  terminalTime: { opacity: 0.5 },
+  terminalEnd: {
+    color: COLORS.cyan,
+    fontSize: 9,
+    marginTop: 10,
+    textAlign: "center"
   },
 
-  // Botão de Próximo
+  // Footer Navigation
+  footerNav: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 20,
+    backgroundColor: COLORS.background
+  },
   nextBtn: {
     backgroundColor: COLORS.cyan,
-    padding: 20,
-    borderRadius: 15,
+    padding: 22,
+    borderRadius: 20,
     alignItems: "center",
-    maxWidth: 450,
-    marginBottom: 40,
-    marginInline: 20
-  }
+    shadowColor: COLORS.cyan,
+    shadowRadius: 15,
+    shadowOpacity: 0.3,
+    elevation: 10
+  },
+  nextBtnText: { color: COLORS.background, fontWeight: "900", letterSpacing: 2 }
 });

@@ -20,7 +20,7 @@ export function PlayerAvatar({
   borderRadius
 }: AvatarProps) {
   const width = size;
-  const height = size * 1.33;
+  const height = borderRadius !== undefined ? (borderRadius >= size/2 ? size : size * 1.33) : size * 1.33;
   const retroGreen = "#00ff41";
 
   // Controle da animação do scanner

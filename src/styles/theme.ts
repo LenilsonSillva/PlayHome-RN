@@ -39,6 +39,7 @@ export const COLORS = {
   black: '#000000',
   white: '#ffffff',
   transparent: 'transparent',
+  greenLight: '#08ff14'
 } as const;
 
 export const SPACING = {

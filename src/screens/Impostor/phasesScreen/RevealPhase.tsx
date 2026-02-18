@@ -27,6 +27,7 @@ import { CustomText } from "@/styles/customText";
 import { PlayerAvatar } from "@/games/common/components/PlayerAvatar";
 import { ImpostorGame, ImpostorPlayer } from "@/games/impostor/types/game";
 import { useTranslation } from "react-i18next";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 const { width } = Dimensions.get("window");
 // Math.floor para evitar erros de precisão aritmética no iOS
@@ -214,7 +215,7 @@ export const RevealPhase = ({
   const accentColor = player.isImpostor ? COLORS.danger : player.color;
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1, paddingTop: 140 }}>
       <View style={styles.container}>
         <View style={styles.cardArea}>
           <GestureDetector gesture={panGesture}>
@@ -292,7 +293,11 @@ export const RevealPhase = ({
                       <Animated.View
                         style={[styles.handIcon, handAnimatedStyle]}
                       >
-                        <Text style={{ fontSize: 50 }}>👆🏽</Text>
+                        <FontAwesome
+                          name="hand-pointer-o"
+                          size={50}
+                          color={player.color}
+                        />
                       </Animated.View>
                     </View>
                   </View>
@@ -339,7 +344,7 @@ export const RevealPhase = ({
 
                   {data.whoStart === player.name && (
                     <View style={styles.starterFlag}>
-                      <CustomText style={styles.starterText}>
+                      <CustomText variant="body" style={styles.starterText}>
                         ⚠️ {t("games.impostor_reveal_youStart")}
                       </CustomText>
                     </View>
@@ -367,11 +372,10 @@ export const RevealPhase = ({
               style={{
                 color: COLORS.white,
                 // Sombra com a cor do tema (ex: Ciano ou Vermelho)
-                textShadowColor: isFlipped
-                  ? player.color + "FF"
-                  : player.color,
-                textShadowOffset: { width: 0, height: 0 }, // Centralizada para brilhar ao redor
+                textShadowColor: isFlipped ? player.color + "FF" : player.color,
+                textShadowOffset: { width: 0, height: 1 }, // Centralizada para brilhar ao redor
                 shadowOpacity: 0.5,
+                textShadowRadius: 5,
                 fontWeight: "900" // Letras mais grossas destacam melhor o brilho
               }}
             >
@@ -430,7 +434,12 @@ const styles = StyleSheet.create({
   },
   bottomLabel: { alignItems: "center" },
   playerName: { color: COLORS.white, textTransform: "uppercase" },
-  swipeHint: { marginTop: 5, letterSpacing: 2, fontSize: 12, fontWeight: "900" },
+  swipeHint: {
+    marginTop: 5,
+    letterSpacing: 2,
+    fontSize: 12,
+    fontWeight: "900"
+  },
   handIcon: {
     position: "absolute",
     bottom: 20,
@@ -511,7 +520,7 @@ const styles = StyleSheet.create({
     color: COLORS.amber,
     fontWeight: "900",
     fontSize: 14,
-    fontStyle: "italic"
+    fontStyle: "italic",
   },
 
   footer: { padding: 30, paddingBottom: 50 },
