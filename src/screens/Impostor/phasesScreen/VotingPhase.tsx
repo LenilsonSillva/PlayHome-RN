@@ -1,156 +1,281 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Modal
+  Modal,
+  ActivityIndicator
 } from "react-native";
 import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
 import { PlayerAvatar } from "@/games/common/components/PlayerAvatar";
 import { Cards } from "@/components/Cards/Cards";
-import { ImpostorGame, ImpostorPlayer } from "@/games/impostor/types/game";
+import { ImpostorPlayer } from "@/games/impostor/types/game";
 import { CircularTimer } from "@/components/Timer/CircularTimer";
 import { useTranslation } from "react-i18next";
+import { PlayerStatusModal } from "./components/PlayerStatusModal";
 
 interface Props {
-  data: ImpostorGame;
-  voteEnded: (finalVotedMap: Record<string, string | null>) => void;
-  currentVoteState: (voterId: string, targetId: string | null) => void;
+  data: any;
+  isOnline?: boolean;
+  // --- Props Offline ---
+  currentVoteState?: (voterId: string, targetId: string | null) => void;
+  voteEnded?: (finalVotedMap: Record<string, string | null>) => void;
+  // --- Props Online ---
+  player?: ImpostorPlayer;
+  onCastVote?: (targetId: string | null) => void;
+  onVoteEnded?: () => void;
 }
 
-export const VotingPhase = ({ data, voteEnded, currentVoteState }: Props) => {
+export const VotingPhase = ({
+  data,
+  isOnline,
+  currentVoteState,
+  voteEnded,
+  player,
+  onCastVote,
+  onVoteEnded
+}: Props) => {
   const { t } = useTranslation();
-  const alivePlayers = data.players.filter((p) => p.isAlive);
+  const alivePlayers = data.players.filter((p: ImpostorPlayer) => p.isAlive);
+  const [statusModalVisible, setStatusModalVisible] = useState(false);
+
+  // ==========================================
+  // 1. ESTADOS LOCAIS
+  // ==========================================
   const [currentVoterIdx, setCurrentVoterIdx] = useState(0);
   const [timeLeft, setTimeLeft] = useState(60);
   const [selectedTarget, setSelectedTarget] = useState<ImpostorPlayer | null>(
     null
   );
-  const [votedMap, setVotedMap] = useState<Record<string, string | null>>({});
+  const [offlineVotesMap, setOfflineVotesMap] = useState<
+    Record<string, string | null>
+  >({});
 
-  const currentVoter = alivePlayers[currentVoterIdx];
-  const suspects = alivePlayers.filter((p) => p.id !== currentVoter.id);
+  // ==========================================
+  // 2. LÓGICA DE IDENTIFICAÇÃO (OFFLINE vs ONLINE)
+  // ==========================================
+  const currentVoter = isOnline
+    ? data.players.find((p: ImpostorPlayer) => p.id === player?.id) // Online: O Votante é sempre você
+    : alivePlayers[currentVoterIdx]; // Offline: O Votante é o índice atual
 
-  // Timer de 60 segundos
+  const suspects = alivePlayers.filter(
+    (p: ImpostorPlayer) => p.id !== currentVoter?.id
+  );
+
+  // Flags de Controle da Interface
+  const isDead = isOnline && (!currentVoter || !currentVoter.isAlive);
+  const hasVotedOnline = isOnline && currentVoter?.voted;
+  const isWaiting = isOnline && (hasVotedOnline || isDead); // Mostra o loading se já votou ou morreu
+  const showTimer = !isOnline || (!hasVotedOnline && !isDead); // when online only while eligible
+
+  // Função auxiliar para pintar as bolinhas de status
+  const hasPlayerVoted = (p: ImpostorPlayer) => {
+    return isOnline ? p.voted : offlineVotesMap[p.id] !== undefined;
+  };
+
+  // ==========================================
+  // 3. EFEITOS (TIMER E FIM DE VOTAÇÃO ONLINE)
+  // ==========================================
+
+  // Dispara o fim da votação online quando o servidor avisar
   useEffect(() => {
+    if (isOnline && data.votingFinished && onVoteEnded) {
+      onVoteEnded();
+    }
+  }, [isOnline, data.votingFinished, onVoteEnded]);
+
+  // Controle de Tempo
+  useEffect(() => {
+    if (data.votingFinished) return;
+    if (isWaiting) return; // não decrementa o tempo se já votou/morreu
+
     if (timeLeft <= 0) {
-      handleConfirmVote(null);
+      handleConfirmVote(null); // Auto-pula quem não votou a tempo
       return;
     }
     const timer = setInterval(() => setTimeLeft((t) => t - 1), 1000);
     return () => clearInterval(timer);
-  }, [timeLeft, currentVoterIdx]);
+  }, [timeLeft, data.votingFinished, isWaiting]);
 
-  // Quando um voto é confirmado, atualiza o estado, passa o voto para o hook no componente pai e passa para o próximo votante ou encerra a votação
+  // ==========================================
+  // 4. REGISTRO DE VOTOS (O CORAÇÃO DO COMPONENTE)
+  // ==========================================
   const handleConfirmVote = (targetId: string | null) => {
-    const updatedMap = { ...votedMap, [currentVoter.id]: targetId };
-    setVotedMap(updatedMap);
-    currentVoteState(currentVoter.id, targetId);
-    setSelectedTarget(null);
+    setSelectedTarget(null); // Fecha o modal sempre
 
-    if (currentVoterIdx < alivePlayers.length - 1) {
-      setCurrentVoterIdx((prev) => prev + 1);
-      setTimeLeft(60);
+    if (isOnline) {
+      // FLUXO ONLINE: Apenas envia pro backend e deixa ele resolver
+      if (onCastVote) onCastVote(targetId);
     } else {
-      voteEnded(updatedMap);
+      // FLUXO OFFLINE: Registra localmente e avança o jogador
+      const updatedMap = { ...offlineVotesMap, [currentVoter.id]: targetId };
+      setOfflineVotesMap(updatedMap);
+
+      if (currentVoteState) currentVoteState(currentVoter.id, targetId);
+
+      if (currentVoterIdx < alivePlayers.length - 1) {
+        // Passa o celular para o próximo
+        setCurrentVoterIdx((prev) => prev + 1);
+        setTimeLeft(60);
+      } else {
+        // Todo mundo votou, encerra o modo offline
+        if (voteEnded) voteEnded(updatedMap);
+      }
     }
   };
 
+  // ==========================================
+  // 5. RENDERIZAÇÃO (PURA E SEM LÓGICA PESADA)
+  // ==========================================
   return (
     <View style={styles.container}>
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
+        {/* CABEÇALHO COM TIMER E QUEM ESTÁ VOTANDO */}
         <View style={styles.header}>
-          <CircularTimer timeLeft={timeLeft} totalTime={60} />
+          <View style={styles.voteTimerHeader}>
+            {showTimer ? (
+              <CircularTimer timeLeft={timeLeft} totalTime={60} />
+            ) : isOnline && hasVotedOnline ? (
+              <CustomText style={styles.timerIcon}>✅</CustomText>
+            ) : isOnline && isDead ? (
+              <CustomText style={styles.timerIcon}>⏳</CustomText>
+            ) : (
+              <CircularTimer timeLeft={timeLeft} totalTime={60} />
+            )}
+          </View>
           <View style={styles.voterInfo}>
             <CustomText variant="label" style={{ color: COLORS.textSecondary }}>
-              {t("games.impostor_voting_titleVotingNow")}
+              {isDead
+                ? t("games.impostor_voting_spectating", "ASSISTINDO")
+                : t("games.impostor_voting_titleVotingNow")}
             </CustomText>
             <CustomText variant="h2" style={styles.voterName}>
-              {currentVoter.name}
+              {currentVoter?.name || "ESPECTADOR"}
             </CustomText>
           </View>
           <PlayerAvatar
-            emoji={currentVoter.emoji}
-            color={currentVoter.color}
+            emoji={currentVoter?.emoji || "👻"}
+            color={currentVoter?.color || COLORS.textSecondary}
             size={50}
           />
         </View>
 
+        {/* ÁREA CENTRAL: CARDS OU LOADING */}
         <View style={styles.voteContent}>
-          <CustomText variant="h3" style={styles.instruction}>
-            {t("games.impostor_voting_selectSuspect")}
-          </CustomText>
-          <View style={styles.grid}>
-            {suspects.map((player) => (
-              <TouchableOpacity
-                key={player.id}
-                style={styles.cardTouch}
-                onPress={() => setSelectedTarget(player)}
+          {isWaiting ? (
+            <View
+              style={{ alignItems: "center", paddingVertical: 40, gap: 20 }}
+            >
+              <ActivityIndicator size="large" color={COLORS.cyan} />
+              <CustomText
+                variant="h3"
+                style={{ textAlign: "center", color: COLORS.textPrimary }}
               >
-                <View
-                  style={[
-                    styles.cardContainer,
-                    { borderTopColor: player.color, borderTopWidth: 2 }
-                  ]}
-                >
-                  <View style={styles.cardInner}>
-                    <PlayerAvatar
-                      emoji={player.emoji}
-                      color={player.color}
-                      size={45}
-                      borderRadius={25}
-                    />
-                    <CustomText
-                      variant="h3"
-                      numberOfLines={1}
-                      style={styles.pName}
+                {isDead ? "VOCÊ FOI ELIMINADO" : "VOTO REGISTRADO"}
+              </CustomText>
+              <CustomText
+                variant="label"
+                style={{ color: COLORS.textSecondary, textAlign: "center" }}
+              >
+                {t(
+                  "games.impostor_voting_waitingOthers",
+                  "Aguardando os outros jogadores votarem..."
+                )}
+              </CustomText>
+            </View>
+          ) : (
+            <>
+              <CustomText variant="h3" style={styles.instruction}>
+                {t("games.impostor_voting_selectSuspect")}
+              </CustomText>
+
+              <View style={styles.grid}>
+                {suspects.map((suspect: ImpostorPlayer) => (
+                  <TouchableOpacity
+                    key={suspect.id}
+                    style={styles.cardTouch}
+                    onPress={() => setSelectedTarget(suspect)}
+                  >
+                    <View
+                      style={[
+                        styles.cardContainer,
+                        { borderTopColor: suspect.color, borderTopWidth: 2 }
+                      ]}
                     >
-                      {player.name}
-                    </CustomText>
-                  </View>
-                  <View style={styles.targetMark}>
-                    <CustomText style={styles.targetText}>
-                      [ {t("games.impostor_voting_selectBtn")} ]
-                    </CustomText>
-                  </View>
-                </View>
+                      <View style={styles.cardInner}>
+                        <PlayerAvatar
+                          emoji={suspect.emoji}
+                          color={suspect.color}
+                          size={45}
+                          borderRadius={25}
+                        />
+                        <CustomText
+                          variant="h3"
+                          numberOfLines={1}
+                          style={styles.pName}
+                        >
+                          {suspect.name}
+                        </CustomText>
+                      </View>
+                      <View style={styles.targetMark}>
+                        <CustomText style={styles.targetText}>
+                          [ {t("games.impostor_voting_selectBtn")} ]
+                        </CustomText>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <TouchableOpacity
+                style={styles.nullBtn}
+                onPress={() => handleConfirmVote(null)}
+              >
+                <CustomText
+                  variant="label"
+                  style={{ color: COLORS.textSecondary }}
+                >
+                  {t("games.impostor_voting_skipBtn", "VOTO NULO / PULAR")}
+                </CustomText>
               </TouchableOpacity>
-            ))}
-          </View>
-          <TouchableOpacity
-            style={styles.nullBtn}
-            onPress={() => handleConfirmVote(null)}
-          >
-            <CustomText variant="label" style={{ color: COLORS.textSecondary }}>
-              {t("games.impostor_voting_skipBtn")}
-            </CustomText>
-          </TouchableOpacity>
+            </>
+          )}
         </View>
 
-        <View style={styles.statusSection}>
+        {/* RODAPÉ: STATUS DA TRIPULAÇÃO */}
+        <TouchableOpacity
+          disabled={!isOnline}
+          activeOpacity={0.8}
+          style={styles.statusSection}
+          onPress={() => setStatusModalVisible(true)}
+        >
           <CustomText variant="label" style={styles.statusTitle}>
-            {t("games.impostor_voting_crewMateStatus")}
+            {t("games.impostor_voting_crewMateStatus", "STATUS DA TRIPULAÇÃO")}
           </CustomText>
           <View style={styles.dotsRow}>
-            {alivePlayers.map((p) => (
+            {alivePlayers.map((p: ImpostorPlayer) => (
               <View
                 key={p.id}
-                style={[
-                  styles.dot,
-                  votedMap[p.id] !== undefined && styles.dotActive
-                ]}
+                style={[styles.dot, hasPlayerVoted(p) && styles.dotActive]}
               />
             ))}
           </View>
-        </View>
+        </TouchableOpacity>
+        <PlayerStatusModal
+          visible={statusModalVisible}
+          onClose={() => setStatusModalVisible(false)}
+          players={data.players}
+          statusType="voted"
+        />
       </ScrollView>
 
-      <Modal visible={!!selectedTarget} transparent animationType="slide">
+      {/* MODAL DE CONFIRMAÇÃO */}
+      <Modal visible={!!selectedTarget} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalBox}>
             <Cards accentColor={COLORS.danger}>
@@ -174,7 +299,7 @@ export const VotingPhase = ({ data, voteEnded, currentVoteState }: Props) => {
                     onPress={() => setSelectedTarget(null)}
                   >
                     <CustomText variant="label">
-                      {t("games.impostor_voting_back")}
+                      {t("games.impostor_voting_back", "VOLTAR")}
                     </CustomText>
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -185,7 +310,7 @@ export const VotingPhase = ({ data, voteEnded, currentVoteState }: Props) => {
                       variant="label"
                       style={{ color: COLORS.background }}
                     >
-                      {t("games.impostor_voting_confirm")}
+                      {t("games.impostor_voting_confirm", "CONFIRMAR VOTO")}
                     </CustomText>
                   </TouchableOpacity>
                 </View>
@@ -198,6 +323,7 @@ export const VotingPhase = ({ data, voteEnded, currentVoteState }: Props) => {
   );
 };
 
+// ... Mantenha exatamente os mesmos styles do seu arquivo original abaixo ...
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -230,6 +356,16 @@ const styles = StyleSheet.create({
     shadowColor: COLORS.cyan,
     shadowRadius: 10,
     shadowOpacity: 0.5
+  },
+  timerIcon: {
+    fontSize: 50,
+    textAlign: "center"
+  },
+  voteTimerHeader: {
+    alignItems: "center",
+    justifyContent: "center",
+    height: 80,
+    width: 80
   },
   voterInfo: { flex: 1 },
   voterName: { color: COLORS.cyan, textTransform: "uppercase" },

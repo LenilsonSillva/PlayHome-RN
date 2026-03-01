@@ -4,9 +4,10 @@ import { GlobalPlayer } from '@/games/common/types/player';
 
 interface PlayersContextData {
   players: GlobalPlayer[];
-  addPlayer: (name: string) => void;
+  addPlayer: (name: string, emoji: string) => void; 
   removePlayer: (id: string) => void;
   clearPlayers: () => void;
+  updatePlayer: (id: string, data: Partial<GlobalPlayer>) => void;
   loading: boolean;
 }
 
@@ -36,7 +37,7 @@ export const PlayersProvider: React.FC<{ children: React.ReactNode }> = ({ child
     saveData();
   }, [players]);
 
-  const addPlayer = useCallback((name: string) => {
+  const addPlayer = useCallback((name: string, emoji: string) => {
     const trimmedName = name.trim();
     if (!trimmedName) return;
 
@@ -54,10 +55,17 @@ export const PlayersProvider: React.FC<{ children: React.ReactNode }> = ({ child
       // Gerador de ID seguro para Mobile
       id: Math.random().toString(36).substring(2, 9) + Date.now().toString(36),
       name: trimmedName,
+      emoji: emoji,
     };
 
     setPlayers((prev) => [...prev, newPlayer]);
   }, [players]);
+
+    const updatePlayer = useCallback((id: string, data: Partial<GlobalPlayer>) => {
+    setPlayers((prev) => 
+      prev.map((player) => (player.id === id ? { ...player, ...data } : player))
+    );
+  }, []);
 
   const removePlayer = useCallback((id: string) => {
     setPlayers((prev) => prev.filter((player) => player.id !== id));
@@ -68,7 +76,7 @@ export const PlayersProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, []);
 
   return (
-    <PlayersContext.Provider value={{ players, addPlayer, removePlayer, clearPlayers, loading }}>
+    <PlayersContext.Provider value={{ players, addPlayer, removePlayer, clearPlayers, loading, updatePlayer }}>
       {children}
     </PlayersContext.Provider>
   );

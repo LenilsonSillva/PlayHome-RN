@@ -170,7 +170,7 @@ export default function HomeScreen() {
         />
       </View>
 
-      <SettingsModal visible={openModal} onClose={() => setOpenModal(false)} />
+      <SettingsModal visible={openModal} onClose={() => setOpenModal(false)} onToggleReview={()=>{}} reviewEnabled/>
 
       {/* INDICADORES ANIMADOS */}
       <View style={styles.footer}>

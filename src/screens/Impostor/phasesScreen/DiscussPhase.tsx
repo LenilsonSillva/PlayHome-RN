@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  useWindowDimensions
+} from "react-native";
 import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
 import { ImpostorGame, ImpostorPlayer } from "@/games/impostor/types/game";
@@ -11,10 +17,12 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 interface DiscussPhaseProps {
   data: ImpostorGame;
   onNextVotingBtn: () => void;
-  onNextEliminationBtn: () => void;
+  onNextEliminationBtn?: () => void;
   reviewEnabled: boolean; // Permite revisar palavras durante a discussão
   onPlayerPress: (player: ImpostorPlayer) => void; // Função para lidar com clique no jogador
   playerHasSeenWord: string[]; // Lista de IDs dos jogadores que já viram suas palavras
+  isOnline?: boolean;
+  onlinePlayer?: ImpostorPlayer;
 }
 
 export const DiscussPhase = ({
@@ -23,9 +31,13 @@ export const DiscussPhase = ({
   onNextEliminationBtn,
   reviewEnabled,
   onPlayerPress,
-  playerHasSeenWord
+  playerHasSeenWord,
+  isOnline,
+  onlinePlayer
 }: DiscussPhaseProps) => {
   const { t } = useTranslation();
+  const { width } = useWindowDimensions();
+  const isLargeScreen = width > 600;
   const [elapsedTime, setElapsedTime] = useState(0);
 
   // Cronômetro da discussão
@@ -104,7 +116,11 @@ export const DiscussPhase = ({
                   {t("games.impostor_discuss_whoStart")}
                 </CustomText>
                 <CustomText variant="h2" style={styles.starterName}>
-                  {data.whoStart}
+                  {!isOnline
+                    ? data.whoStart
+                    : data.whoStart === onlinePlayer?.name
+                      ? "VOCÊ"
+                      : data.whoStart}
                 </CustomText>
               </View>
               <View style={styles.starterAvatarWrapper}>
@@ -130,88 +146,131 @@ export const DiscussPhase = ({
             {t("games.impostor_discuss_monitorTitle")}
           </CustomText>
 
-          {data.players.map((player) => (
-            <TouchableOpacity
-              key={player.id}
-              disabled={
-                !reviewEnabled ||
-                !player.isAlive ||
-                playerHasSeenWord.includes(player.id)
-              } // Desabilita se a revisão não estiver ativa, se o jogador estiver morto ou se já tiver visto a palavra
-              onPress={() => onPlayerPress(player)}
-              style={[styles.playerRow, !player.isAlive && styles.playerDead]}
-            >
-              <View style={styles.playerMainInfo}>
-                <PlayerAvatar
-                  emoji={player.emoji}
-                  color={player.isAlive ? player.color : COLORS.textSecondary}
-                  size={35}
-                  hideScan={true}
-                />
-                <View style={styles.nameBox}>
-                  <CustomText variant="h3" style={styles.pName}>
-                    {player.name}
+          <View style={styles.crewGrid}>
+            {data.players.map((player) => (
+              <TouchableOpacity
+                key={player.id}
+                disabled={
+                  !reviewEnabled ||
+                  !player.isAlive ||
+                  playerHasSeenWord.includes(player.id) ||
+                  (isOnline && !(onlinePlayer?.id === player.id))
+                } // Desabilita se a revisão não estiver ativa, se o jogador estiver morto ou se já tiver visto a palavra
+                onPress={
+                  !isOnline
+                    ? () => onPlayerPress(player)
+                    : onlinePlayer?.id === player.id
+                      ? () => onPlayerPress(player)
+                      : undefined
+                }
+                style={[
+                  styles.playerRow,
+                  { width: isLargeScreen ? "48.5%" : "100%" },
+                  ,
+                  !player.isAlive && styles.playerDead
+                ]}
+              >
+                <View style={styles.playerMainInfo}>
+                  <PlayerAvatar
+                    emoji={player.emoji}
+                    color={player.isAlive ? player.color : COLORS.textSecondary}
+                    size={35}
+                    hideScan={true}
+                  />
+                  <View style={styles.nameBox}>
+                    <CustomText variant="h3" style={styles.pName}>
+                      {!isOnline
+                        ? player.name
+                        : onlinePlayer?.id === player.id
+                          ? "VOCÊ"
+                          : player.name}
+                    </CustomText>
+                    <CustomText variant="hint" style={styles.pStatus}>
+                      {player.isAlive
+                        ? t("games.impostor_discuss_isAlive")
+                        : t("games.impostor_discuss_notAlive")}
+                    </CustomText>
+                  </View>
+                </View>
+
+                <View style={{ marginRight: 15 }}>
+                  {reviewEnabled && player.isAlive ? (
+                    !isOnline ? (
+                      playerHasSeenWord.includes(player.id) ? (
+                        <FontAwesome
+                          name="eye-slash"
+                          size={20}
+                          color={COLORS.textSecondary}
+                        />
+                      ) : (
+                        <FontAwesome name="eye" size={20} color={COLORS.cyan} />
+                      )
+                    ) : onlinePlayer?.id === player.id ? (
+                      playerHasSeenWord.includes(player.id) ? (
+                        <FontAwesome
+                          name="eye-slash"
+                          size={20}
+                          color={COLORS.textSecondary}
+                        />
+                      ) : (
+                        <FontAwesome name="eye" size={20} color={COLORS.cyan} />
+                      )
+                    ) : null
+                  ) : null}
+                </View>
+
+                <View style={styles.playerScoreBox}>
+                  <CustomText variant="label" style={styles.scoreLabel}>
+                    {t("games.impostor_discuss_score")}
                   </CustomText>
-                  <CustomText variant="hint" style={styles.pStatus}>
-                    {player.isAlive
-                      ? t("games.impostor_discuss_isAlive")
-                      : t("games.impostor_discuss_notAlive")}
+                  <CustomText variant="h3" style={styles.scoreValue}>
+                    {/* Mostra o score da rodada passada */}
+                    {player.score}
                   </CustomText>
                 </View>
-              </View>
-
-              <View style={{ marginRight: 15 }}>
-                {reviewEnabled && player.isAlive ? (
-                  playerHasSeenWord.includes(player.id) ? (
-                    <FontAwesome
-                      name="eye-slash"
-                      size={20}
-                      color={COLORS.textSecondary}
-                    />
-                  ) : (
-                    <FontAwesome name="eye" size={20} color={COLORS.cyan} />
-                  )
-                ) : null}
-              </View>
-
-              <View style={styles.playerScoreBox}>
-                <CustomText variant="label" style={styles.scoreLabel}>
-                  {t("games.impostor_discuss_score")}
-                </CustomText>
-                <CustomText variant="h3" style={styles.scoreValue}>
-                  {/* Mostra o score da rodada passada */}
-                  {player.score}
-                </CustomText>
-              </View>
-            </TouchableOpacity>
-          ))}
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
 
         {/* 7. BOTÕES DE AÇÃO */}
         <View style={styles.actionFooter}>
-          <TouchableOpacity
-            style={styles.primaryBtn}
-            onPress={onNextVotingBtn}
-            activeOpacity={0.8}
-          >
-            <LinearGradient
-              colors={[COLORS.danger, "#7f1d1d"]}
-              style={styles.btnGradient}
+          {!isOnline || (isOnline && onlinePlayer?.isHost) ? (
+            <TouchableOpacity
+              style={styles.primaryBtn}
+              onPress={onNextVotingBtn}
+              activeOpacity={0.8}
             >
-              <CustomText variant="h3" style={styles.btnText}>
-                {t("games.impostor_discuss_startVote")}
+              <LinearGradient
+                colors={[COLORS.danger, "#7f1d1d"]}
+                style={styles.btnGradient}
+              >
+                <CustomText variant="h3" style={styles.btnText}>
+                  {t("games.impostor_discuss_startVote")}
+                </CustomText>
+              </LinearGradient>
+            </TouchableOpacity>
+          ) : (
+            <View style={styles.waitView}>
+              <CustomText variant="h3" style={styles.waitText}>
+                ⏳
               </CustomText>
-            </LinearGradient>
-          </TouchableOpacity>
+              <CustomText variant="label" style={styles.waitText}>
+                Aguarde o comandante da missão Iniciar a votação.
+              </CustomText>
+            </View>
+          )}
 
-          <TouchableOpacity
-            style={styles.secondaryBtn}
-            onPress={onNextEliminationBtn}
-          >
-            <CustomText variant="label" style={styles.secondaryBtnText}>
-              {t("games.impostor_discuss_eliminate")}
-            </CustomText>
-          </TouchableOpacity>
+          {!isOnline && (
+            <TouchableOpacity
+              style={styles.secondaryBtn}
+              onPress={onNextEliminationBtn}
+            >
+              <CustomText variant="label" style={styles.secondaryBtnText}>
+                {t("games.impostor_discuss_eliminate")}
+              </CustomText>
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
     </View>
@@ -278,6 +337,11 @@ const styles = StyleSheet.create({
   },
   starterAvatarWrapper: {
     marginTop: -10 // Compensa o margin interno do PlayerAvatar
+  },
+  crewGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between"
   },
   crewSection: {
     marginBottom: 30
@@ -355,6 +419,13 @@ const styles = StyleSheet.create({
   secondaryBtnText: {
     color: COLORS.textSecondary,
     fontSize: 12,
-    textDecorationLine: "underline",
+    textDecorationLine: "underline"
+  },
+  waitView: {
+    gap: 5,
+    paddingInline: 20
+  },
+  waitText: {
+    textAlign: "center"
   }
 });

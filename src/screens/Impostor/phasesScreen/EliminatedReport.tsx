@@ -5,22 +5,29 @@ import {
   TouchableOpacity,
   ScrollView,
   Platform,
-  Text
+  Text,
+  ActivityIndicator
 } from "react-native";
 import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
 import { Cards } from "@/components/Cards/Cards";
-import { ImpostorPlayer } from "@/games/impostor/types/game";
+import {
+  ImpostorPlayer,
+  OnlineImpostorGame
+} from "@/games/impostor/types/game";
 import { PlayerAvatar } from "@/games/common/components/PlayerAvatar";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
+import { useAlert } from "@/contexts/alertContext";
 
 interface Props {
   player: ImpostorPlayer | null;
   allPlayers: ImpostorPlayer[];
   votes: Record<string, string | null>;
   wasVoting: boolean;
-  onNext: () => void;
+  onNext: () => void | Promise<void>;
+  isOnline?: boolean;
+  onlinePlayer?: OnlineImpostorGame;
 }
 
 export const EliminatedReport = ({
@@ -28,15 +35,34 @@ export const EliminatedReport = ({
   allPlayers,
   votes,
   wasVoting,
-  onNext
+  onNext,
+  isOnline,
+  onlinePlayer
 }: Props) => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const [showLogs, setShowLogs] = useState(false);
   const date = new Date().toLocaleDateString();
   const time = new Date().toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit"
   });
+  const { showAlert } = useAlert();
+  const [isWaiting, setIsWaiting] = useState(false);
+
+  const handleReturnCommand = async () => {
+    setIsWaiting(true);
+    try {
+      // Aguarda se for Promise, senão executa normalmente
+      const result = onNext();
+      if (result instanceof Promise) {
+        await result;
+      }
+      // Quando chega aqui, o backend respondeu (ou offline terminou) e a tela deve mudar
+    } catch (error) {
+      setIsWaiting(false);
+      showAlert("Erro", error as string);
+    }
+  };
 
   const roles = [
     t("games.impostor_eliminated_function1"),
@@ -46,9 +72,9 @@ export const EliminatedReport = ({
     t("games.impostor_eliminated_function5")
   ];
   const playerRole = player
-    ? player.isImpostor
+    ? player?.isImpostor
       ? t("games.impostor_eliminated_impostor")
-      : roles[player.name.length % roles.length]
+      : roles[player?.name.length % roles.length]
     : "";
 
   const voteStats = useMemo(() => {
@@ -67,7 +93,10 @@ export const EliminatedReport = ({
     <View style={styles.container}>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingBottom: isOnline ? (onlinePlayer?.isHost ? 130 : 30) : 130 }
+        ]}
       >
         <View style={{ height: 130 }} />
         {player ? (
@@ -133,7 +162,9 @@ export const EliminatedReport = ({
               </View>
 
               <View style={styles.stamp}>
-                <CustomText style={styles.stampText}>{t("games.impostor_eliminated_eliminated")}</CustomText>
+                <CustomText style={styles.stampText}>
+                  {t("games.impostor_eliminated_eliminated")}
+                </CustomText>
               </View>
             </Cards>
           </View>
@@ -172,14 +203,19 @@ export const EliminatedReport = ({
                     <View style={styles.barInfo}>
                       <CustomText style={styles.barName}>{p.name}</CustomText>
                       <CustomText style={styles.barPercent}>
-                        {Math.round(width)}% {count === 0 ? null : count === 1 ? `(${count} ${t("games.impostor_eliminated_votes")})` : `(${count} ${t("games.impostor_eliminated_votes")}s)`}
+                        {Math.round(width)}%{" "}
+                        {count === 0
+                          ? null
+                          : count === 1
+                            ? `(${count} ${t("games.impostor_eliminated_votes")})`
+                            : `(${count} ${t("games.impostor_eliminated_votes")}s)`}
                       </CustomText>
                     </View>
                     <View style={styles.barTrack}>
                       <LinearGradient
                         start={{ x: 1, y: 0 }}
                         end={{ x: -1, y: 0 }}
-                        colors={[p.color, "transparent"]}
+                        colors={[p.color || COLORS.cyan, "transparent"]}
                         style={[styles.barFill, { width: `${width}%` }]}
                       />
                     </View>
@@ -232,8 +268,11 @@ export const EliminatedReport = ({
                         <CustomText style={styles.terminalTime}>
                           [{idx + 1}]:{" "}
                         </CustomText>
-                        {t("games.impostor_eliminated_crew")+":"} {voter?.name.toUpperCase()} {"->"} {t("games.impostor_eliminated_target")+":"}{" "}
-                        {target?.name.toUpperCase() || t("games.impostor_eliminated_null")}
+                        {t("games.impostor_eliminated_crew") + ":"}{" "}
+                        {voter?.name.toUpperCase()} {"->"}{" "}
+                        {t("games.impostor_eliminated_target") + ":"}{" "}
+                        {target?.name.toUpperCase() ||
+                          t("games.impostor_eliminated_null")}
                       </CustomText>
                     );
                   })}
@@ -245,29 +284,58 @@ export const EliminatedReport = ({
             )}
           </View>
         )}
+        {isOnline
+          ? !onlinePlayer?.isHost && (
+              <View style={styles.footerNavNotHost}>
+                <CustomText variant="h2">⏳</CustomText>
+                <CustomText variant="label" style={styles.textFooterWaitHost}>
+                  Aguarde o Host para prosseguir
+                </CustomText>
+              </View>
+            )
+          : null}
       </ScrollView>
 
-      <View style={styles.footerNav}>
-        <TouchableOpacity
-          style={styles.nextBtn}
-          onPress={onNext}
-          activeOpacity={0.8}
-        >
-          <CustomText variant="h3" style={styles.nextBtnText}>
-            {t("games.impostor_eliminated_returnBtn")}
-          </CustomText>
-        </TouchableOpacity>
-      </View>
+      {(!isOnline || (isOnline && onlinePlayer?.isHost)) && (
+        <View style={styles.footerNav}>
+          <TouchableOpacity
+            style={styles.nextBtn}
+            onPress={isOnline ? handleReturnCommand : onNext}
+            disabled={isWaiting}
+            activeOpacity={0.8}
+          >
+            {isWaiting ? (
+              <ActivityIndicator size="large" color={COLORS.background} />
+            ) : (
+              <CustomText variant="h3" style={styles.nextBtnText}>
+                {t("games.impostor_eliminated_returnBtn")}
+              </CustomText>
+            )}
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
-  scrollContent: { paddingBottom: 150, alignContent: "center", justifyContent: "center", minHeight: "100%" },
+  scrollContent: {
+    alignContent: "center",
+    justifyContent: "center",
+    minHeight: "100%",
+    width: "100%"
+  },
 
   // Estilos do Crachá
-  badgeWrapper: { height: 280, width: "100%", maxWidth: 450, marginBottom: 40 },
+  badgeWrapper: {
+    height: 280,
+    width: "100%",
+    maxWidth: 450,
+    marginBottom: 40,
+    alignContent: "center",
+    justifyContent: "center"
+  },
   badgeHeader: {
     padding: 10,
     borderBottomWidth: 1,
@@ -356,7 +424,7 @@ const styles = StyleSheet.create({
   barInfo: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 6,
+    marginBottom: 6
   },
   barName: {
     fontSize: 14,
@@ -430,5 +498,20 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     elevation: 10
   },
-  nextBtnText: { color: COLORS.background, fontWeight: "900", letterSpacing: 2 }
+  nextBtnText: {
+    color: COLORS.background,
+    fontWeight: "900",
+    letterSpacing: 2
+  },
+  footerNavNotHost: {
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingInline: 20,
+    paddingTop: 30,
+    gap: 10
+  },
+  textFooterWaitHost: {
+    textAlign: "center"
+  }
 });

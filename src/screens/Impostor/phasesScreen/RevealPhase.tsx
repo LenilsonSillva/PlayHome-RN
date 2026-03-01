@@ -4,7 +4,8 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
-  Text
+  Text,
+  ActivityIndicator
 } from "react-native";
 import {
   Gesture,
@@ -25,9 +26,15 @@ import Svg, { Path } from "react-native-svg";
 import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
 import { PlayerAvatar } from "@/games/common/components/PlayerAvatar";
-import { ImpostorGame, ImpostorPlayer } from "@/games/impostor/types/game";
+import {
+  ImpostorGame,
+  ImpostorPlayer,
+  OnlineImpostorGame
+} from "@/games/impostor/types/game";
 import { useTranslation } from "react-i18next";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { PlayerStatusModal } from "./components/PlayerStatusModal";
+import { useAlert } from "@/contexts/alertContext";
 
 const { width } = Dimensions.get("window");
 // Math.floor para evitar erros de precisão aritmética no iOS
@@ -36,18 +43,22 @@ const CARD_HEIGHT = 480;
 
 interface RevealPhaseProps {
   player: ImpostorPlayer;
-  data: ImpostorGame;
-  onNext: () => void;
-  isLast: boolean;
-  revealedAfterReroll: boolean;
+  data: ImpostorGame | OnlineImpostorGame;
+  isOnline?: boolean;
+  onNext: () => void | Promise<any>;
+  isLast?: boolean;
+  revealedAfterReroll?: boolean;
+  onPlayerReady?: () => void | Promise<any>;
 }
 
 export const RevealPhase = ({
   player,
   data,
+  isOnline,
   onNext,
   isLast,
-  revealedAfterReroll
+  revealedAfterReroll,
+  onPlayerReady
 }: RevealPhaseProps) => {
   const { t } = useTranslation();
   const [isFlipped, setIsFlipped] = useState(false);
@@ -56,6 +67,10 @@ export const RevealPhase = ({
   const rotation = useSharedValue(0); // 0 a 180
   const waveOffset = useSharedValue(0);
   const cardOpacity = useSharedValue(0); // Começa em 0 (invisível)
+  const [statusModalVisible, setStatusModalVisible] = useState(false);
+  const accentColor = player.isImpostor ? COLORS.danger : player.color;
+  const [isWaiting, setIsWaiting] = useState(false);
+  const { showAlert } = useAlert();
 
   // Função para escurecer a cor do jogador para a onda
   const getWaveColor = () => {
@@ -64,29 +79,59 @@ export const RevealPhase = ({
   };
 
   useEffect(() => {
-    // Resetamos o valor para o início antes de começar
-    waveOffset.value = 0;
+    if (!isOnline) {
+      // Resetamos o valor para o início antes de começar
+      waveOffset.value = 0;
 
-    // A onda se move lateralmente uma única vez e para no destino (-CARD_WIDTH)
-    waveOffset.value = withTiming(-CARD_WIDTH, {
-      duration: 1500,
-      easing: Easing.out(Easing.quad) // Usei 'out' para ela parar suavemente
-    });
+      // A onda se move lateralmente uma única vez e para no destino (-CARD_WIDTH)
+      waveOffset.value = withTiming(-CARD_WIDTH, {
+        duration: 1500,
+        easing: Easing.out(Easing.quad) // Usei 'out' para ela parar suavemente
+      });
+    }
   }, [player]); // Reinicia sempre que o jogador mudar
 
   // Reset instantâneo ao trocar de jogador
   useEffect(() => {
     rotation.value = 0;
-    setIsFlipped(false);
-    // Efeito de Fade In: Reseta para 0 e vai para 1
-    // Inicia invisível e aparece suavemente
-    cardOpacity.value = 0;
-    cardOpacity.value = withTiming(1, {
-      duration: 500,
-      easing: Easing.out(Easing.quad)
-    });
-    startHandAnimation();
+    if (!isOnline) {
+      setIsFlipped(false);
+
+      // Efeito de Fade In: Reseta para 0 e vai para 1
+      // Inicia invisível e aparece suavemente
+      cardOpacity.value = 0;
+      cardOpacity.value = withTiming(1, {
+        duration: 500,
+        easing: Easing.out(Easing.quad)
+      });
+      startHandAnimation();
+    }
   }, [player, revealedAfterReroll]);
+
+  // Resets do Online diferente do Offline para não bugar a cada atualização do player.
+  useEffect(() => {
+    if (isOnline) {
+      rotation.value = 0;
+      setIsFlipped(false);
+
+      // Efeito de Fade In: Reseta para 0 e vai para 1
+      // Inicia invisível e aparece suavemente
+      cardOpacity.value = 0;
+      cardOpacity.value = withTiming(1, {
+        duration: 500,
+        easing: Easing.out(Easing.quad)
+      });
+      // Resetamos o valor para o início antes de começar
+      waveOffset.value = 0;
+
+      // A onda se move lateralmente uma única vez e para no destino (-CARD_WIDTH)
+      waveOffset.value = withTiming(-CARD_WIDTH, {
+        duration: 1500,
+        easing: Easing.out(Easing.quad) // Usei 'out' para ela parar suavemente
+      });
+      startHandAnimation();
+    }
+  }, [revealedAfterReroll, player.word]);
 
   const handProgress = useSharedValue(0); // 0 = Início (Direita), 1 = Fim (Esquerda)
   const startHandAnimation = () => {
@@ -138,17 +183,33 @@ export const RevealPhase = ({
       });
     });
 
-  const handleNextAction = useCallback(() => {
-    // 1. Primeiro fazemos o card sumir (Fade Out)
-    cardOpacity.value = withTiming(0, { duration: 200 }, (isDone) => {
-      if (isDone) {
-        // Reset de segurança para o próximo jogador
-        rotation.value = 0;
-        // 2. Troca o jogador no estado do React
-        runOnJS(onNext)();
-      }
+  // 🔥 2. CRIE ESTA FUNÇÃO AUXILIAR: Ela tenta ir pra próxima fase, se der erro (sem net), devolve a carta
+  const executeNext = async (resolve: any, reject: any) => {
+    try {
+      await onNext();
+      resolve();
+    } catch (error) {
+      cardOpacity.value = withTiming(1); // Devolve a carta para a tela
+      reject(error);
+    }
+  };
+
+  const handleNextAction = () => {
+    return new Promise<void>((resolve, reject) => {
+      // Some com a carta (Fade Out)
+      cardOpacity.value = withTiming(
+        isOnline ? 1 : 0,
+        { duration: 200 },
+        (isDone) => {
+          if (isDone) {
+            rotation.value = 0;
+            // Pede para o JS rodar a função assíncrona que vai falar com o Servidor
+            runOnJS(executeNext)(resolve, reject);
+          }
+        }
+      );
     });
-  }, [onNext]);
+  };
 
   // --- ESTILOS ANIMADOS (Giro Inverso para Esquerda) ---
   const frontStyle = useAnimatedStyle(() => {
@@ -211,8 +272,27 @@ export const RevealPhase = ({
     };
   });
 
+  // Fim da espera quando o jogador estiver pronto no servidor
+  useEffect(() => {
+    setIsWaiting(false);
+  }, [player?.ready, data.phase]);
+
+  // Função que gera a ação após o clique no botão, em conjunto com o servidor.
+  const handleWaitAction = async (action: string) => {
+    setIsWaiting(true);
+
+    try {
+      if (action === "nextAction") await handleNextAction();
+      if (action === "onPlayerReady") await onPlayerReady?.();
+      // Se der certo, a tela vai mudar sozinha, não precisa setIsWaiting(false)
+    } catch (error) {
+      // Se a sala não existir, ele para a bolinha e avisa o jogador!
+      setIsWaiting(false);
+      showAlert("Alerta!", error as string);
+    }
+  };
+
   if (!player) return null;
-  const accentColor = player.isImpostor ? COLORS.danger : player.color;
 
   return (
     <GestureHandlerRootView style={{ flex: 1, paddingTop: 140 }}>
@@ -232,7 +312,10 @@ export const RevealPhase = ({
                   {/* ID no Topo */}
                   <View style={styles.topId}>
                     <Text style={styles.idText}>
-                      {data.players.indexOf(player) + 1}
+                      {isOnline
+                        ? data.players.map((p) => p.name).indexOf(player.name) +
+                          1
+                        : data.players.indexOf(player) + 1}
                     </Text>
                   </View>
 
@@ -317,7 +400,10 @@ export const RevealPhase = ({
                 >
                   <View style={styles.topId}>
                     <Text style={styles.idText}>
-                      {data.players.indexOf(player) + 1}
+                      {isOnline
+                        ? data.players.map((p) => p.name).indexOf(player.name) +
+                          1
+                        : data.players.indexOf(player) + 1}
                     </Text>
                   </View>
 
@@ -355,17 +441,61 @@ export const RevealPhase = ({
           </GestureDetector>
         </View>
 
+        {/* ÁREA DOS DOTS PARA MOSTRAR QUEM ESTÁ PRONTO */}
+
+        {isOnline && (
+          <TouchableOpacity
+            style={styles.statusReady}
+            activeOpacity={0.8}
+            onPress={() => setStatusModalVisible(true)}
+          >
+            <CustomText variant="label" style={{ color: player.color }}>
+              Ver Status
+            </CustomText>
+            <View style={styles.dotsRow}>
+              {data.players.map((p) => (
+                <View
+                  key={p.socketId + p.name}
+                  style={[styles.dot, p.ready && styles.dotActive]}
+                />
+              ))}
+            </View>
+          </TouchableOpacity>
+        )}
+
         {/* FOOTER: BOTÃO FIXO */}
         <View style={styles.footer}>
           <TouchableOpacity
             style={[
               styles.actionBtn,
               {
-                backgroundColor: isFlipped ? player.color : player.color + "AA"
+                backgroundColor: !isOnline
+                  ? isFlipped
+                    ? player.color
+                    : player.color + "AA"
+                  : isFlipped
+                    ? player.color
+                    : player.color + "AA"
               }
             ]}
-            onPress={isFlipped ? handleNextAction : triggerManualFlip}
+            onPress={
+              !isOnline
+                ? isFlipped
+                  ? handleNextAction
+                  : triggerManualFlip
+                : isFlipped
+                  ? player.ready
+                    ? player.isHost
+                      ? data.players.every((p) => p.ready)
+                        ? () => handleWaitAction("nextAction")
+                        : () => showAlert("Calma", "Aguarde todos ficarem prontos!")
+                      : () =>
+                          showAlert("Aguarde!", "O host deve iniciar a partida.")
+                    : () => handleWaitAction("onPlayerReady")
+                  : triggerManualFlip
+            }
             activeOpacity={0.8}
+            disabled={isWaiting}
           >
             <CustomText
               variant="h3"
@@ -379,15 +509,45 @@ export const RevealPhase = ({
                 fontWeight: "900" // Letras mais grossas destacam melhor o brilho
               }}
             >
-              {isFlipped
-                ? isLast
-                  ? t("games.impostor_reveal_startMission")
-                  : t("games.impostor_reveal_next") + " ➜"
-                : t("games.impostor_reveal_revealNowBtn")}
+              {!isOnline ? (
+                isFlipped ? (
+                  isLast ? (
+                    t("games.impostor_reveal_startMission")
+                  ) : (
+                    t("games.impostor_reveal_next") + " ➜"
+                  )
+                ) : (
+                  t("games.impostor_reveal_revealNowBtn")
+                )
+              ) : isFlipped ? (
+                player.ready ? (
+                  player.isHost ? (
+                    isWaiting ? (
+                      <ActivityIndicator color="#FFF" size="small" />
+                    ) : (
+                      t("games.impostor_reveal_startMission")
+                    )
+                  ) : (
+                    t("games.impostor_reveal_waitHost")
+                  )
+                ) : isWaiting ? (
+                  <ActivityIndicator color="#FFF" size="small" />
+                ) : (
+                  t("games.impostor_reveal_isReady")
+                )
+              ) : (
+                t("games.impostor_reveal_revealNowBtn")
+              )}
             </CustomText>
           </TouchableOpacity>
         </View>
       </View>
+      <PlayerStatusModal
+        visible={statusModalVisible}
+        onClose={() => setStatusModalVisible(false)}
+        players={data.players}
+        statusType="ready"
+      />
     </GestureHandlerRootView>
   );
 };
@@ -510,6 +670,26 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     backgroundColor: "rgba(255,255,255,0.1)"
   },
+  statusReady: {
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 5
+  },
+  dotsRow: { flexDirection: "row", gap: 8 },
+  dot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: COLORS.textSecondary
+  },
+  dotActive: {
+    backgroundColor: COLORS.success,
+    shadowColor: COLORS.success,
+    shadowRadius: 5,
+    shadowOpacity: 1,
+    elevation: 5
+  },
   starterFlag: {
     paddingHorizontal: 20,
     paddingVertical: 8,
@@ -520,7 +700,7 @@ const styles = StyleSheet.create({
     color: COLORS.amber,
     fontWeight: "900",
     fontSize: 14,
-    fontStyle: "italic",
+    fontStyle: "italic"
   },
 
   footer: { padding: 30, paddingBottom: 50 },

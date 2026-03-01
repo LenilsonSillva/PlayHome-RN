@@ -8,6 +8,7 @@ export type GlobalPlayer = {
 };
 
 export type OnlinePlayer = GlobalPlayer & {
+  socketId: string;
   ready: boolean;
   revealed?: boolean;
   voted?: boolean;

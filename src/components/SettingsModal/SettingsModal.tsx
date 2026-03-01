@@ -18,8 +18,8 @@ interface SettingsModalProps {
   onClose: () => void;
   showChangeWordBtn?: boolean;
   onReroll?: () => void;
-  reviewEnabled: boolean;
-  onToggleReview: (val: boolean) => void;
+  reviewEnabled?: boolean;
+  onToggleReview?: (val: boolean) => void;
   showReviewWordBtn?: boolean;
 }
 
@@ -116,7 +116,7 @@ export const SettingsModal = ({
                 {showReviewWordBtn && (
                   <TouchableOpacity
                     style={styles.optionRow}
-                    onPress={() => onToggleReview(!reviewEnabled)}
+                    onPress={() => onToggleReview?.(!reviewEnabled)}
                   >
                     <View>
                       <CustomText variant="h3" style={styles.whiteText}>

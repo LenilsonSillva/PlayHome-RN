@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { useOfflineImpostor } from "@/games/impostor/hooks/useOfflineImpostor";
 import { COLORS } from "@/styles/theme";
@@ -14,9 +14,9 @@ import { Header } from "@/components/Header/Header";
 import { useTranslation } from "react-i18next";
 import { ImpostorPlayer } from "@/games/impostor/types/game";
 import { EliminatedReport } from "../phasesScreen/EliminatedReport";
-import { ReviewWordModal } from "@/components/Modals/Impostor/ReviewWordModal";
+import { ReviewWordModal } from "../phasesScreen/components/ReviewWordModal";
 
-export const ImpostorGameScreen = ({ route }: any) => {
+export const OfflineImpostorGameScreen = ({ route }: any) => {
   const { t } = useTranslation();
   const { players } = usePlayers();
   const {
@@ -138,80 +138,80 @@ export const ImpostorGameScreen = ({ route }: any) => {
         }}
         position="absolute"
       />
-      <View style={{flex: 1 }} >
-      <SettingsModal
-        visible={openModal}
-        onClose={() => setOpenModal(false)}
-        showChangeWordBtn={game?.phase === "reveal" && true}
-        onReroll={onRerollPress}
-        showReviewWordBtn={game?.phase === "discussion"}
-        reviewEnabled={reviewEnabled}
-        onToggleReview={setReviewEnabled}
-      />
-      {game.phase === "reveal" && (
-        <RevealPhase
-          player={game.players[currentPlayerIndex]}
-          data={game}
-          onNext={handleNextReveal}
-          isLast={currentPlayerIndex === game.players.length - 1}
-          revealedAfterReroll={reveal}
+      <View style={{ flex: 1 }}>
+        <SettingsModal
+          visible={openModal}
+          onClose={() => setOpenModal(false)}
+          showChangeWordBtn={game?.phase === "reveal" && true}
+          onReroll={onRerollPress}
+          showReviewWordBtn={game?.phase === "discussion"}
+          reviewEnabled={reviewEnabled}
+          onToggleReview={setReviewEnabled}
         />
-      )}
+        {game.phase === "reveal" && (
+          <RevealPhase
+            player={game.players[currentPlayerIndex]}
+            data={game}
+            onNext={handleNextReveal}
+            isLast={currentPlayerIndex === game.players.length - 1}
+            revealedAfterReroll={reveal}
+          />
+        )}
 
-      <ReviewWordModal
-        player={reviewPlayer}
-        onClose={() => setReviewPlayer(null)}
-      />
+        <ReviewWordModal
+          player={reviewPlayer}
+          onClose={() => setReviewPlayer(null)}
+        />
 
-      {game.phase === "discussion" && (
-        <DiscussPhase
-          data={game}
-          onNextVotingBtn={() => nextPhase("voting")}
-          onNextEliminationBtn={() => nextPhase("elimination")}
-          reviewEnabled={reviewEnabled} // Passa a permissão
-          onPlayerPress={playerHasSeenWord} // Função de clique
-          playerHasSeenWord={storePlayer} // Passa os jogadores que já viram a palavra para mostrar o indicador visual
-        />
-      )}
+        {game.phase === "discussion" && (
+          <DiscussPhase
+            data={game}
+            onNextVotingBtn={() => nextPhase("voting")}
+            onNextEliminationBtn={() => nextPhase("elimination")}
+            reviewEnabled={reviewEnabled} // Passa a permissão
+            onPlayerPress={playerHasSeenWord} // Função de clique
+            playerHasSeenWord={storePlayer} // Passa os jogadores que já viram a palavra para mostrar o indicador visual
+          />
+        )}
 
-      {game.phase === "voting" && !showReport && (
-        <VotingPhase
-          data={game}
-          currentVoteState={submitVote}
-          voteEnded={handleVotingEnd}
-        />
-      )}
+        {game.phase === "voting" && !showReport && (
+          <VotingPhase
+            data={game}
+            currentVoteState={submitVote}
+            voteEnded={handleVotingEnd}
+          />
+        )}
 
-      {game.phase === "elimination" && !showReport && (
-        <EliminationPhase
-          data={game}
-          onConfirmElimination={handleSelectToEliminate}
-        />
-      )}
-      {showReport && (
-        <EliminatedReport
-          player={eliminatedTarget}
-          allPlayers={game.players}
-          votes={votes} // Passa os votos do hook
-          wasVoting={wasVoting}
-          onNext={() => {
-            setShowReport(false);
-            resolveElimination();
-          }}
-        />
-      )}
+        {game.phase === "elimination" && !showReport && (
+          <EliminationPhase
+            data={game}
+            onConfirmElimination={handleSelectToEliminate}
+          />
+        )}
+        {showReport && (
+          <EliminatedReport
+            player={eliminatedTarget}
+            allPlayers={game.players}
+            votes={votes} // Passa os votos do hook
+            wasVoting={wasVoting}
+            onNext={() => {
+              setShowReport(false);
+              resolveElimination();
+            }}
+          />
+        )}
 
-      {game.phase === "result" && (
-        <ResultPhase
-          data={game}
-          onNextRound={() => {
-            // 1. Reseta o índice de revelação para o primeiro jogador
-            setCurrentPlayerIndex(0);
-            // 2. O hook sorteia novo impostor e palavra mantendo os scores
-            startGame();
-          }}
-        />
-      )}
+        {game.phase === "result" && (
+          <ResultPhase
+            data={game}
+            onNextRound={() => {
+              // 1. Reseta o índice de revelação para o primeiro jogador
+              setCurrentPlayerIndex(0);
+              // 2. O hook sorteia novo impostor e palavra mantendo os scores
+              startGame();
+            }}
+          />
+        )}
       </View>
     </View>
   );
@@ -220,7 +220,7 @@ export const ImpostorGameScreen = ({ route }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.background
   },
   titleContainer: {
     alignItems: "center"

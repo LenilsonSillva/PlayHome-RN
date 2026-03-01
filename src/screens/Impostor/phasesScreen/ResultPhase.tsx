@@ -18,23 +18,30 @@ import Animated, {
 } from "react-native-reanimated";
 import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
-import { ImpostorGame, ImpostorPlayer } from "@/games/impostor/types/game";
+import {
+  ImpostorGame,
+  ImpostorPlayer,
+  OnlineImpostorGame
+} from "@/games/impostor/types/game";
 import { useTranslation } from "react-i18next";
 
 interface Props {
-  data: ImpostorGame;
+  data: ImpostorGame | OnlineImpostorGame;
   onNextRound: () => void;
+  isOnline?: boolean;
 }
 
 const { width, height } = Dimensions.get("window");
 
-export const ResultPhase = ({ data, onNextRound }: Props) => {
+export const ResultPhase = ({ data, onNextRound, isOnline }: Props) => {
   const { t, i18n } = useTranslation();
   const scrollY = useSharedValue(0);
 
   // Lógica de Vitória
-  const survivors = data.players.filter((p: any) => p.isAlive);
-  const impostorsAlive = survivors.filter((p: any) => p.isImpostor).length;
+  const survivors = data.players.filter((p: ImpostorPlayer) => p.isAlive);
+  const impostorsAlive = survivors.filter(
+    (p: ImpostorPlayer) => p.isImpostor
+  ).length;
   const crewAlive = survivors.length - impostorsAlive;
   const crewWon = impostorsAlive === 0;
 
@@ -66,8 +73,6 @@ export const ResultPhase = ({ data, onNextRound }: Props) => {
     );
     return { opacity, transform: [{ translateY }] };
   });
-
-  console.log(data.players.length, height);
 
   return (
     <View style={styles.container}>
@@ -192,15 +197,21 @@ export const ResultPhase = ({ data, onNextRound }: Props) => {
 
       {/* FOOTER FIXO */}
       <View style={styles.footer}>
-        <TouchableOpacity
-          style={styles.nextBtn}
-          onPress={onNextRound}
-          activeOpacity={0.8}
-        >
-          <CustomText variant="h3" style={styles.btnText}>
-            {t("games.impostor_result_nextMission")} 🚀
+        {!isOnline || (isOnline && ('isHost' in data ? data.isHost : true)) ? (
+          <TouchableOpacity
+            style={styles.nextBtn}
+            onPress={onNextRound}
+            activeOpacity={0.8}
+          >
+            <CustomText variant="h3" style={styles.btnText}>
+              {t("games.impostor_result_nextMission")} 🚀
+            </CustomText>
+          </TouchableOpacity>
+        ) : (
+          <CustomText variant="label" style={styles.textNotHost}>
+            Aguarde o host para iniciar outra partida
           </CustomText>
-        </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -325,7 +336,7 @@ const RankingRow = ({
           }
         ]}
       >
-        {data.usedWords.length === 2 || player.globalScore === 0
+        {player.globalScore === 0
           ? null
           : player.globalScore > 0
             ? "+" + player.globalScore
@@ -532,5 +543,8 @@ const styles = StyleSheet.create({
     fontWeight: "900",
     letterSpacing: 1,
     fontSize: 18
+  },
+  textNotHost : {
+    textAlign: "center"
   }
 });

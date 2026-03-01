@@ -9,16 +9,17 @@ import {
 import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
 import { Cards } from "@/components/Cards/Cards";
-import { ImpostorPlayer } from "@/games/impostor/types/game";
+import { ImpostorGame, ImpostorPlayer } from "@/games/impostor/types/game";
 import { useTranslation } from "react-i18next";
 
 interface Props {
   player: ImpostorPlayer | null;
   onClose: () => void;
+  Onlinedata?: ImpostorGame;
 }
 
-export const ReviewWordModal = ({ player, onClose }: Props) => {
-  const {t} = useTranslation();
+export const ReviewWordModal = ({ player, onClose, Onlinedata }: Props) => {
+  const { t } = useTranslation();
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -50,12 +51,24 @@ export const ReviewWordModal = ({ player, onClose }: Props) => {
                 </TouchableOpacity>
               ) : (
                 <View style={styles.wordBox}>
-                  <CustomText variant="hint">{player.isImpostor ? t("games.impostor_discuss__modalReview_youAre") : t("games.impostor_discuss__modalReview_yourWord")}</CustomText>
+                  <CustomText variant="hint">
+                    {player.isImpostor
+                      ? t("games.impostor_discuss__modalReview_youAre")
+                      : t("games.impostor_discuss__modalReview_yourWord")}
+                  </CustomText>
                   <CustomText
                     variant="h1"
-                    style={{ color: player.isImpostor ? COLORS.danger : player.color, fontSize: 38, textAlign: "center" }}
+                    style={{
+                      color: player.isImpostor ? COLORS.danger : player.color,
+                      fontSize: 38,
+                      textAlign: "center"
+                    }}
                   >
-                    {player.isImpostor ? t("games.impostor_discuss_impostor") : player.word}
+                    {player.isImpostor
+                      ? t("games.impostor_discuss_impostor")
+                      : player.word === undefined
+                        ? Onlinedata?.word
+                        : player.word}
                   </CustomText>
                   {player.isImpostor && player.hint && (
                     <CustomText variant="hint" style={styles.hintText}>
@@ -66,7 +79,9 @@ export const ReviewWordModal = ({ player, onClose }: Props) => {
               )}
 
               <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
-                <CustomText variant="label">{t("games.impostor_discuss__modalReview_closeBtn")}</CustomText>
+                <CustomText variant="label">
+                  {t("games.impostor_discuss__modalReview_closeBtn")}
+                </CustomText>
               </TouchableOpacity>
             </View>
           </Cards>
@@ -96,5 +111,11 @@ const styles = StyleSheet.create({
   },
   wordBox: { alignItems: "center", marginTop: 30, gap: 10 },
   hintText: { color: COLORS.amber, textAlign: "center", marginTop: 10 },
-  closeBtn: { padding: 10, opacity: 0.5, backgroundColor: COLORS.surfaceLight, borderRadius: 8, marginBottom: 20 }
+  closeBtn: {
+    padding: 10,
+    opacity: 0.5,
+    backgroundColor: COLORS.surfaceLight,
+    borderRadius: 8,
+    marginBottom: 20
+  }
 });
