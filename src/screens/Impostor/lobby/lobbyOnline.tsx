@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  TextInput,
-  TouchableOpacity,
-  Switch,
-  ActivityIndicator,
-} from "react-native";
+import { View, StyleSheet, ScrollView, TextInput, TouchableOpacity, Switch, ActivityIndicator } from "react-native";
 import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
 import { categories as ALL_CATEGORIES } from "@/games/common/data/words";
@@ -15,11 +7,14 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useOnlineImpostorLobby } from "@/games/impostor/hooks/useOnlineImpostorLobby";
 import { useNavigation } from "@react-navigation/native";
 import { useAlert } from "@/contexts/alertContext";
+import { useTranslation } from "react-i18next";
 
 export const LobbyOnline = () => {
+  const { t } = useTranslation();
   const { state, actions } = useOnlineImpostorLobby();
   const [isCreating, setIsCreating] = useState(true);
   const [showCats, setShowCats] = useState(false);
+  const [showOptions, setShowOptions] = useState(false);
   const navigation = useNavigation<any>();
   const [isWaiting, setIsWaiting] = useState(false);
   const { showAlert } = useAlert();
@@ -43,58 +38,62 @@ export const LobbyOnline = () => {
     } catch (error) {
       // Se a sala não existir, ele para a bolinha e avisa o jogador!
       setIsWaiting(false);
-      showAlert("Alerta!", error as string);
+      showAlert(t("alerts.alert"), error as string);
     }
   };
 
   // --- TELA DE ACESSO (FORA DA SALA) ---
   if (!state.inRoom) {
     return (
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.segmentedControl}>
-          <TouchableOpacity
-            style={[styles.segBtn, isCreating && styles.activeSeg]}
-            onPress={() => setIsCreating(true)}
-          >
-            <CustomText
-              style={[styles.segText, isCreating && { color: COLORS.cyan }]}
-            >
-              CRIAR ESTAÇÃO
+          <TouchableOpacity style={[styles.segBtn, isCreating && styles.activeSeg]} onPress={() => setIsCreating(true)}>
+            <CustomText style={[styles.segText, isCreating && { color: COLORS.cyan }]}>
+              {t("games.impostor_lobby_createRoom")}
             </CustomText>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.segBtn, !isCreating && styles.activeSeg]}
-            onPress={() => setIsCreating(false)}
-          >
-            <CustomText
-              style={[styles.segText, !isCreating && { color: COLORS.cyan }]}
-            >
-              CONECTAR
+          <TouchableOpacity style={[styles.segBtn, !isCreating && styles.activeSeg]} onPress={() => setIsCreating(false)}>
+            <CustomText style={[styles.segText, !isCreating && { color: COLORS.cyan }]}>
+              {t("games.impostor_lobby_joinRoom")}
             </CustomText>
           </TouchableOpacity>
         </View>
 
+        {/* --- BANNER DE INFORMAÇÃO MULTIPLAYER --- */}
+        <View style={styles.infoBanner}>
+          <View style={styles.infoIconWrapper}>
+            <MaterialCommunityIcons name="cellphone-link" size={26} color={COLORS.cyan} />
+          </View>
+          <View style={styles.infoTextContainer}>
+            <CustomText variant="h3" style={styles.infoTitle}>
+              {t("games.impostor_lobby_explainTitle")}
+            </CustomText>
+            <CustomText variant="label" style={styles.infoSubtitle}>
+              {isCreating ? t("games.impostor_lobby_explainCreateRoom") : t("games.impostor_lobby_explainJoinRoom")}
+            </CustomText>
+          </View>
+        </View>
+
         <View style={styles.section}>
           <CustomText variant="label" style={styles.cyanLabel}>
-            IDENTIFICAÇÃO
+            {t("games.impostor_lobby_myID")}
           </CustomText>
           <TextInput
             style={styles.input}
-            placeholder="Seu Nome"
+            placeholder={t("games.impostor_lobby_playerName")}
             placeholderTextColor={COLORS.textSecondary}
             value={state.name}
             onChangeText={actions.setName}
             maxLength={15}
+            returnKeyType="done"
+            submitBehavior="submit"
           />
 
           {!isCreating && (
             <>
               <TextInput
                 style={[styles.input, { marginTop: 15 }]}
-                placeholder="Código de Acesso"
+                placeholder={t("games.impostor_lobby_accessCode")}
                 placeholderTextColor={COLORS.textSecondary}
                 value={state.roomCode}
                 onChangeText={actions.setRoomCode}
@@ -104,17 +103,10 @@ export const LobbyOnline = () => {
 
               {/* EXIBIÇÃO DA ÚLTIMA SALA (Apenas se existir no estado) */}
               {state.lastRoomCode && (
-                <TouchableOpacity
-                  style={styles.lastRoomBadge}
-                  onPress={() => actions.setRoomCode(state.lastRoomCode!)}
-                >
-                  <MaterialCommunityIcons
-                    name="history"
-                    size={14}
-                    color={COLORS.cyan}
-                  />
+                <TouchableOpacity style={styles.lastRoomBadge} onPress={() => actions.setRoomCode(state.lastRoomCode!)}>
+                  <MaterialCommunityIcons name="history" size={14} color={COLORS.cyan} />
                   <CustomText variant="hint" style={styles.lastRoomText}>
-                    USAR ÚLTIMO CÓDIGO: {state.lastRoomCode}
+                    {t("games.impostor_lobby_lastRoom")} {state.lastRoomCode}
                   </CustomText>
                 </TouchableOpacity>
               )}
@@ -123,19 +115,15 @@ export const LobbyOnline = () => {
 
           <TouchableOpacity
             style={styles.mainBtn}
-            onPress={() =>
-              isCreating
-                ? handleWaitAction("createRoom")
-                : handleWaitAction("joinRoom")
-            }
+            onPress={() => (isCreating ? handleWaitAction("createRoom") : handleWaitAction("joinRoom"))}
           >
             <CustomText variant="h3" style={{ color: COLORS.background }}>
               {isWaiting ? (
                 <ActivityIndicator color="#000" size="small" />
               ) : isCreating ? (
-                "GERAR CÓDIGO"
+                t("games.impostor_lobby_codeGenerate")
               ) : (
-                "ESTABELECER CONEXÃO"
+                t("games.impostor_lobby_connectRoom")
               )}
             </CustomText>
           </TouchableOpacity>
@@ -147,33 +135,26 @@ export const LobbyOnline = () => {
   // --- SALA DE ESPERA (DENTRO DA SALA) ---
   return (
     <View style={{ flex: 1 }}>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* HEADER DA SALA COM BOTÃO SAIR/DESFAZER */}
         <View style={styles.roomHeader}>
           <View>
-            <CustomText variant="label">ID DA ESTAÇÃO</CustomText>
+            <CustomText variant="label">{t("games.impostor_lobby_roomCode")}</CustomText>
             <CustomText variant="h1" style={styles.roomCodeDisplay}>
               {state.roomCode}
             </CustomText>
           </View>
 
           <TouchableOpacity style={styles.leaveBtn} onPress={actions.leaveRoom}>
-            <MaterialCommunityIcons
-              name="power"
-              size={28}
-              color={COLORS.danger}
-            />
-            <CustomText style={styles.leaveText}>ENCERRAR</CustomText>
+            <MaterialCommunityIcons name="power" size={28} color={COLORS.danger} />
+            <CustomText style={styles.leaveText}>{t("games.impostor_lobby_leaveRoom")}</CustomText>
           </TouchableOpacity>
         </View>
 
         {/* LISTA DE TRIPULANTES */}
         <View style={styles.section}>
           <CustomText variant="label" style={styles.cyanLabel}>
-            TRIPULANTES ATIVOS ({state.players.length})
+            {t("games.impostor_lobby_playersConnected")} ({state.players.length})
           </CustomText>
           <View style={styles.playersList}>
             {state.players.map((p) => (
@@ -187,7 +168,7 @@ export const LobbyOnline = () => {
                   ]}
                 />
                 <CustomText variant="h3" style={styles.playerName}>
-                  {p.name} {p.socketId === state.mySocketId ? "(VOCÊ)" : ""}
+                  {p.name} {p.socketId === state.mySocketId ? t("games.impostor_lobby_you") : ""}
                 </CustomText>
                 {p.isHost && (
                   <View style={styles.hostBadge}>
@@ -203,24 +184,22 @@ export const LobbyOnline = () => {
         {state.isHost ? (
           <View style={styles.section}>
             <CustomText variant="label" style={styles.cyanLabel}>
-              CONFIGURAÇÕES DO LÍDER
+              {t("games.impostor_lobby_settingsTitle")}
             </CustomText>
 
             <View style={styles.counterCard}>
               <View>
-                <CustomText variant="h3">Impostores</CustomText>
+                <CustomText variant="h3">{t("games.impostor_lobby_numberOfImpostors")}</CustomText>
                 <CustomText variant="hint">
-                  Limite: {state.maxImpostors}
+                  {t("games.impostor_lobby_impostorsLimit")}
+                  {state.maxImpostors}
                 </CustomText>
               </View>
               <View style={styles.counterRow}>
                 <TouchableOpacity
-                  onPress={() =>
-                    actions.setSelectImpostorNumbers(
-                      Math.max(1, state.selectImpostorNumbers - 1)
-                    )
-                  }
-                  style={styles.cBtn}
+                  onPress={() => actions.setSelectImpostorNumbers(Math.max(1, state.selectImpostorNumbers - 1))}
+                  style={[styles.cBtn, state.selectImpostorNumbers === 1 && styles.btnDisabled]}
+                  disabled={state.selectImpostorNumbers === 1}
                 >
                   <CustomText variant="h2" style={{ color: "#FFF" }}>
                     -
@@ -230,15 +209,9 @@ export const LobbyOnline = () => {
                   {state.selectImpostorNumbers}
                 </CustomText>
                 <TouchableOpacity
-                  onPress={() =>
-                    actions.setSelectImpostorNumbers(
-                      Math.min(
-                        state.maxImpostors,
-                        state.selectImpostorNumbers + 1
-                      )
-                    )
-                  }
-                  style={styles.cBtn}
+                  onPress={() => actions.setSelectImpostorNumbers(Math.min(state.maxImpostors, state.selectImpostorNumbers + 1))}
+                  style={[styles.cBtn, state.selectImpostorNumbers >= state.maxImpostors && styles.btnDisabled]}
+                  disabled={state.selectImpostorNumbers >= state.maxImpostors}
                 >
                   <CustomText variant="h2" style={{ color: "#FFF" }}>
                     +
@@ -247,65 +220,99 @@ export const LobbyOnline = () => {
               </View>
             </View>
 
-            <View style={styles.switchesGrid}>
-              {[
+            {/* OPTIONS SWITCH */}
+            <TouchableOpacity
+              style={[styles.categoryToggle, showOptions && styles.categoryToggleActive]}
+              onPress={() => setShowOptions(!showOptions)}
+            >
+              <CustomText variant="label" style={{ color: showOptions ? COLORS.black : COLORS.cyan }}>
+                {showOptions ? t("games.impostor_lobby_gameOptClose") + " ⇡" : t("games.impostor_lobby_gameOpt") + " ⇣"}
+              </CustomText>
+            </TouchableOpacity>
+
+            {showOptions &&
+              [
                 {
-                  label: "Duas Palavras",
+                  label: t("games.impostor_lobby_twoWords"),
+                  sub: t("games.impostor_lobby_twoWordsSub"),
                   val: state.twoGroups,
-                  set: actions.setTwoGroups
+                  set: actions.setTwoGroups,
+                  disable: false,
+                  show: true
                 },
                 {
-                  label: "Sorteio Início",
+                  label: t("games.impostor_lobby_whoStart"),
+                  sub: t("games.impostor_lobby_whoStartSub"),
                   val: state.whoStart,
-                  set: actions.setWhoStart
+                  set: actions.setWhoStart,
+                  disable: false,
+                  show: true
                 },
                 {
-                  label: "Impostor Inicia",
+                  label: t("games.impostor_lobby_impostorStarts"),
+                  sub: t("games.impostor_lobby_impostorStartsSub"),
                   val: state.impostorCanStart,
                   set: actions.setImpostorCanStart,
-                  dis: !state.whoStart
+                  disable: !state.whoStart,
+                  show: state.whoStart
                 },
                 {
-                  label: "Dica p/ Impostor",
+                  label: t("games.impostor_lobby_impostorHint"),
+                  sub: t("games.impostor_lobby_impostorHintSub"),
                   val: state.impostorHint,
-                  set: actions.setImpostorHint
+                  set: actions.setImpostorHint,
+                  disable: false,
+                  show: true
+                },
+                {
+                  label: t("games.impostor_lobby_impostorCat"),
+                  sub: t("games.impostor_lobby_impostorTrapSub"),
+                  val: state.impostorCat,
+                  set: actions.setImpostorCat,
+                  disable: !state.impostorHint,
+                  show: state.impostorHint
+                },
+                {
+                  label: t("games.impostor_lobby_impostorTrap"),
+                  sub: t("games.impostor_lobby_impostorTrapSub"),
+                  val: state.impostorTrap,
+                  set: actions.setImpostorTrap,
+                  disable: !state.impostorHint,
+                  show: state.impostorHint
                 }
-              ].map((item, i) => (
-                <View
-                  key={i}
-                  style={[styles.switchBox, item.dis && { opacity: 0.3 }]}
-                >
-                  <CustomText style={styles.switchLabel}>
-                    {item.label}
-                  </CustomText>
-                  <Switch
-                    value={item.val}
-                    onValueChange={item.set}
-                    disabled={item.dis}
-                    trackColor={{
-                      false: COLORS.surfaceLight,
-                      true: COLORS.danger
-                    }}
-                    thumbColor={item.val ? COLORS.white : COLORS.textSecondary}
-                  />
-                </View>
-              ))}
-            </View>
+              ].map(
+                (item, index) =>
+                  item.show && (
+                    <View key={index} style={styles.switchBox}>
+                      <View style={{ flex: 1 }}>
+                        <CustomText variant="h3" style={{ fontSize: 16 }}>
+                          {item.label}
+                        </CustomText>
+                        <CustomText variant="hint" style={{ fontSize: 11 }}>
+                          {item.sub}
+                        </CustomText>
+                      </View>
+                      <Switch
+                        value={item.val}
+                        onValueChange={item.set}
+                        trackColor={{
+                          false: COLORS.surfaceLight,
+                          true: COLORS.danger
+                        }}
+                        thumbColor={item.val ? COLORS.white : COLORS.textSecondary}
+                        disabled={item.disable}
+                      />
+                    </View>
+                  )
+              )}
 
             {/* ABA DE CATEGORIAS */}
             <TouchableOpacity
-              style={[
-                styles.categoryToggle,
-                showCats && styles.categoryToggleActive
-              ]}
+              style={[styles.categoryToggle, showCats && styles.categoryToggleActive]}
               onPress={() => setShowCats(!showCats)}
             >
-              <CustomText
-                variant="label"
-                style={{ color: showCats ? COLORS.background : COLORS.cyan }}
-              >
-                {showCats ? "FECHAR BANCO DE DADOS" : "CATEGORIAS DE PALAVRAS"}{" "}
-                {showCats ? "⇡" : "⇣"}
+              <CustomText variant="label" style={{ color: showCats ? COLORS.background : COLORS.cyan }}>
+                {showCats ? t("games.impostor_lobby_DBClose") : t("games.impostor_lobby_DBSelect")} {showCats ? "⇡" : "⇣"}
               </CustomText>
             </TouchableOpacity>
 
@@ -314,10 +321,7 @@ export const LobbyOnline = () => {
                 {ALL_CATEGORIES.map((cat) => (
                   <TouchableOpacity
                     key={cat}
-                    style={[
-                      styles.catChip,
-                      state.selectedCategories.includes(cat) && styles.catActive
-                    ]}
+                    style={[styles.catChip, state.selectedCategories.includes(cat) && styles.catActive]}
                     onPress={() => {
                       const next = state.selectedCategories.includes(cat)
                         ? state.selectedCategories.filter((c) => c !== cat)
@@ -343,9 +347,7 @@ export const LobbyOnline = () => {
         ) : (
           <View style={styles.waitingBox}>
             <ActivityIndicator color={COLORS.cyan} size="large" />
-            <CustomText style={styles.waitingText}>
-              AGUARDANDO O COMANDANTE INICIAR...
-            </CustomText>
+            <CustomText style={styles.waitingText}>{t("games.impostor_lobby_waitingInit")}</CustomText>
           </View>
         )}
       </ScrollView>
@@ -353,18 +355,24 @@ export const LobbyOnline = () => {
       {state.isHost && (
         <View style={styles.footer}>
           <TouchableOpacity
-            style={[
-              styles.startBtn,
-              state.players.length < 3 && { opacity: 0.5 }
-            ]}
+            style={[styles.startBtn, state.players.length < 3 && styles.startBtnDisabled]}
             disabled={state.players.length < 3 || isWaiting}
             onPress={() => handleWaitAction("startGame")}
           >
             {isWaiting ? (
               <ActivityIndicator color="#FFF" size="small" />
+            ) : state.players.length < 3 ? (
+              <View style={{ alignItems: "center" }}>
+                <CustomText variant="h2" style={styles.startBtnText}>
+                  {t("games.impostor_lobby_startMission")}
+                </CustomText>
+                <CustomText variant="hint" style={{ color: "rgba(255,255,255,0.5)" }}>
+                  {t("games.impostor_lobby_startMinimum")}
+                </CustomText>
+              </View>
             ) : (
-              <CustomText variant="h2" style={{ color: COLORS.white }}>
-                INICIAR MISSÃO
+              <CustomText variant="h2" style={styles.startBtnText}>
+                {t("games.impostor_lobby_startMission")}
               </CustomText>
             )}
           </TouchableOpacity>
@@ -396,6 +404,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 10
   },
+  btnDisabled: { opacity: 0.2 },
   activeSeg: { backgroundColor: COLORS.surfaceLight },
   segText: { fontSize: 12, fontWeight: "bold", color: COLORS.textSecondary },
   input: {
@@ -428,6 +437,41 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     marginTop: 25
+  },
+
+  // --- Estilos do Banner Multiplayer ---
+  infoBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 242, 255, 0.05)", // Fundo ciano bem transparente
+    borderWidth: 1,
+    borderColor: "rgba(0, 242, 255, 0.3)",
+    borderStyle: "dashed", // Dá aquele ar de tecnologia/interface
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 25
+  },
+  infoIconWrapper: {
+    width: 46,
+    height: 46,
+    borderRadius: 12,
+    backgroundColor: "rgba(0, 242, 255, 0.1)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 15
+  },
+  infoTextContainer: {
+    flex: 1
+  },
+  infoTitle: {
+    color: COLORS.cyan,
+    letterSpacing: 1,
+    marginBottom: 4
+  },
+  infoSubtitle: {
+    color: COLORS.textSecondary,
+    fontSize: 11,
+    lineHeight: 16
   },
 
   roomHeader: {
@@ -470,42 +514,36 @@ const styles = StyleSheet.create({
   hostBadgeText: { fontSize: 9, fontWeight: "bold", color: "#FFF" },
 
   counterCard: {
+    backgroundColor: "rgba(255,255,255,0.03)",
+    padding: 20,
+    borderRadius: 16,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.03)",
-    padding: 15,
-    borderRadius: 12,
-    marginBottom: 15
+    marginBottom: 25,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.05)"
   },
   counterRow: { flexDirection: "row", alignItems: "center", gap: 15 },
   cBtn: {
-    width: 38,
-    height: 38,
+    width: 40,
+    height: 40,
     backgroundColor: COLORS.surfaceLight,
-    borderRadius: 8,
+    borderRadius: 10,
     alignItems: "center",
     justifyContent: "center"
   },
-  cValue: {
-    color: COLORS.danger,
-    fontWeight: "bold",
-    fontSize: 22,
-    minWidth: 25,
-    textAlign: "center"
-  },
+  cValue: { minWidth: 30, textAlign: "center", color: COLORS.danger },
 
   switchesGrid: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
   switchBox: {
-    width: "48.5%",
-    backgroundColor: "rgba(255,255,255,0.02)",
-    padding: 12,
-    borderRadius: 12,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.05)"
+    paddingVertical: 22,
+    paddingHorizontal: 5,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(255,255,255,0.05)"
   },
   switchLabel: {
     fontSize: 11,
@@ -519,24 +557,23 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.cyan,
     alignItems: "center",
-    marginTop: 15
+    marginBottom: 20
   },
   categoryToggleActive: { backgroundColor: COLORS.cyan },
   catGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
-    marginTop: 15,
-    padding: 10,
-    backgroundColor: "rgba(0,0,0,0.2)",
-    borderRadius: 12
+    gap: 10,
+    marginTop: 15
   },
   catChip: {
     width: "48.5%",
-    padding: 15,
-    borderRadius: 10,
+    padding: 18,
+    borderRadius: 12,
     backgroundColor: COLORS.surfaceLight,
-    alignItems: "center"
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.05)"
   },
   catActive: { backgroundColor: COLORS.cyan },
   catText: { fontSize: 11, color: COLORS.textSecondary, fontWeight: "bold" },
@@ -561,11 +598,18 @@ const styles = StyleSheet.create({
   startBtn: {
     backgroundColor: COLORS.danger,
     padding: 22,
-    borderRadius: 16,
+    borderRadius: 20,
     alignItems: "center",
-    elevation: 10,
+    justifyContent: "center",
     shadowColor: COLORS.danger,
-    shadowOpacity: 0.5,
-    shadowRadius: 10
-  }
+    shadowRadius: 20,
+    shadowOpacity: 0.6,
+    elevation: 15
+  },
+  startBtnDisabled: {
+    backgroundColor: COLORS.textSecondary,
+    shadowOpacity: 0,
+    elevation: 0
+  },
+  startBtnText: { color: "#FFF", letterSpacing: 2 }
 });

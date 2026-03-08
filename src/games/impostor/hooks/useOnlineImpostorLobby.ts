@@ -5,10 +5,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { PLAYER_ICONS } from "../constants/icons";
 import { ICON_COLORS } from "../constants/colors";
 import { pickRandom } from "@/games/common/utils/array";
+import { useTranslation } from "react-i18next";
 
 export function useOnlineImpostorLobby() {
   const socket = useSocket();
   const navigation = useNavigation<any>();
+  const { t } = useTranslation();
 
   // Estados de Fluxo
   const [isCreating, setIsCreating] = useState(true);
@@ -25,6 +27,8 @@ export function useOnlineImpostorLobby() {
   const [whoStart, setWhoStart] = useState(true);
   const [impostorCanStart, setImpostorCanStart] = useState(true);
   const [impostorHint, setImpostorHint] = useState(false);
+  const [impostorTrap, setImpostorTrap] = useState(false);
+  const [impostorCat, setImpostorCat] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([
     "Objetos",
     "Animais",
@@ -34,9 +38,7 @@ export function useOnlineImpostorLobby() {
     "Emoções"
   ]);
 
-  const generateId = () =>
-    Math.random().toString(36).substring(2, 9) +
-    new Date().getTime().toString(36);
+  const generateId = () => Math.random().toString(36).substring(2, 9) + new Date().getTime().toString(36);
 
   const maxImpostors = useMemo(() => {
     if (players.length >= 7) return 3;
@@ -48,6 +50,13 @@ export function useOnlineImpostorLobby() {
     setSelectImpostorNumbers((p) => Math.min(p, maxImpostors));
   }, [maxImpostors]);
 
+  useEffect(() => {
+    if (!impostorHint) {
+      setImpostorTrap(false);
+      setImpostorCat(false);
+    }
+  }, [impostorHint]);
+
   // Sincronização de Sockets e Storage
   useEffect(() => {
     AsyncStorage.getItem("lastRoomCode").then((val) => setLastRoomCode(val));
@@ -56,9 +65,7 @@ export function useOnlineImpostorLobby() {
 
     socket.on("room-updated", (room) => {
       // 🔥 TRAVA DE SEGURANÇA: Eu ainda estou na sala de verdade?
-      const amIStillInRoom = room.players.some(
-        (p: any) => p.socketId === socket.id
-      );
+      const amIStillInRoom = room.players.some((p: any) => p.socketId === socket.id);
       // Se o servidor avisar que a sala atualizou, mas meu nome não está lá,
       // significa que eu acabei de sair (ou fui expulso). Então ignora o aviso!
       if (!amIStillInRoom) return;
@@ -106,22 +113,14 @@ export function useOnlineImpostorLobby() {
     setWhoStart(true);
     setImpostorCanStart(true);
     setImpostorHint(false);
-    setSelectedCategories([
-      "Objetos",
-      "Animais",
-      "Ciência",
-      "Natureza",
-      "Comida",
-      "Emoções"
-    ]);
+    setSelectedCategories(["Objetos", "Animais", "Ciência", "Natureza", "Comida", "Emoções"]);
   }, []);
 
   const handleCreate = useCallback(() => {
     return new Promise((resolve, reject) => {
-      if (!socket?.connected)
-        return reject("Sem conexão com o servidor. Verifique sua internet.");
+      if (!socket?.connected) return reject(t("alerts.lostConnection"));
       // 🔥 Adicionado Promise
-      if (!name.trim()) return reject("Digite seu nome de tripulante.");
+      if (!name.trim()) return reject(t("alerts.impostor_crewmateName"));
 
       const payload = {
         name,
@@ -146,10 +145,9 @@ export function useOnlineImpostorLobby() {
 
   const handleJoin = useCallback(() => {
     return new Promise((resolve, reject) => {
-      if (!socket?.connected)
-        return reject("Sem conexão com o servidor. Verifique sua internet.");
+      if (!socket?.connected) return reject(t("alerts.lostConnection"));
       // 🔥 Adicionado Promise
-      if (!name.trim() || !roomCode.trim()) return reject("Preencha todos os campos.");
+      if (!name.trim() || !roomCode.trim()) return reject(t("alerts.fillIn"));
 
       const payload = {
         name,
@@ -187,8 +185,7 @@ export function useOnlineImpostorLobby() {
 
   const startGame = () => {
     return new Promise((resolve, reject) => {
-      if (!socket?.connected)
-        return reject("Sem conexão com o servidor. Verifique sua internet.");
+      if (!socket?.connected) return reject(t("alerts.lostConnection"));
 
       socket?.emit(
         "start-game",
@@ -200,6 +197,8 @@ export function useOnlineImpostorLobby() {
             whoStart,
             impostorCanStart,
             impostorHasHint: impostorHint,
+            impostorTrap,
+            impostorCat,
             selectedCategories
           }
         },
@@ -224,6 +223,8 @@ export function useOnlineImpostorLobby() {
       whoStart,
       impostorCanStart,
       impostorHint,
+      impostorCat,
+      impostorTrap,
       selectedCategories,
       maxImpostors,
       isCreating,
@@ -236,6 +237,8 @@ export function useOnlineImpostorLobby() {
       setWhoStart,
       setImpostorCanStart,
       setImpostorHint,
+      setImpostorCat,
+      setImpostorTrap,
       setSelectedCategories,
       setSelectImpostorNumbers,
       handleCreate,

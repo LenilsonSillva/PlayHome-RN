@@ -2,6 +2,7 @@ import React from "react";
 import { View, StyleSheet, Modal, TouchableOpacity } from "react-native";
 import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
+import { useTranslation } from "react-i18next";
 
 // 🔥 Definimos como os botões vão funcionar
 export interface AlertButtonProps {
@@ -19,36 +20,23 @@ interface AlertsModalProps {
   onClose: () => void;
 }
 
-export const AlertsModal = ({
-  visible,
-  emoji,
-  title = "AVISO!",
-  message,
-  buttons,
-  onClose
-}: AlertsModalProps) => {
+export const AlertsModal = ({ visible, emoji, title, message, buttons, onClose }: AlertsModalProps) => {
   // Se não passarem nenhum botão, usamos o padrão
+  const { t } = useTranslation();
   const showEmoji = emoji ?? "⚠️";
-  const defaultButtons: AlertButtonProps[] = [
-    { text: "ENTENDIDO", onPress: onClose, style: "default" }
-  ];
+  const defaultButtons: AlertButtonProps[] = [{ text: t("alerts.gotIt"), onPress: onClose, style: "default" }];
+  const titleText = title || t("alerts.warning");
 
-  const activeButtons =
-    buttons && buttons.length > 0 ? buttons : defaultButtons;
+  const activeButtons = buttons && buttons.length > 0 ? buttons : defaultButtons;
 
   return (
-    <Modal
-      transparent
-      animationType="fade"
-      visible={visible}
-      onRequestClose={onClose}
-    >
+    <Modal transparent animationType="fade" visible={visible} onRequestClose={onClose}>
       <View style={styles.overlay}>
         <View style={styles.modal}>
           <CustomText style={styles.icon}>{showEmoji}</CustomText>
 
           <CustomText variant="h2" style={styles.title}>
-            {title}
+            {titleText}
           </CustomText>
 
           <CustomText variant="h3" style={styles.desc}>
@@ -66,11 +54,7 @@ export const AlertsModal = ({
                   key={index}
                   style={[
                     styles.btnBase,
-                    isCancel
-                      ? styles.btnCancel
-                      : isDestructive
-                        ? styles.btnDestructive
-                        : styles.btnDefault,
+                    isCancel ? styles.btnCancel : isDestructive ? styles.btnDestructive : styles.btnDefault,
                     activeButtons.length === 2 && {
                       flex: 1,
                       marginHorizontal: 5

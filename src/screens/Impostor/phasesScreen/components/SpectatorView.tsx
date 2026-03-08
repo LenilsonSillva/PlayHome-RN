@@ -1,16 +1,13 @@
 import React from "react";
-import { View, StyleSheet, ScrollView, Dimensions } from "react-native";
+import { View, StyleSheet, ScrollView } from "react-native";
 import { PlayerAvatar } from "@/games/common/components/PlayerAvatar";
 import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
-import {
-  ImpostorPlayer,
-  OnlineImpostorGame
-} from "@/games/impostor/types/game";
-
-const { width } = Dimensions.get("window");
+import { ImpostorPlayer, OnlineImpostorGame } from "@/games/impostor/types/game";
+import { useTranslation } from "react-i18next";
 
 export function SpectatorView({ gameData }: { gameData: OnlineImpostorGame }) {
+  const { t, i18n } = useTranslation();
   const rawPlayers = gameData?.players ?? gameData?.allPlayers ?? [];
   const players = rawPlayers.map((p: ImpostorPlayer) => ({
     id: p.id ?? p.socketId,
@@ -32,70 +29,47 @@ export function SpectatorView({ gameData }: { gameData: OnlineImpostorGame }) {
         <View style={styles.header}>
           <View style={styles.liveBadge}>
             <View style={styles.dot} />
-            <CustomText
-              variant="label"
-              style={{ color: COLORS.danger, fontSize: 10 }}
-            >
+            <CustomText variant="label" style={{ color: COLORS.danger, fontSize: 10 }}>
               LIVE FEED
             </CustomText>
           </View>
-          <CustomText variant="h1">
-            OBSERVADOR{" "}
+          <View style={[styles.observerTitle, { flexDirection: i18n.language === "en" ? "row-reverse" : "row", gap: 4 }]}>
+            <CustomText variant="h1">{t("games.impostor_spectator_observer")}</CustomText>
             <CustomText variant="h1" style={{ color: COLORS.textSecondary }}>
-              TÁTICO
+              {t("games.impostor_spectator_tatical")}
             </CustomText>
-          </CustomText>
-          <CustomText variant="hint">
-            Monitoramento de tripulação em tempo real
-          </CustomText>
+          </View>
+          <CustomText variant="hint">{t("games.impostor_spectator_monitorLabel")}</CustomText>
         </View>
 
         <View style={styles.statusBox}>
           <CustomText variant="label">
-            ESTADO DO SISTEMA:{" "}
-            <CustomText style={{ color: COLORS.cyan }}>
-              {gameData.phase?.toUpperCase()}
-            </CustomText>
+            {t("games.impostor_spectator_systemStatus")}{" "}
+            <CustomText style={{ color: COLORS.cyan }}>{gameData.phase?.toUpperCase()}</CustomText>
           </CustomText>
         </View>
 
         <View style={styles.squadGrid}>
           {players.map((p: any) => (
-            <View
-              key={p.id}
-              style={[styles.playerCard, !p.isAlive && styles.deadCard]}
-            >
-              <PlayerAvatar
-                emoji={p.emoji}
-                color={p.isAlive ? p.color : COLORS.textSecondary}
-                size={50}
-                hideScan={!p.isAlive}
-              />
+            <View key={p.id} style={[styles.playerCard, !p.isAlive && styles.deadCard]}>
+              <PlayerAvatar emoji={p.emoji} color={p.isAlive ? p.color : COLORS.textSecondary} size={50} hideScan={!p.isAlive} />
 
               <View style={styles.playerInfo}>
                 <CustomText variant="h3" numberOfLines={1}>
                   {p.name}
                 </CustomText>
-                <CustomText
-                  variant="hint"
-                  style={{ color: p.isAlive ? COLORS.success : COLORS.danger }}
-                >
-                  {p.isAlive ? "SINAL ATIVO" : "SINAL PERDIDO"}
+                <CustomText variant="hint" style={{ color: p.isAlive ? COLORS.success : COLORS.danger }}>
+                  {p.isAlive ? t("games.impostor_discuss_isAlive") : t("games.impostor_discuss_notAlive")}
                 </CustomText>
               </View>
 
               <View style={styles.meta}>
-                <CustomText style={styles.scoreText}>{p.score} PTS</CustomText>
+                <CustomText style={styles.scoreText}>
+                  {p.score} {t("games.impostor_result_points")}
+                </CustomText>
                 {gameData.phase === "voting" && p.isAlive && (
-                  <View
-                    style={[
-                      styles.statusTag,
-                      p.voted && { backgroundColor: COLORS.success }
-                    ]}
-                  >
-                    <CustomText style={styles.tagText}>
-                      {p.voted ? "VOTOU" : "..."}
-                    </CustomText>
+                  <View style={[styles.statusTag, p.voted && { backgroundColor: COLORS.success }]}>
+                    <CustomText style={styles.tagText}>{p.voted ? t("games.impostor_statusModal_voted") : "..."}</CustomText>
                   </View>
                 )}
               </View>
@@ -110,9 +84,7 @@ export function SpectatorView({ gameData }: { gameData: OnlineImpostorGame }) {
         </View>
 
         <View style={styles.footer}>
-          <CustomText variant="hint">
-            AGUARDANDO FINALIZAÇÃO DA MISSÃO...
-          </CustomText>
+          <CustomText variant="hint">{t("games.impostor_spectator_waitingEnd")}</CustomText>
         </View>
       </ScrollView>
     </View>
@@ -129,6 +101,11 @@ const styles = StyleSheet.create({
   },
   container: { padding: 25, paddingTop: 60, paddingBottom: 100 },
   header: { alignItems: "center", marginBottom: 30 },
+  observerTitle: {
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center"
+  },
   liveBadge: {
     flexDirection: "row",
     alignItems: "center",

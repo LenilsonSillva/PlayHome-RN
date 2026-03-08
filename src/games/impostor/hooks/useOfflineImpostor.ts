@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import type { ImpostorGame, ImpostorPlayer } from "../types/game";
 import type { LobbyState, LobbyConfig } from "../types/lobbyOffline";
 import { initializeGame } from "../logic/initializeGame";
+import { getRoundPoints } from "../utils/scoringUtils";
 
 export type UseOfflineImpostorReturn = {
   lobby: LobbyState;
@@ -18,7 +19,7 @@ export type UseOfflineImpostorReturn = {
   submitVote: (voterId: string, targetId: string | null) => void;
   processVotingResult: (
     finalVotes?: Record<string, string | null>
-  ) => string | null; // 🔥 Corrigido aqui
+  ) => string | null;
 };
 
 export function useOfflineImpostor(): UseOfflineImpostorReturn {
@@ -30,7 +31,9 @@ export function useOfflineImpostor(): UseOfflineImpostorReturn {
       impostorHasHint: false,
       impostorCanStart: false,
       selectedCategories: [],
-      whoStartButton: false
+      whoStartButton: false,
+      impostorTrap: false,
+      impostorCat: false 
     }
   });
 
@@ -70,7 +73,9 @@ export function useOfflineImpostor(): UseOfflineImpostorReturn {
               impostorHasHint: game.impostorHasHint,
               impostorCanStart: game.impostorCanStart,
               selectedCategories: game.selectedCategories,
-              whoStartButton: !!game.whoStart
+              whoStartButton: !!game.whoStart,
+              impostorTrap: game.impostorTrap,
+              impostorCat: game.impostorCat
             }
           : lobby.config);
 
@@ -84,6 +89,8 @@ export function useOfflineImpostor(): UseOfflineImpostorReturn {
         configToUse.selectedCategories,
         configToUse.whoStartButton,
         configToUse.impostorCanStart,
+        configToUse.impostorTrap,
+        configToUse.impostorCat,
         impostorHistoryRef.current,
         wordHistoryRef.current
       );
@@ -115,6 +122,8 @@ export function useOfflineImpostor(): UseOfflineImpostorReturn {
       game.selectedCategories,
       !!game.whoStart,
       game.impostorCanStart,
+      game.impostorTrap,
+      game.impostorCat,
       impostorHistoryRef.current,
       wordHistoryRef.current
     );
@@ -154,17 +163,11 @@ export function useOfflineImpostor(): UseOfflineImpostorReturn {
 
       if (isGameOver) {
         const updatedWithScores = prev.players.map((p) => {
-          let points = p.isImpostor
-            ? p.isAlive
-              ? 2
-              : -1.5
-            : p.isAlive
-              ? 1
-              : 0;
+          const roundPoints = getRoundPoints(p);
           return {
             ...p,
-            score: (p.score || 0) + points,
-            globalScore: points
+            score: roundPoints,
+            globalScore: (p.globalScore || 0) + roundPoints
           };
         });
         return { ...prev, players: updatedWithScores, phase: "result" };

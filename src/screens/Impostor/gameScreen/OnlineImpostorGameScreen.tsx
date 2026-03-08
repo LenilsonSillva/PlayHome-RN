@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, ActivityIndicator } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useOnlineImpostorGame } from "@/games/impostor/hooks/useOnlineImpostorGame";
 import { Header } from "@/components/Header/Header";
@@ -11,7 +11,6 @@ import { EliminatedReport } from "../phasesScreen/EliminatedReport";
 import { ResultPhase } from "../phasesScreen/ResultPhase";
 import { SpectatorView } from "../phasesScreen/components/SpectatorView";
 import { ReviewWordModal } from "../phasesScreen/components/ReviewWordModal";
-import { NewHostModal } from "../phasesScreen/components/NewHostModal";
 import { CustomText } from "@/styles/customText";
 import { COLORS } from "@/styles/theme";
 
@@ -37,10 +36,30 @@ export const OnlineImpostorGameScreen = () => {
     reveal,
     showNewHostAlert,
     setShowNewHostAlert,
+    isDataReady,
     actions
   } = hook;
 
   if (!gameData || !localPlayer) return null;
+
+  // ✅ Se é espectador e dados NÃO estão prontos, mostra loading
+  if (gameData.isSpectator && !isDataReady) {
+    return (
+      <View style={styles.container}>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <ActivityIndicator size="large" color={COLORS.cyan} />
+          <CustomText
+            variant="label"
+            style={{ marginTop: 16, color: COLORS.textSecondary }}
+          >
+            {t("loading")}
+          </CustomText>
+        </View>
+      </View>
+    );
+  }
 
   // Header do jogo
   const PhaseHeader = (

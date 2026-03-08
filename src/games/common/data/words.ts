@@ -805,3 +805,5 @@ export const WORDS: WordData[] = [
 export const categories = Array.from(
   new Set(WORDS.map((word) => word.category)),
 ).sort();
+
+export const selectedCategories = ["Objetos", "Animais", "Ciência", "Natureza", "Comida", "Emoções"];

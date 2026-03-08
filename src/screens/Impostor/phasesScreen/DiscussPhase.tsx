@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  useWindowDimensions
-} from "react-native";
+import { View, StyleSheet, TouchableOpacity, ScrollView, useWindowDimensions } from "react-native";
 import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
 import { ImpostorGame, ImpostorPlayer } from "@/games/impostor/types/game";
@@ -38,15 +32,18 @@ export const DiscussPhase = ({
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const isLargeScreen = width > 600;
+  const [startTime] = useState(Date.now());
   const [elapsedTime, setElapsedTime] = useState(0);
 
   // Cronômetro da discussão
   useEffect(() => {
     const interval = setInterval(() => {
-      setElapsedTime((prev) => prev + 1);
+      const seconds = Math.floor((Date.now() - startTime) / 1000);
+      setElapsedTime(seconds);
     }, 1000);
+
     return () => clearInterval(interval);
-  }, []);
+  }, [startTime]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -54,17 +51,12 @@ export const DiscussPhase = ({
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
-  const impostorsAlive = data.players.filter(
-    (p) => p.isAlive && p.isImpostor
-  ).length;
+  const impostorsAlive = data.players.filter((p) => p.isAlive && p.isImpostor).length;
   const startingPlayer = data.players.find((p) => p.name === data.whoStart);
 
   return (
     <View style={styles.container}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         {/* Espaço para evitar sobreposição com o header fixo */}
         <View style={{ height: 130 }} />
         {/* 3 e 5. STATUS DO SISTEMA (Tempo e Impostores) */}
@@ -78,57 +70,31 @@ export const DiscussPhase = ({
             </CustomText>
           </View>
 
-          <View
-            style={[
-              styles.statusCard,
-              { borderLeftWidth: 1, borderLeftColor: "rgba(255,255,255,0.1)" }
-            ]}
-          >
-            <CustomText
-              variant="label"
-              style={[styles.statusLabel, { color: COLORS.danger }]}
-            >
+          <View style={[styles.statusCard, { borderLeftWidth: 1, borderLeftColor: "rgba(255,255,255,0.1)" }]}>
+            <CustomText variant="label" style={[styles.statusLabel, { color: COLORS.danger }]}>
               {t("games.impostor_discuss_impostorsLeft")}
             </CustomText>
-            <CustomText
-              variant="h2"
-              style={[styles.statusValue, { color: COLORS.danger }]}
-            >
+            <CustomText variant="h2" style={[styles.statusValue, { color: COLORS.danger }]}>
               {impostorsAlive}{" "}
-              {impostorsAlive === 1
-                ? t("games.impostor_discuss_impostor")
-                : t("games.impostor_discuss_impostors")}
+              {impostorsAlive === 1 ? t("games.impostor_discuss_impostor") : t("games.impostor_discuss_impostors")}
             </CustomText>
           </View>
         </View>
 
         {/* 4. QUEM INICIA A PARTIDA */}
-        {data.players
-          .filter((p) => p.isAlive)
-          .find((p) => p.name === data.whoStart)?.name && (
+        {data.players.filter((p) => p.isAlive).find((p) => p.name === data.whoStart)?.name && (
           <View style={styles.starterSection}>
-            <LinearGradient
-              colors={["rgba(0, 242, 255, 0.1)", "transparent"]}
-              style={styles.starterCard}
-            >
+            <LinearGradient colors={["rgba(0, 242, 255, 0.1)", "transparent"]} style={styles.starterCard}>
               <View style={styles.starterTextContent}>
                 <CustomText variant="label" style={{ color: COLORS.cyan }}>
                   {t("games.impostor_discuss_whoStart")}
                 </CustomText>
                 <CustomText variant="h2" style={styles.starterName}>
-                  {!isOnline
-                    ? data.whoStart
-                    : data.whoStart === onlinePlayer?.name
-                      ? "VOCÊ"
-                      : data.whoStart}
+                  {!isOnline ? data.whoStart : data.whoStart === onlinePlayer?.name ? "VOCÊ" : data.whoStart}
                 </CustomText>
               </View>
               <View style={styles.starterAvatarWrapper}>
-                <PlayerAvatar
-                  emoji={startingPlayer?.emoji || "👤"}
-                  color={startingPlayer?.color || COLORS.cyan}
-                  size={50}
-                />
+                <PlayerAvatar emoji={startingPlayer?.emoji || "👤"} color={startingPlayer?.color || COLORS.cyan} size={50} />
               </View>
             </LinearGradient>
           </View>
@@ -163,12 +129,7 @@ export const DiscussPhase = ({
                       ? () => onPlayerPress(player)
                       : undefined
                 }
-                style={[
-                  styles.playerRow,
-                  { width: isLargeScreen ? "48.5%" : "100%" },
-                  ,
-                  !player.isAlive && styles.playerDead
-                ]}
+                style={[styles.playerRow, { width: isLargeScreen ? "48.5%" : "100%" }, , !player.isAlive && styles.playerDead]}
               >
                 <View style={styles.playerMainInfo}>
                   <PlayerAvatar
@@ -179,16 +140,10 @@ export const DiscussPhase = ({
                   />
                   <View style={styles.nameBox}>
                     <CustomText variant="h3" style={styles.pName}>
-                      {!isOnline
-                        ? player.name
-                        : onlinePlayer?.id === player.id
-                          ? "VOCÊ"
-                          : player.name}
+                      {!isOnline ? player.name : onlinePlayer?.id === player.id ? "VOCÊ" : player.name}
                     </CustomText>
                     <CustomText variant="hint" style={styles.pStatus}>
-                      {player.isAlive
-                        ? t("games.impostor_discuss_isAlive")
-                        : t("games.impostor_discuss_notAlive")}
+                      {player.isAlive ? t("games.impostor_discuss_isAlive") : t("games.impostor_discuss_notAlive")}
                     </CustomText>
                   </View>
                 </View>
@@ -197,21 +152,13 @@ export const DiscussPhase = ({
                   {reviewEnabled && player.isAlive ? (
                     !isOnline ? (
                       playerHasSeenWord.includes(player.id) ? (
-                        <FontAwesome
-                          name="eye-slash"
-                          size={20}
-                          color={COLORS.textSecondary}
-                        />
+                        <FontAwesome name="eye-slash" size={20} color={COLORS.textSecondary} />
                       ) : (
                         <FontAwesome name="eye" size={20} color={COLORS.cyan} />
                       )
                     ) : onlinePlayer?.id === player.id ? (
                       playerHasSeenWord.includes(player.id) ? (
-                        <FontAwesome
-                          name="eye-slash"
-                          size={20}
-                          color={COLORS.textSecondary}
-                        />
+                        <FontAwesome name="eye-slash" size={20} color={COLORS.textSecondary} />
                       ) : (
                         <FontAwesome name="eye" size={20} color={COLORS.cyan} />
                       )
@@ -225,7 +172,7 @@ export const DiscussPhase = ({
                   </CustomText>
                   <CustomText variant="h3" style={styles.scoreValue}>
                     {/* Mostra o score da rodada passada */}
-                    {player.score}
+                    {player.globalScore}
                   </CustomText>
                 </View>
               </TouchableOpacity>
@@ -236,15 +183,8 @@ export const DiscussPhase = ({
         {/* 7. BOTÕES DE AÇÃO */}
         <View style={styles.actionFooter}>
           {!isOnline || (isOnline && onlinePlayer?.isHost) ? (
-            <TouchableOpacity
-              style={styles.primaryBtn}
-              onPress={onNextVotingBtn}
-              activeOpacity={0.8}
-            >
-              <LinearGradient
-                colors={[COLORS.danger, "#7f1d1d"]}
-                style={styles.btnGradient}
-              >
+            <TouchableOpacity style={styles.primaryBtn} onPress={onNextVotingBtn} activeOpacity={0.8}>
+              <LinearGradient colors={[COLORS.danger, "#7f1d1d"]} style={styles.btnGradient}>
                 <CustomText variant="h3" style={styles.btnText}>
                   {t("games.impostor_discuss_startVote")}
                 </CustomText>
@@ -262,10 +202,7 @@ export const DiscussPhase = ({
           )}
 
           {!isOnline && (
-            <TouchableOpacity
-              style={styles.secondaryBtn}
-              onPress={onNextEliminationBtn}
-            >
+            <TouchableOpacity style={styles.secondaryBtn} onPress={onNextEliminationBtn}>
               <CustomText variant="label" style={styles.secondaryBtnText}>
                 {t("games.impostor_discuss_eliminate")}
               </CustomText>

@@ -1,150 +1,148 @@
-import React, { useEffect, useRef, useMemo } from 'react';
-import { StyleSheet, View, Animated, Dimensions, Easing } from 'react-native';
-import { COLORS } from '@/styles/theme';
+import React, { useEffect, useMemo } from "react";
+import { View, StyleSheet, Dimensions } from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withTiming,
+  withSequence,
+  Easing,
+  withDelay
+} from "react-native-reanimated";
+import { LinearGradient } from "expo-linear-gradient";
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 
-// Configurações para facilitar o ajuste do visual
-const METEOR_COUNT = 10;
-const MIN_DURATION = 2000;
-const MAX_DURATION = 4500;
+// ==========================================
+// ✨ PARALLAX DE ESTRELAS INFINITO (MANTIDO)
+// ==========================================
+const StarLayer = ({ count, size, speed, opacity }: any) => {
+  const translateX = useSharedValue(0);
 
-interface MeteorProps {
-  index: number;
-}
-
-const MeteorItem = ({ index }: MeteorProps) => {
-  // Valores animados individuais
-  const animatedValue = useRef(new Animated.Value(0)).current;
-
-  // Geramos valores aleatórios para cada meteoro usando useMemo para não mudar no re-render
-  const config = useMemo(() => ({
-    // Posição inicial: pode começar em qualquer lugar no topo ou na direita
-    startPos: {
-      x: Math.random() * (width + 200),
-      y: -100,
-    },
-    // Tamanho aleatório (alguns longos e finos, outros curtos e brilhantes)
-    size: {
-      w: 1 + Math.random() * 2,
-      h: 60 + Math.random() * 100,
-    },
-    opacity: 0.1 + Math.random() * 0.5,
-    delay: index * 800 + Math.random() * 4000, // Escalonar a entrada deles
-  }), [index]);
-
-  const startAnimation = useCallback(() => {
-    animatedValue.setValue(0);
-    
-    Animated.timing(animatedValue, {
-      toValue: 1,
-      duration: Math.random() * (MAX_DURATION - MIN_DURATION) + MIN_DURATION,
-      easing: Easing.linear,
-      useNativeDriver: true,
-      delay: Math.random() * 3000, // Espera aleatória entre quedas
-    }).start(() => startAnimation());
-  }, [animatedValue]);
+  // Gera as estrelas uma única vez e espalha pela tela
+  const stars = useMemo(() => {
+    return Array.from({ length: count }).map((_, i) => ({
+      id: i,
+      top: Math.random() * height,
+      left: Math.random() * width,
+      opacity: Math.random() * opacity + 0.1 // Opacidade variada por estrela
+    }));
+  }, [count, opacity]);
 
   useEffect(() => {
-    startAnimation();
-  }, [startAnimation]);
+    // Move a camada inteira para a esquerda e reseta perfeitamente (Loop infinito)
+    translateX.value = withRepeat(withTiming(-width, { duration: speed, easing: Easing.linear }), -1, false);
+  }, []);
 
-  // Interpolação do movimento diagonal (Caindo da direita para a esquerda)
-  const translateX = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [config.startPos.x, config.startPos.x - width - 400],
-  });
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }]
+  }));
 
-  const translateY = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [config.startPos.y, height + 200],
-  });
-
-  const scale = animatedValue.interpolate({
-    inputRange: [0, 0.1, 0.9, 1],
-    outputRange: [0, 1, 1, 0], // Surge suave e some suave
-  });
+  // Renderiza as estrelas. Copiamos 2x para o loop ser perfeito e não deixar buracos
+  const renderStars = () => (
+    <View style={{ width, height }}>
+      {stars.map((s) => (
+        <View key={s.id} style={[styles.star, { top: s.top, left: s.left, width: size, height: size, opacity: s.opacity }]} />
+      ))}
+    </View>
+  );
 
   return (
-    <Animated.View
-      style={[
-        styles.meteor,
-        {
-          width: config.size.w,
-          height: config.size.h,
-          opacity: config.opacity,
-          transform: [
-            { translateX },
-            { translateY },
-            { scaleY: scale },
-            { rotate: '35deg' }, // Ângulo de queda
-          ],
-        },
-      ]}
-    >
-      {/* Cabeça do meteoro (ponto mais brilhante) */}
-      <View style={styles.meteorHead} />
+    <Animated.View style={[styles.starLayer, animatedStyle]}>
+      {renderStars()}
+      {renderStars()}
     </Animated.View>
   );
 };
 
-export const MeteorBackground = () => {
+// ==========================================
+// 📡 SCANNER DE RADAR TÁTICO (AJUSTADO)
+// ==========================================
+const Scanline = () => {
+  const translateY = useSharedValue(-100);
+
+  useEffect(() => {
+    // 🔥 O Truque do Delay: O scanner viaja muito além da tela (height * 3).
+    // Ele cruza a tela em ~2 segundos e passa os próximos ~6 segundos escondido lá embaixo
+    // antes de o loop reiniciar do topo!
+    translateY.value = withRepeat(withTiming(height * 3, { duration: 15000, easing: Easing.linear }), -1, false);
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }]
+  }));
+
   return (
-    <View style={styles.container}>
-      {/* Adicionamos uma camada de estrelas estáticas ao fundo para dar profundidade */}
-      {[...Array(30)].map((_, i) => (
-        <View 
-          key={`star-${i}`} 
-          style={[
-            styles.star, 
-            { 
-              top: Math.random() * height, 
-              left: Math.random() * width,
-              opacity: Math.random() * 0.5
-            }
-          ]} 
-        />
-      ))}
-      
-      {/* Chuva de Meteoros */}
-      {[...Array(METEOR_COUNT)].map((_, i) => (
-        <MeteorItem key={`meteor-${i}`} index={i} />
-      ))}
+    <Animated.View style={[styles.scanlineWrapper, animatedStyle]}>
+      <LinearGradient
+        colors={["transparent", "rgba(0, 242, 255, 0.02)", "rgba(0, 242, 255, 0.25)", "transparent"]}
+        locations={[0, 0.6, 0.95, 1]}
+        style={StyleSheet.absoluteFillObject}
+      />
+    </Animated.View>
+  );
+};
+
+// ==========================================
+// 🌌 COMPONENTE PRINCIPAL
+// ==========================================
+export const ImpostorBackground = () => {
+  return (
+    <View style={styles.container} pointerEvents="none">
+      {/* 1. O Vazio Espacial */}
+      <LinearGradient colors={["#020617", "#000000", "#020617"]} style={StyleSheet.absoluteFillObject} />
+
+      {/* 2. Parallax (Sensação de profundidade 3D da nave voando) */}
+      {/* Estrelas Fundo (Muitas, lentas e pequenas) */}
+      <StarLayer count={60} size={1.5} speed={45000} opacity={0.3} />
+      {/* Estrelas Meio (Velocidade média) */}
+      <StarLayer count={30} size={2.5} speed={30000} opacity={0.5} />
+      {/* Estrelas Frente (Poucas, grandes e muito rápidas) */}
+      <StarLayer count={15} size={3.5} speed={15000} opacity={0.8} />
+
+      {/* 3. Sobreposição Tática (O Scanline mais fino e com delay) */}
+      <Scanline />
+
+      {/* 4. Vinheta Escura nas bordas para focar a visão no centro */}
+      <View style={styles.vignette} />
     </View>
   );
 };
 
-// Precisamos importar o useCallback para a animação recursiva
-import { useCallback } from 'react';
-
+// ==========================================
+// 🎨 ESTILOS
+// ==========================================
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: COLORS.background,
-    overflow: 'hidden',
+    backgroundColor: "#000",
+    overflow: "hidden"
+  },
+  starLayer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    flexDirection: "row", // Coloca as duas cópias lado a lado
+    width: width * 2, // Dobro da tela para o loop caber
+    height: height
   },
   star: {
-    position: 'absolute',
-    width: 2,
-    height: 2,
-    backgroundColor: '#FFF',
-    borderRadius: 1,
+    position: "absolute",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 50
   },
-  meteor: {
-    position: 'absolute',
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    borderRadius: 99,
+  scanlineWrapper: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: width,
+    height: 60, // 🔥 Tamanho bem menor e mais sutil como você pediu
+    zIndex: 10
   },
-  meteorHead: {
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    height: 4,
-    backgroundColor: COLORS.cyan,
-    shadowColor: COLORS.cyan,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1,
-    shadowRadius: 10,
-    elevation: 5,
+  vignette: {
+    ...StyleSheet.absoluteFillObject,
+    borderWidth: 60,
+    borderColor: "rgba(0,0,0,0.4)", // Escurece as bordas da tela sutilmente
+    borderRadius: 20
   }
 });

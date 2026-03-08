@@ -1,3 +1,7 @@
+/**
+ * Jogador base com informações pessoais
+ * Usado em lobby e dados iniciais
+ */
 export type GlobalPlayer = {
   id: string;
   name: string;
@@ -7,9 +11,14 @@ export type GlobalPlayer = {
   globalScore?: number;
 };
 
+/**
+ * Jogador online com status de sessão
+ * Estende GlobalPlayer com informações de conexão
+ */
 export type OnlinePlayer = GlobalPlayer & {
   socketId: string;
-  ready: boolean;
+  ready?: boolean;
   revealed?: boolean;
   voted?: boolean;
 };
+

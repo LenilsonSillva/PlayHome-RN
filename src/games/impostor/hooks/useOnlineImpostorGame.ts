@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { BackHandler } from "react-native";
+import { BackHandler, ActivityIndicator, View } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { useSocket } from "@/contexts/socketContext";
 import { useAlert } from "@/contexts/alertContext";
@@ -8,11 +8,13 @@ import {
   ImpostorPlayer,
   OnlineImpostorGame
 } from "@/games/impostor/types/game";
+import { useTranslation } from "react-i18next";
 
 export function useOnlineImpostorGame() {
   const socket = useSocket();
   const route = useRoute<any>();
   const navigation = useNavigation<any>();
+  const {t} = useTranslation();
   const { showAlert } = useAlert();
 
   // --- UI / game state ---
@@ -23,23 +25,19 @@ export function useOnlineImpostorGame() {
   const [reviewPlayer, setReviewPlayer] = useState<ImpostorPlayer | null>(null);
   const [reveal, setReveal] = useState(false);
   const [showNewHostAlert, setShowNewHostAlert] = useState(false);
+  /** ✅ Flag para garantir que espectador só renderiza com dados prontos */
+  const [isDataReady, setIsDataReady] = useState(false);
 
   // --- gameData ---
   const [gameData, setGameData] = useState<OnlineImpostorGame>(() => {
     const raw = route.params?.data || route.params;
     if (!raw) return null;
 
-    const { allPlayers, score, globalScore, ...rest } = raw;
+    const { allPlayers, ...rest } = raw;
 
     return {
       ...rest,
-      score: globalScore,
-      globalScore: score,
-      players: (allPlayers || []).map((p: ImpostorPlayer) => ({
-        ...p,
-        score: p.globalScore,
-        globalScore: p.score
-      })),
+      players: allPlayers || [],
       mySocketId: socket?.id
     };
   });
@@ -53,7 +51,7 @@ export function useOnlineImpostorGame() {
   // --- localPlayer derived state ---
   const localPlayer: ImpostorPlayer = {
     id: socket?.id || "",
-    name: gameData?.myName || "VOCÊ",
+    name: gameData?.myName || t("games.impostor_lobby_you"),
     emoji: gameData.myEmoji || "🤫",
     color: gameData.myColor || COLORS.cyan,
     isImpostor: gameData.isImpostor,
@@ -101,24 +99,26 @@ export function useOnlineImpostorGame() {
             ? data.isHost
             : data.hostId === socket?.id;
 
-        // Pegamos os jogadores que vieram do servidor
         const sourcePlayers = allPlayers || data.players || prev?.players || [];
 
-        // Invertemos para todos do array de novo
-        const invertedPlayers = sourcePlayers.map((p: any) => ({
-          ...p,
-          score: p.globalScore, // INVERTIDO
-          globalScore: p.score // INVERTIDO
-        }));
-
-        return {
+        const newGameData = {
           ...rest,
-          score: globalScore, // INVERTIDO
-          globalScore: score, // INVERTIDO
-          players: invertedPlayers,
+          score,
+          globalScore,
+          players: sourcePlayers,
           isHost: isHostFromServer,
           mySocketId: prev?.mySocketId || socket?.id
         };
+
+        // ✅ Se é espectador, marca que dados estão prontos quando receber players
+        if (data.isSpectator && sourcePlayers.length > 0) {
+          setIsDataReady(true);
+        } else if (!data.isSpectator) {
+          // ✅ Jogador normal sempre tem dados prontos
+          setIsDataReady(true);
+        }
+
+        return newGameData;
       });
     }
 
@@ -132,9 +132,7 @@ export function useOnlineImpostorGame() {
       leaveTimeoutRef.current = setTimeout(() => {
         // se ainda não houve force-lobby/host-change que cancelaremos, mostramos
         if (pendingLeftNameRef.current) {
-          showAlert(
-            "Tripulação",
-            `${pendingLeftNameRef.current} saiu do jogo.`
+          showAlert( t("alerts.impostor_crewmate"), `${pendingLeftNameRef.current} ${t("alerts.impostor_leftGame")}`
           );
         }
         pendingLeftNameRef.current = null;
@@ -162,7 +160,7 @@ export function useOnlineImpostorGame() {
     const onForceLobby = () => {
       // force-lobby tem prioridade: cancela pendentes e mostra apenas esse
       cancelPendingPlayerLeft();
-      showAlert("Erro", "Jogadores insuficientes. Voltando ao lobby.");
+      showAlert(t("alerts.error"), t("alerts.impostor_closingRoom"));
       navigation.reset({
         index: 1,
         routes: [{ name: "Home" }, { name: "ImpostorLobby" }]
@@ -176,8 +174,8 @@ export function useOnlineImpostorGame() {
         // se esta máquina agora é host, cancela aviso de player-left e mostra apenas o host alert
         cancelPendingPlayerLeft();
         showAlert(
-          "VOCÊ É O NOVO COMANDANTE!",
-          "O comandante anterior desconectou, agora você assume o controle.",
+          t("alerts.impostor_newHost"),
+          t("alerts.impostor_lastHostLeft"),
           "👑"
         );
       }
@@ -216,13 +214,13 @@ export function useOnlineImpostorGame() {
 
   const handleExitAttempt = useCallback(() => {
     showAlert(
-      "Sair da Estação",
-      "Deseja realmente abandonar a missão atual?",
+      t("alerts.impostor_leaveRoomTitle"),
+      t("alerts.impostor_realyLeave"),
       undefined,
       [
-        { text: "CANCELAR", style: "cancel" },
+        { text: t("alerts.cancel"), style: "cancel" },
         {
-          text: "SAIR",
+          text: t("alerts.quit"),
           style: "destructive",
           onPress: () => {
             socket?.emit("leave-room", { roomCode: gameData.roomCode });
@@ -240,7 +238,7 @@ export function useOnlineImpostorGame() {
   // --- Game actions ---
   const handleNextPhase = (nextPhase: string) =>
     new Promise((resolve, reject) => {
-      if (!socket?.connected) return reject("Sem conexão com o servidor.");
+      if (!socket?.connected) return reject(t("alerts.noConnection"));
       socket?.emit(
         "next-phase",
         { roomCode: gameData.roomCode, phase: nextPhase },
@@ -258,7 +256,7 @@ export function useOnlineImpostorGame() {
 
   const handleToggleReady = () =>
     new Promise((resolve, reject) => {
-      if (!socket?.connected) return reject("Sem conexão com o servidor.");
+      if (!socket?.connected) return reject(t("alerts.noConnection"));
       socket?.emit(
         "toggle-ready",
         { roomCode: gameData.roomCode },
@@ -319,6 +317,7 @@ export function useOnlineImpostorGame() {
     reveal,
     showNewHostAlert,
     setShowNewHostAlert,
+    isDataReady,
     actions: {
       handleExitAttempt,
       handleNextPhase,

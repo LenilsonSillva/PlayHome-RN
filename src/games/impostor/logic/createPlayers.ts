@@ -15,16 +15,13 @@ export function createImpostorPlayers(
   const shuffledColors = shuffleArray([...ICON_COLORS]);
 
   return players.map((p, index) => {
-    const score = p.score ?? 0;
-    const globalScore = p.globalScore ?? score;
-
     return {
       ...p,
       isImpostor: impostorIds.includes(p.id),
       isAlive: true,
       word: null,
-      score,
-      globalScore,
+      score: 0, // Nova rodada começa com score zerado
+      globalScore: p.globalScore ?? 0, // Mantém histórico de rodadas anteriores
       emoji: p.emoji ?? shuffledIcons[index % shuffledIcons.length],
       color: p.color ?? shuffledColors[index % shuffledColors.length],
     };

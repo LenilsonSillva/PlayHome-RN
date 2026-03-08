@@ -22,11 +22,11 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
 
     // Logs de debug para você ver no terminal do VS Code
     newSocket.on("connect", () => {
-      console.log("✅ Conectado ao servidor:", newSocket.id);
+      console.log("✅ Connected", newSocket.id);
     });
 
     newSocket.on("disconnect", () => {
-      console.log("❌ Desconectado do servidor");
+      console.log("❌ Disconnected");
     });
 
     // Limpeza ao fechar o app

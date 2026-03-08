@@ -1,20 +1,9 @@
 import React, { useState, useMemo } from "react";
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Platform,
-  Text,
-  ActivityIndicator
-} from "react-native";
+import { View, StyleSheet, TouchableOpacity, ScrollView, Platform, Text, ActivityIndicator } from "react-native";
 import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
 import { Cards } from "@/components/Cards/Cards";
-import {
-  ImpostorPlayer,
-  OnlineImpostorGame
-} from "@/games/impostor/types/game";
+import { ImpostorPlayer, OnlineImpostorGame } from "@/games/impostor/types/game";
 import { PlayerAvatar } from "@/games/common/components/PlayerAvatar";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
@@ -30,15 +19,7 @@ interface Props {
   onlinePlayer?: OnlineImpostorGame;
 }
 
-export const EliminatedReport = ({
-  player,
-  allPlayers,
-  votes,
-  wasVoting,
-  onNext,
-  isOnline,
-  onlinePlayer
-}: Props) => {
+export const EliminatedReport = ({ player, allPlayers, votes, wasVoting, onNext, isOnline, onlinePlayer }: Props) => {
   const { t } = useTranslation();
   const [showLogs, setShowLogs] = useState(false);
   const date = new Date().toLocaleDateString();
@@ -60,7 +41,7 @@ export const EliminatedReport = ({
       // Quando chega aqui, o backend respondeu (ou offline terminou) e a tela deve mudar
     } catch (error) {
       setIsWaiting(false);
-      showAlert("Erro", error as string);
+      showAlert(t("alerts.error"), error as string);
     }
   };
 
@@ -93,31 +74,20 @@ export const EliminatedReport = ({
     <View style={styles.container}>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[
-          styles.scrollContent,
-          { paddingBottom: isOnline ? (onlinePlayer?.isHost ? 130 : 30) : 130 }
-        ]}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: isOnline ? (onlinePlayer?.isHost ? 130 : 30) : 130 }]}
       >
         <View style={{ height: 130 }} />
         {player ? (
           <View style={styles.badgeWrapper}>
             <Cards accentColor={player.color}>
               <View style={styles.badgeHeader}>
-                <CustomText style={styles.headerText}>
-                  CREW IDENTIFICATION CARD
-                </CustomText>
-                <CustomText style={styles.serialText}>
-                  SN-{player.id.slice(0, 5).toUpperCase()}
-                </CustomText>
+                <CustomText style={styles.headerText}>CREW IDENTIFICATION CARD</CustomText>
+                <CustomText style={styles.serialText}>SN-{player.id.slice(0, 5).toUpperCase()}</CustomText>
               </View>
 
               <View style={styles.badgeBody}>
                 <View style={styles.avatarSection}>
-                  <PlayerAvatar
-                    emoji={player.emoji}
-                    color={player.color}
-                    size={90}
-                  />
+                  <PlayerAvatar emoji={player.emoji} color={player.color} size={90} />
                 </View>
 
                 <View style={styles.infoSection}>
@@ -139,9 +109,7 @@ export const EliminatedReport = ({
                       style={[
                         styles.infoText,
                         {
-                          color: player.isImpostor
-                            ? COLORS.danger
-                            : COLORS.textPrimary,
+                          color: player.isImpostor ? COLORS.danger : COLORS.textPrimary,
                           fontSize: 14
                         }
                       ]}
@@ -162,9 +130,7 @@ export const EliminatedReport = ({
               </View>
 
               <View style={styles.stamp}>
-                <CustomText style={styles.stampText}>
-                  {t("games.impostor_eliminated_eliminated")}
-                </CustomText>
+                <CustomText style={styles.stampText}>{t("games.impostor_eliminated_eliminated")}</CustomText>
               </View>
             </Cards>
           </View>
@@ -225,12 +191,8 @@ export const EliminatedReport = ({
 
               <View style={[styles.barRow, styles.nullRow]}>
                 <View style={styles.barInfo}>
-                  <CustomText style={styles.nullName}>
-                    {t("games.impostor_eliminated_nullVotes")}
-                  </CustomText>
-                  <CustomText style={styles.barPercent}>
-                    {Math.round((totalVotesNull / totalVotes) * 100)}%
-                  </CustomText>
+                  <CustomText style={styles.nullName}>{t("games.impostor_eliminated_nullVotes")}</CustomText>
+                  <CustomText style={styles.barPercent}>{Math.round((totalVotesNull / totalVotes) * 100)}%</CustomText>
                 </View>
                 <View style={styles.barTrack}>
                   <View
@@ -246,10 +208,7 @@ export const EliminatedReport = ({
               </View>
             </View>
 
-            <TouchableOpacity
-              style={styles.terminalBtn}
-              onPress={() => setShowLogs(!showLogs)}
-            >
+            <TouchableOpacity style={styles.terminalBtn} onPress={() => setShowLogs(!showLogs)}>
               <CustomText variant="label" style={styles.terminalBtnText}>
                 {showLogs
                   ? "[-] " + t("games.impostor_eliminated_closeLogsAccess")
@@ -265,20 +224,14 @@ export const EliminatedReport = ({
                     const target = allPlayers.find((ap) => ap.id === votedId);
                     return (
                       <CustomText key={voterId} style={styles.terminalLine}>
-                        <CustomText style={styles.terminalTime}>
-                          [{idx + 1}]:{" "}
-                        </CustomText>
-                        {t("games.impostor_eliminated_crew") + ":"}{" "}
-                        {voter?.name.toUpperCase()} {"->"}{" "}
+                        <CustomText style={styles.terminalTime}>[{idx + 1}]: </CustomText>
+                        {t("games.impostor_eliminated_crew") + ":"} {voter?.name.toUpperCase()} {"->"}{" "}
                         {t("games.impostor_eliminated_target") + ":"}{" "}
-                        {target?.name.toUpperCase() ||
-                          t("games.impostor_eliminated_null")}
+                        {target?.name.toUpperCase() || t("games.impostor_eliminated_null")}
                       </CustomText>
                     );
                   })}
-                  <CustomText style={styles.terminalEnd}>
-                    {t("games.impostor_eliminated_endTransmission")}
-                  </CustomText>
+                  <CustomText style={styles.terminalEnd}>{t("games.impostor_eliminated_endTransmission")}</CustomText>
                 </ScrollView>
               </View>
             )}

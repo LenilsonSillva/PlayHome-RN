@@ -8,9 +8,9 @@ import {
 } from "react-native";
 import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
-import { PlayerAvatar } from "@/games/common/components/PlayerAvatar";
 import { ImpostorPlayer } from "@/games/impostor/types/game";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { useTranslation } from "react-i18next";
 
 interface PlayerStatusModalProps {
   visible: boolean;
@@ -25,12 +25,15 @@ export const PlayerStatusModal = ({
   players,
   statusType
 }: PlayerStatusModalProps) => {
+
+  const {t} = useTranslation();
+
   const textStatus = () => {
     switch (statusType) {
       case "ready":
-        return "PRONTO";
+        return t("games.impostor_statusModal_ready");
       case "voted":
-        return "VOTOU";
+        return t("games.impostor_statusModal_voted");
 
       default:
         break;
@@ -97,7 +100,7 @@ export const PlayerStatusModal = ({
                           fontSize: 10
                         }}
                       >
-                        {player[statusType] ? textStatus() : "AGUARDANDO"}
+                        {player[statusType] ? textStatus() : t("games.impostor_statusModal_waiting")}
                       </CustomText>
                     </View>
                   </View>
@@ -107,7 +110,7 @@ export const PlayerStatusModal = ({
 
           <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
             <CustomText variant="label" style={{ color: COLORS.white }}>
-              FECHAR
+              {t("home.back_btn")}
             </CustomText>
           </TouchableOpacity>
         </View>

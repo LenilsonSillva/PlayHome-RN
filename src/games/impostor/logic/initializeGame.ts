@@ -5,7 +5,6 @@ import { distributeWords } from "./distributeWords";
 import { pickRandom } from "../../common/utils/array";
 import { WORDS } from "../../common/data/words";
 
-
 export function getImpostorCount(playersCount: number): number {
   if (playersCount >= 7) return 3;
   if (playersCount >= 5) return 2;
@@ -32,15 +31,13 @@ export function initializeGame(
   selectedCategories: string[],
   whoStartButton: boolean,
   impostorCanStart: boolean,
+  impostorTrap: boolean,
+  impostorCat: boolean,
   impostorHistory: string[][] = [],
-  usedWords: string[] = []
+  usedWords: string[] = [],
 ): ImpostorGame {
   // 1. Cria os jogadores (define quem é impostor, emoji e cor)
-  const impostorPlayers = createImpostorPlayers(
-    allPlayers,
-    impostorCount,
-    impostorHistory
-  );
+  const impostorPlayers = createImpostorPlayers(allPlayers, impostorCount, impostorHistory);
 
   // 2. Distribui as palavras
   const { updatedPlayers, chosenWord } = distributeWords(
@@ -49,15 +46,13 @@ export function initializeGame(
     selectedCategories,
     WORDS,
     impostorHasHint,
-    usedWords
+    impostorTrap,
+    impostorCat,
+    usedWords,
   );
 
   // 3. Define quem começa (usando a lista atualizada de jogadores)
-  const whoStart = selectWhoStart(
-    updatedPlayers,
-    whoStartButton,
-    impostorCanStart
-  );
+  const whoStart = selectWhoStart(updatedPlayers, whoStartButton, impostorCanStart);
 
   // O retorno deve bater exatamente com o seu Type 'ImpostorGame'
   return {
@@ -65,6 +60,8 @@ export function initializeGame(
     impostorCount,
     twoWordsMode,
     impostorHasHint,
+    impostorTrap,
+    impostorCat,
     impostorCanStart,
     selectedCategories,
     chosenWord,

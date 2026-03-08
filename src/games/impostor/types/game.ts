@@ -1,6 +1,9 @@
-import { OnlinePlayer } from "@/games/common/types/player";
+import { GlobalPlayer } from "@/games/common/types/player";
 
-// Jogador do Impostor
+/**
+ * Jogador do jogo Impostor
+ * Combina informações pessoais com status do jogo
+ */
 export type ImpostorPlayer = {
   id: string;
   name: string;
@@ -10,9 +13,11 @@ export type ImpostorPlayer = {
   isAlive: boolean;
   word: string | null;
   hint?: string;
+  /** Pontos obtidos NA RODADA ATUAL (pode ser positivo ou negativo) */
   score: number;
+  /** Acumulação histórica de pontos (resultado permanente) */
   globalScore: number;
-  isHost?: boolean,
+  isHost?: boolean;
   vote?: string;
   ready?: boolean;
   revealed?: boolean;
@@ -20,6 +25,9 @@ export type ImpostorPlayer = {
   voted?: boolean;
 };
 
+/**
+ * Estado completo de uma partida Impostor
+ */
 export type ImpostorGame = {
   players: ImpostorPlayer[];
   impostorCount: number;
@@ -29,14 +37,26 @@ export type ImpostorGame = {
   selectedCategories: string[];
   chosenWord: string[];
   whoStart?: string;
-  phase: "discussion" | "voting" | "reveal" | "elimination" | "result"; // fases do jogo
-  impostorHistory: string[][]; // histórico de quem foi impostor
-  usedWords: string[];         // palavras já usadas
-  word?: string
+  phase: "discussion" | "voting" | "reveal" | "elimination" | "result";
+  impostorHistory: string[][];
+  usedWords: string[];
+  word?: string;
+  impostorTrap: boolean;
+  impostorCat: boolean;
 };
 
+/**
+ * Dados específicos do jogador online durante o jogo
+ * Estende ImpostorGame com dados personalizados
+ *
+ * ⚠️ IMPORTANTE:
+ * - `isSpectator = true`: Você está observando (entrou após jogo começar)
+ * - `isHost`: Você pode controlar configurações/próxima rodada
+ * - `isImpostor`: Seu role no jogo
+ */
 export type OnlineImpostorGame = ImpostorGame & {
-  allPlayers: OnlinePlayer;
+  /** Todos os jogadores dessa partida (participantes + espectadores que viraram jogadores) */
+  allPlayers: ImpostorPlayer[];
   isHost: boolean;
   isImpostor: boolean;
   myColor: string;
@@ -47,12 +67,15 @@ export type OnlineImpostorGame = ImpostorGame & {
   revealed: boolean;
   roomCode: string;
   voted: boolean;
-  votes: Record<string, string | null >;
+  votes: Record<string, string | null>;
   votingFinished?: boolean;
+  /** True se você entrou em jogo já em andamento (espectador) */
   isSpectator?: boolean;
   word: string | null;
   hint: string;
+  /** Pontos obtidos NA RODADA ATUAL (pode ser positivo ou negativo) */
   score: number;
+  /** Acumulação histórica de pontos (resultado permanente) */
   globalScore: number;
   eliminatedId?: string | null;
-}
+};

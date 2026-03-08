@@ -6,6 +6,7 @@ import { Header } from "@/components/Header/Header";
 import { SettingsModal } from "@/components/SettingsModal/SettingsModal";
 import { LobbyOffline } from "./LobbyOffline";
 import { LobbyOnline } from "./LobbyOnline";
+import { ImpostorBackground } from "@/components/Background/Background";
 
 export default function ImpostorLobby() {
   const [mode, setMode] = useState<"local" | "online">("local");
@@ -22,6 +23,7 @@ export default function ImpostorLobby() {
 
   return (
     <View style={styles.container}>
+      <ImpostorBackground/>
       <Header
         centerElement={LobbyTitle}
         onOpenSettings={() => {
