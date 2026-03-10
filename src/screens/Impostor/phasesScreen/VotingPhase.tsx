@@ -32,6 +32,7 @@ export const VotingPhase = ({ data, isOnline, currentVoteState, voteEnded, playe
   const [currentVoterIdx, setCurrentVoterIdx] = useState(0);
 
   const TOTAL_TIME = 60; // Constante global de tempo
+  const serverOffset = data.serverTime ? data.serverTime - Date.now() : 0;
   const [endTime, setEndTime] = useState(() =>
     isOnline && data.votingEndTime ? data.votingEndTime : Date.now() + TOTAL_TIME * 1000
   );
@@ -84,8 +85,8 @@ export const VotingPhase = ({ data, isOnline, currentVoteState, voteEnded, playe
     if (data.votingFinished || isWaiting) return;
 
     const timer = setInterval(() => {
-      const now = Date.now();
-      const remaining = Math.max(0, Math.ceil((endTime - now) / 1000));
+      const now = Date.now() + serverOffset;
+      const remaining = Math.max(0, Math.ceil((endTime - (Date.now() + serverOffset)) / 1000));
       setTimeLeft(remaining);
     }, 1000);
 
@@ -149,10 +150,10 @@ export const VotingPhase = ({ data, isOnline, currentVoteState, voteEnded, playe
           </View>
           <View style={styles.voterInfo}>
             <CustomText variant="label" style={{ color: COLORS.textSecondary }}>
-              {isDead ? t("games.impostor_voting_spectating", "ASSISTINDO") : t("games.impostor_voting_titleVotingNow")}
+              {isDead ? t("games.impostor_voting_spectating") : t("games.impostor_voting_titleVotingNow")}
             </CustomText>
             <CustomText variant="h2" style={styles.voterName}>
-              {currentVoter?.name || "ESPECTADOR"}
+              {currentVoter?.name || t("games.impostor_phase_spectator")}
             </CustomText>
           </View>
           <PlayerAvatar emoji={currentVoter?.emoji || "👻"} color={currentVoter?.color || COLORS.textSecondary} size={50} />
@@ -164,10 +165,10 @@ export const VotingPhase = ({ data, isOnline, currentVoteState, voteEnded, playe
             <View style={{ alignItems: "center", paddingVertical: 40, gap: 20 }}>
               <ActivityIndicator size="large" color={COLORS.cyan} />
               <CustomText variant="h3" style={{ textAlign: "center", color: COLORS.textPrimary }}>
-                {isDead ? "VOCÊ FOI ELIMINADO" : "VOTO REGISTRADO"}
+                {isDead ? t("games.impostor_voting_youEliminated") : t("games.impostor_voting_gotVote")}
               </CustomText>
               <CustomText variant="label" style={{ color: COLORS.textSecondary, textAlign: "center" }}>
-                {t("games.impostor_voting_waitingOthers", "Aguardando os outros jogadores votarem...")}
+                {t("games.impostor_voting_waitingOthers")}
               </CustomText>
             </View>
           ) : (
@@ -196,7 +197,7 @@ export const VotingPhase = ({ data, isOnline, currentVoteState, voteEnded, playe
 
               <TouchableOpacity style={styles.nullBtn} onPress={() => handleConfirmVote(null)}>
                 <CustomText variant="label" style={{ color: COLORS.textSecondary }}>
-                  {t("games.impostor_voting_skipBtn", "VOTO NULO / PULAR")}
+                  {t("games.impostor_voting_skipBtn")}
                 </CustomText>
               </TouchableOpacity>
             </>
@@ -211,7 +212,7 @@ export const VotingPhase = ({ data, isOnline, currentVoteState, voteEnded, playe
           onPress={() => setStatusModalVisible(true)}
         >
           <CustomText variant="label" style={styles.statusTitle}>
-            {t("games.impostor_voting_crewMateStatus", "STATUS DA TRIPULAÇÃO")}
+            {t("games.impostor_voting_crewMateStatus")}
           </CustomText>
           <View style={styles.dotsRow}>
             {alivePlayers.map((p: ImpostorPlayer) => (
@@ -242,11 +243,11 @@ export const VotingPhase = ({ data, isOnline, currentVoteState, voteEnded, playe
                 </View>
                 <View style={styles.modalActions}>
                   <TouchableOpacity style={styles.cancel} onPress={() => setSelectedTarget(null)}>
-                    <CustomText variant="label">{t("games.impostor_voting_back", "VOLTAR")}</CustomText>
+                    <CustomText variant="label">{t("games.impostor_voting_back")}</CustomText>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.confirm} onPress={() => handleConfirmVote(selectedTarget!.id)}>
                     <CustomText variant="label" style={{ color: COLORS.background }}>
-                      {t("games.impostor_voting_confirm", "CONFIRMAR VOTO")}
+                      {t("games.impostor_voting_confirm")}
                     </CustomText>
                   </TouchableOpacity>
                 </View>

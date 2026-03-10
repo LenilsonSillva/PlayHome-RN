@@ -196,7 +196,7 @@ export const DiscussPhase = ({
                 ⏳
               </CustomText>
               <CustomText variant="label" style={styles.waitText}>
-                Aguarde o comandante da missão Iniciar a votação.
+                {t("games.impostor_discuss_waitHost")}
               </CustomText>
             </View>
           )}

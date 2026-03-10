@@ -118,6 +118,7 @@
     "impostor_reveal_changeWord_sub": "NÃO CONHEÇO A PALAVRA",
     "impostor_reveal_isReady": "ESTOU PRONTO",
     "impostor_reveal_waitHost": "AGUARDE O INÍCIO",
+    "impostor_reveal_statusBtn": "Ver status",
 
     "impostor_discuss_time": "TEMPO DECORRIDO",
     "impostor_discuss_impostorsLeft": "AMEAÇAS VIVAS",
@@ -138,6 +139,7 @@
     "impostor_discuss__modalReview_closeBtn": "FECHAR TERMINAL",
     "impostor_discuss__modalReview_yourWord": "SUA PALAVRA É:",
     "impostor_discuss__modalReview_youAre": "VOCÊ É O",
+    "impostor_discuss_waitHost": "Aguarde o Host Iniciar a votação...",
 
     "impostor_voting_titleVotingNow": "VOTANDO AGORA",
     "impostor_voting_selectSuspect": "SELECIONE O SUSPEITO",
@@ -147,6 +149,10 @@
     "impostor_voting_confirmVote": "CONFIRMAÇÃO DE VOTO",
     "impostor_voting_back": "VOLTAR",
     "impostor_voting_confirm": "CONFIRMAR",
+    "impostor_voting_spectating": "ASSISTINDO",
+    "impostor_voting_youEliminated": "VOCÊ FOI ELIMINADOR",
+    "impostor_voting_gotVote": "VOTO REGISTRADO",
+    "impostor_voting_waitingOthers": "Agurdando os outros jogadores votarem...",
 
     "impostor_elimination_aletTitle": "SISTEMA DE SEGURANÇA",
     "impostor_elimination_title1": "CONTROLE DO ",
@@ -158,6 +164,7 @@
     "impostor_elimination_ejectConfirm": "CONFIRMAR EJEÇÃO?",
     "impostor_elimination_back": "ABORTAR",
     "impostor_elimination_confirm": "CONFIRMAR",
+    
 
     "impostor_eliminated_name": "NOME",
     "impostor_eliminated_function": "FUNÇÃO",
@@ -181,6 +188,7 @@
     "impostor_eliminated_tie": "EMPATE DETECTADO",
     "impostor_eliminated_tieText": "Nenhum tripulante foi ejetado. O sistema de votação não obteve maioria absoluta.",
     "impostor_eliminated_votes": "voto",
+    "impostor_eliminated_waitHost": "Aguarde o Host para prosseguir...",
 
     "impostor_result_victoryTitleMasc": "VITÓRIA DO\n",
     "impostor_result_victoryTitleFemi": "VITÓRIA DA\n",

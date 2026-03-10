@@ -359,7 +359,7 @@ export const RevealPhase = ({ player, data, isOnline, onNext, isLast, revealedAf
         {isOnline && (
           <TouchableOpacity style={styles.statusReady} activeOpacity={0.8} onPress={() => setStatusModalVisible(true)}>
             <CustomText variant="label" style={{ color: player.color }}>
-              Ver Status
+              {t("games.impostor_reveal_statusBtn")}
             </CustomText>
             <View style={styles.dotsRow}>
               {data.players.map((p) => (

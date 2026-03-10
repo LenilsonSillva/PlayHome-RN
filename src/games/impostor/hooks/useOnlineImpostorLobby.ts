@@ -63,38 +63,45 @@ export function useOnlineImpostorLobby() {
 
     if (!socket) return;
 
-    socket.on("room-updated", (room) => {
+    const onRoomUpdated = (room: any) => {
       // 🔥 TRAVA DE SEGURANÇA: Eu ainda estou na sala de verdade?
       const amIStillInRoom = room.players.some((p: any) => p.socketId === socket.id);
-      // Se o servidor avisar que a sala atualizou, mas meu nome não está lá,
-      // significa que eu acabei de sair (ou fui expulso). Então ignora o aviso!
-      if (!amIStillInRoom) return;
-      if (!room.code) return;
+      if (!amIStillInRoom || !room.code) return;
 
       setPlayers(room.players);
       setRoomCode(room.code);
       setInRoom(true);
       setIsHost(room.hostId === socket.id);
-    });
+    };
 
-    socket.on("game-update", (data) => {
+    const onGameUpdate = (data: any) => {
       navigation.navigate("OnlineImpostorGame", { data });
-    });
+    };
 
-    socket.on("disconnect", () => {
-      // O evento leaveRoom precisa acessar os estados atuais, no useEffect vazio
-      // é melhor apenas limpar localmente, pois o servidor já cuida da desconexão
-      setInRoom(false);
-      setIsHost(false);
-      setPlayers([]);
-      setRoomCode("");
-      navigation.navigate("ImpostorLobby");
-    });
+    const onDisconnect = () => {
+      // 🔥 A SOLUÇÃO ESTÁ AQUI:
+      // Só executa o bloco de limpeza e redirecionamento se você
+      // realmente estiver em uma sala (inRoom).
+      // Isso impede que jogadores no modo offline sejam chutados pro Lobby!
+      setInRoom((currentlyInRoom) => {
+        if (currentlyInRoom) {
+          setIsHost(false);
+          setPlayers([]);
+          setRoomCode("");
+          navigation.navigate("ImpostorLobby");
+        }
+        return false;
+      });
+    };
+
+    socket.on("room-updated", onRoomUpdated);
+    socket.on("game-update", onGameUpdate);
+    socket.on("disconnect", onDisconnect);
 
     return () => {
-      socket.off("room-updated");
-      socket.off("game-update");
-      socket.off("disconnect");
+      socket.off("room-updated", onRoomUpdated);
+      socket.off("game-update", onGameUpdate);
+      socket.off("disconnect", onDisconnect);
     };
   }, [socket, navigation]);
 

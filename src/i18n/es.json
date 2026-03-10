@@ -118,6 +118,7 @@
     "impostor_reveal_changeWord_sub": "NO CONOZCO LA PALABRA",
     "impostor_reveal_isReady": "ESTOY LISTO",
     "impostor_reveal_waitHost": "ESPERA EL INICIO",
+    "impostor_reveal_statusBtn": "Ver estado",
 
     "impostor_discuss_time": "TIEMPO TRANSCURRIDO",
     "impostor_discuss_impostorsLeft": "AMENAZAS VIVAS",
@@ -138,6 +139,7 @@
     "impostor_discuss__modalReview_closeBtn": "CERRAR TERMINAL",
     "impostor_discuss__modalReview_yourWord": "TU PALABRA ES:",
     "impostor_discuss__modalReview_youAre": "TÚ ERES EL",
+    "impostor_discuss_waitHost": "Espera a que el anfitrión inicie la votación...",
 
     "impostor_voting_titleVotingNow": "VOTANDO AHORA",
     "impostor_voting_selectSuspect": "SELECCIONA AL SOSPECHOSO",
@@ -147,6 +149,10 @@
     "impostor_voting_confirmVote": "CONFIRMACIÓN DE VOTO",
     "impostor_voting_back": "VOLVER",
     "impostor_voting_confirm": "CONFIRMAR",
+    "impostor_voting_spectating": "ESPECTANDO",
+    "impostor_voting_youEliminated": "FUISTE ELIMINADO",
+    "impostor_voting_gotVote": "VOTO REGISTRADO",
+    "impostor_voting_waitingOthers": "Esperando a que los otros jugadores voten...",
 
     "impostor_elimination_aletTitle": "SISTEMA DE SEGURIDAD",
     "impostor_elimination_title1": "CONTROL DEL ",
@@ -181,6 +187,7 @@
     "impostor_eliminated_tie": "EMPATE DETECTADO",
     "impostor_eliminated_tieText": "Ningún tripulante fue expulsado. El sistema de votación no obtuvo mayoría absoluta.",
     "impostor_eliminated_votes": "voto",
+    "impostor_eliminated_waitHost": "Espera a que el anfitrión continúe...",
 
     "impostor_result_victoryTitleMasc": "VICTORIA DEL\n",
     "impostor_result_victoryTitleFemi": "VICTORIA DE LA\n",
