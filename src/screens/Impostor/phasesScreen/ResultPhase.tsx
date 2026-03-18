@@ -166,7 +166,7 @@ export const ResultPhase = ({ data, onNextRound, isOnline }: Props) => {
           </TouchableOpacity>
         ) : (
           <CustomText variant="label" style={styles.textNotHost}>
-            Aguarde o host para iniciar outra partida
+            {t("games.impostor_result_waitHost")}
           </CustomText>
         )}
       </View>

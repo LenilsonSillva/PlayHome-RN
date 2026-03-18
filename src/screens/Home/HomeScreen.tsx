@@ -1,12 +1,5 @@
 import React, { useRef, useState } from "react";
-import {
-  View,
-  StyleSheet,
-  Dimensions,
-  Animated,
-  TouchableOpacity,
-  ImageBackground
-} from "react-native";
+import { View, StyleSheet, Dimensions, Animated, TouchableOpacity, ImageBackground } from "react-native";
 import { useTranslation } from "react-i18next";
 import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
@@ -34,7 +27,7 @@ export default function HomeScreen() {
       color: COLORS.danger,
       desc: t("games.impostor_desc"),
       img: require("../../../assets/bgImpostor.png"),
-      navigate: ()=>navigation.navigate("ImpostorLobby")
+      navigate: () => navigation.navigate("ImpostorLobby")
     },
     {
       id: "2",
@@ -43,7 +36,7 @@ export default function HomeScreen() {
       color: COLORS.cyan,
       desc: t("games.cripto_desc"),
       img: require("../../../assets/bgCrip.png"),
-      navigate: ()=>''
+      navigate: () => navigation.navigate("CryptographyLobby")
     }
   ];
 
@@ -51,9 +44,7 @@ export default function HomeScreen() {
     <View style={styles.logoContainer}>
       <CustomText style={styles.mainLogoText}>
         PLAY
-        <CustomText style={{ color: COLORS.textSecondary, fontSize: 40 }}>
-          HOME
-        </CustomText>
+        <CustomText style={{ color: COLORS.textSecondary, fontSize: 40 }}>HOME</CustomText>
       </CustomText>
       <CustomText variant="hint" style={styles.mainSubtitle}>
         {t("home.main_subtitle")?.toUpperCase()}
@@ -85,16 +76,9 @@ export default function HomeScreen() {
           snapToInterval={ITEM_WIDTH + GAP}
           decelerationRate="fast"
           contentContainerStyle={{ paddingHorizontal: SPACER }}
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-            { useNativeDriver: true }
-          )}
+          onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], { useNativeDriver: true })}
           renderItem={({ item, index }) => {
-            const inputRange = [
-              (index - 1) * (ITEM_WIDTH + GAP),
-              index * (ITEM_WIDTH + GAP),
-              (index + 1) * (ITEM_WIDTH + GAP)
-            ];
+            const inputRange = [(index - 1) * (ITEM_WIDTH + GAP), index * (ITEM_WIDTH + GAP), (index + 1) * (ITEM_WIDTH + GAP)];
 
             const scale = scrollX.interpolate({
               inputRange,
@@ -124,40 +108,21 @@ export default function HomeScreen() {
               >
                 <TouchableOpacity activeOpacity={0.9} style={{ flex: 1 }} onPress={item.navigate}>
                   <Cards accentColor={item.color}>
-                    <ImageBackground
-                      source={item.img}
-                      style={{ position: "static", opacity: 0.4 }}
-                    />
+                    <ImageBackground source={item.img} style={{ position: "static", opacity: 0.4 }} />
                     <View style={styles.emojiWrapper}>
-                      <CustomText
-                        style={[styles.largeEmoji, { shadowColor: item.color }]}
-                      >
-                        {item.icon}
-                      </CustomText>
+                      <CustomText style={[styles.largeEmoji, { shadowColor: item.color }]}>{item.icon}</CustomText>
                     </View>
 
                     <View style={styles.textCenter}>
-                      <CustomText
-                        variant="h2"
-                        style={{ color: item.color, textAlign: "center" }}
-                      >
+                      <CustomText variant="h2" style={{ color: item.color, textAlign: "center" }}>
                         {item.title}
                       </CustomText>
-                      <CustomText
-                        variant="body"
-                        numberOfLines={4}
-                        style={[
-                          styles.cardDesc,
-                          { color: COLORS.textSecondary }
-                        ]}
-                      >
+                      <CustomText variant="body" numberOfLines={4} style={[styles.cardDesc, { color: COLORS.textSecondary }]}>
                         {item.desc}
                       </CustomText>
                     </View>
 
-                    <View
-                      style={[styles.actionBtn, { borderColor: item.color }]}
-                    >
+                    <View style={[styles.actionBtn, { borderColor: item.color }]}>
                       <CustomText variant="label" style={{ color: item.color }}>
                         {t("home.connect_btn")} →
                       </CustomText>
@@ -170,27 +135,19 @@ export default function HomeScreen() {
         />
       </View>
 
-      <SettingsModal visible={openModal} onClose={() => setOpenModal(false)} onToggleReview={()=>{}} reviewEnabled/>
+      <SettingsModal visible={openModal} onClose={() => setOpenModal(false)} onToggleReview={() => {}} reviewEnabled />
 
       {/* INDICADORES ANIMADOS */}
       <View style={styles.footer}>
         <View style={styles.pagination}>
           {DATA.map((_, i) => {
             const scaleX = scrollX.interpolate({
-              inputRange: [
-                (i - 1) * (ITEM_WIDTH + GAP),
-                i * (ITEM_WIDTH + GAP),
-                (i + 1) * (ITEM_WIDTH + GAP)
-              ],
+              inputRange: [(i - 1) * (ITEM_WIDTH + GAP), i * (ITEM_WIDTH + GAP), (i + 1) * (ITEM_WIDTH + GAP)],
               outputRange: [1, 2.5, 1],
               extrapolate: "clamp"
             });
             const dotOpacity = scrollX.interpolate({
-              inputRange: [
-                (i - 1) * (ITEM_WIDTH + GAP),
-                i * (ITEM_WIDTH + GAP),
-                (i + 1) * (ITEM_WIDTH + GAP)
-              ],
+              inputRange: [(i - 1) * (ITEM_WIDTH + GAP), i * (ITEM_WIDTH + GAP), (i + 1) * (ITEM_WIDTH + GAP)],
               outputRange: [0.2, 1, 0.2],
               extrapolate: "clamp"
             });

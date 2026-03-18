@@ -14,14 +14,18 @@ import { SocketProvider } from "@/contexts/socketContext";
 import { AlertProvider } from "@/contexts/alertContext";
 import { OfflineImpostorGameScreen } from "@/screens/Impostor/gameScreen/OfflineImpostorGameScreen";
 import { OnlineImpostorGameScreen } from "@/screens/Impostor/gameScreen/OnlineImpostorGameScreen";
+import { CryptographyLobby } from "@/screens/Criptography/lobby";
+import { OfflineCryptographyGameScreen } from "@/screens/Criptography/gameScreen/OfflineCryptographyGameScreen";
 
 // Tipagem das rotas
 export type RootStackParamList = {
   Splash: undefined;
   Home: undefined;
   ImpostorLobby: undefined;
+  CryptographyLobby: undefined;
   ImpostorGame: { config: any }; // Você pode definir o tipo correto para config conforme necessário;
   OnlineImpostorGame: { config: any };
+  OfflineCryptographyGame: { config: any }
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -47,6 +51,11 @@ export default function App() {
               <Stack.Screen name="Splash" component={SplashScreen} />
               <Stack.Screen name="Home" component={HomeScreen} />
               <Stack.Screen name="ImpostorLobby" component={ImpostorLobby} />
+              <Stack.Screen name="CryptographyLobby" component={CryptographyLobby} />
+              <Stack.Screen
+                name="OfflineCryptographyGame"
+                component={OfflineCryptographyGameScreen}
+              />
               <Stack.Screen
                 name="ImpostorGame"
                 component={OfflineImpostorGameScreen}

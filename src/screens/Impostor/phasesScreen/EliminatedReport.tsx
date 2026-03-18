@@ -242,7 +242,7 @@ export const EliminatedReport = ({ player, allPlayers, votes, wasVoting, onNext,
               <View style={styles.footerNavNotHost}>
                 <CustomText variant="h2">⏳</CustomText>
                 <CustomText variant="label" style={styles.textFooterWaitHost}>
-                  {t("games.impostor_discuss_waitHost")}
+                  {t("games.impostor_eliminated_waitHost")}
                 </CustomText>
               </View>
             )

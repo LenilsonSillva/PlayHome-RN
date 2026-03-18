@@ -188,6 +188,7 @@
     "impostor_eliminated_tieText": "Ningún tripulante fue expulsado. El sistema de votación no obtuvo mayoría absoluta.",
     "impostor_eliminated_votes": "voto",
     "impostor_eliminated_waitHost": "Espera a que el anfitrión continúe...",
+    "impostor_result_waitHost": "Espera al anfitrión para iniciar otra partida...",
 
     "impostor_result_victoryTitleMasc": "VICTORIA DEL\n",
     "impostor_result_victoryTitleFemi": "VICTORIA DE LA\n",

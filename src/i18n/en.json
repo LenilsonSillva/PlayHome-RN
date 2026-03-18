@@ -202,6 +202,7 @@
     "impostor_result_third": "rd",
     "impostor_result_moreRanking": "th",
     "impostor_result_nextMission": "NEXT ROUND",
+    "impostor_result_waitHost": "Wait for the host to start another match...",
 
     "impostor_statusModal_ready": "READY",
     "impostor_statusModal_voted": "VOTED",

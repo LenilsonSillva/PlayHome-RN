@@ -33,8 +33,7 @@ export const OfflineImpostorGameScreen = ({ route }: any) => {
 
   const [openModal, setOpenModal] = useState<boolean>(false); // Controla a visibilidade do modal de configurações
   const [reveal, setReveal] = useState<boolean>(false); // Controla se é a primeira revelação ou se já passou por um reroll (para mostrar o indicador de palavra revelada após reroll)
-  const [eliminatedTarget, setEliminatedTarget] =
-    useState<ImpostorPlayer | null>(null); // Guarda o jogador que foi eliminado para mostrar no relatório
+  const [eliminatedTarget, setEliminatedTarget] = useState<ImpostorPlayer | null>(null); // Guarda o jogador que foi eliminado para mostrar no relatório
   const [showReport, setShowReport] = useState(false); // Controla a visibilidade do relatório de eliminação
   const [wasVoting, setWasVoting] = useState(false); // Controla se a eliminação foi resultado de uma votação ou de um relatório direto do host (para ajustar o texto do relatório)
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0); // Controla qual jogador está revelando a palavra no modo offline
@@ -121,9 +120,7 @@ export const OfflineImpostorGameScreen = ({ route }: any) => {
       <CustomText variant="label" style={{ color: COLORS.danger }}>
         {t(`games.impostor_phase_header_title`)}
       </CustomText>
-      <CustomText variant="h3">
-        {t(`games.impostor_phase_${game?.phase}`)}
-      </CustomText>
+      <CustomText variant="h3">{t(`games.impostor_phase_${game?.phase}`)}</CustomText>
     </View>
   );
 
@@ -158,10 +155,7 @@ export const OfflineImpostorGameScreen = ({ route }: any) => {
           />
         )}
 
-        <ReviewWordModal
-          player={reviewPlayer}
-          onClose={() => setReviewPlayer(null)}
-        />
+        <ReviewWordModal player={reviewPlayer} onClose={() => setReviewPlayer(null)} />
 
         {game.phase === "discussion" && (
           <DiscussPhase
@@ -175,18 +169,11 @@ export const OfflineImpostorGameScreen = ({ route }: any) => {
         )}
 
         {game.phase === "voting" && !showReport && (
-          <VotingPhase
-            data={game}
-            currentVoteState={submitVote}
-            voteEnded={handleVotingEnd}
-          />
+          <VotingPhase data={game} currentVoteState={submitVote} voteEnded={handleVotingEnd} />
         )}
 
         {game.phase === "elimination" && !showReport && (
-          <EliminationPhase
-            data={game}
-            onConfirmElimination={handleSelectToEliminate}
-          />
+          <EliminationPhase data={game} onConfirmElimination={handleSelectToEliminate} />
         )}
         {showReport && (
           <EliminatedReport
