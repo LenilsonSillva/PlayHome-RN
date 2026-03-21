@@ -15,8 +15,6 @@ import { InfiltrationAction } from "../phasesScreen/InfiltrationAction";
 import { SettingsModal } from "@/components/SettingsModal/SettingsModal";
 import { RoundResult } from "../phasesScreen/RoundResult";
 import { InterceptionAction } from "../phasesScreen/InterceptionAction";
-// import { InterceptionAction } from "./phasesScreen/InterceptionAction";
-// import { ResultPhase } from "./phasesScreen/ResultPhase";
 
 export function OfflineCryptographyGameScreen() {
   const route = useRoute<any>();
@@ -53,7 +51,7 @@ export function OfflineCryptographyGameScreen() {
   // ⭐ Dependências Corrigidas (Inicia o jogo apenas 1x)
   useEffect(() => {
     if (route.params?.config && players.length > 0 && !gameState) {
-      startGame(players, route.params.config, route.params.manualAssignments);
+      startGame(players, route.params.config, route.params.manualAssignments, route.params.globalUsedWords);
     }
   }, [route.params?.config, route.params?.manualAssignments, players, startGame, gameState]);
 

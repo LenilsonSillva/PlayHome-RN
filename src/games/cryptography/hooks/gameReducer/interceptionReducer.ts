@@ -9,7 +9,6 @@ export function interceptionReducer(state: CryptoGameState | null, action: GameA
     case "INTERCEPTION_RESULT": {
       if (!("winnerTeamIndex" in action)) return state;
 
-      // 🔥 1. Calcula os milissegundos exatos que o time demorou para responder
       const now = Date.now();
       const timeSpentOnWord = now - (state.lastActionTime || now);
 
@@ -19,7 +18,6 @@ export function interceptionReducer(state: CryptoGameState | null, action: GameA
         updatedTeams = state.teams.map((t, i) => {
           if (i !== action.winnerTeamIndex) return t;
 
-          // 🔥 2. Adiciona o acerto no currículo do Operador (Para o MVP!)
           const opStats = { ...t.operatorStats };
           if (t.operatorId) {
             opStats[t.operatorId] = (opStats[t.operatorId] || 0) + 1;
@@ -29,10 +27,10 @@ export function interceptionReducer(state: CryptoGameState | null, action: GameA
             ...t,
             score: t.score + 1,
             roundScore: t.roundScore + 1,
-            wordsGuessed: state.currentWord ? [...t.wordsGuessed, state.currentWord] : t.wordsGuessed,
+            wordsGuessed: state.currentWord ?[...t.wordsGuessed, state.currentWord] : t.wordsGuessed,
             roundTimeSpent: t.roundTimeSpent + timeSpentOnWord,
             totalTimeSpent: t.totalTimeSpent + timeSpentOnWord,
-            operatorStats: opStats // Atualiza a pontuação individual dele!
+            operatorStats: opStats
           };
         });
       }
@@ -52,9 +50,9 @@ export function interceptionReducer(state: CryptoGameState | null, action: GameA
         };
       }
 
-      const nextWord = getUniqueWord(state.config.categories, state.usedWords);
+      const result = getUniqueWord(state.config.categories, state.usedWords);
 
-      if (!nextWord) {
+      if (!result.word) {
         return { ...state, phase: "round-result", roundEndTime: undefined, lastActionTime: undefined };
       }
 
@@ -62,8 +60,8 @@ export function interceptionReducer(state: CryptoGameState | null, action: GameA
         ...state,
         teams: updatedTeams,
         currentMatchIndex: nextMatchIndex,
-        currentWord: nextWord,
-        usedWords: [...state.usedWords, nextWord],
+        currentWord: result.word,
+        usedWords: result.didReset ? [result.word] : [...state.usedWords, result.word],
         currentTeamIndex: newCurrentTeamIndex,
         roundEndTime: undefined,
         lastActionTime: undefined
@@ -79,7 +77,6 @@ export function interceptionReducer(state: CryptoGameState | null, action: GameA
         
         return {
           ...t,
-          // 🔥 3. Conta o "Passo" como um Erro para o cálculo de Eficiência do grupo
           roundErrors: t.roundErrors + 1,
           totalErrors: t.totalErrors + 1,
           roundTimeSpent: t.roundTimeSpent + timeSpentOnTurn,

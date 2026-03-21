@@ -11,7 +11,6 @@ export function infiltrationReducer(state: CryptoGameState | null, action: GameA
     case "INFILTRATION_WORD": {
       if (!("success" in action)) return state;
 
-      // 🔥 1. Calcula o tempo exato neste Swipe
       const now = Date.now();
       const timeSpentOnWord = now - (state.lastActionTime || now);
 
@@ -26,13 +25,12 @@ export function infiltrationReducer(state: CryptoGameState | null, action: GameA
       } else {
         if (state.skipsLeft === 0) return state;
         newSkips = state.skipsLeft - 1;
-        newErrors = 1; // Registra o pulo como erro
+        newErrors = 1;
       }
 
       const updatedTeams = state.teams.map((t, i) => {
         if (i !== state.currentTeamIndex) return t;
 
-        // 🔥 2. Adiciona o acerto no currículo do Operador
         const opStats = { ...t.operatorStats };
         if (action.success && t.operatorId) {
           opStats[t.operatorId] = (opStats[t.operatorId] || 0) + 1;
@@ -51,9 +49,10 @@ export function infiltrationReducer(state: CryptoGameState | null, action: GameA
         };
       });
 
-      const nextWord = getUniqueWord(state.config.categories, state.usedWords);
+      // 🔥 CORREÇÃO: Lê o 'result.word' do novo formato
+      const result = getUniqueWord(state.config.categories, state.usedWords);
 
-      if (!nextWord) {
+      if (!result.word) {
         return {
           ...state,
           teams: updatedTeams,
@@ -66,35 +65,36 @@ export function infiltrationReducer(state: CryptoGameState | null, action: GameA
       return {
         ...state,
         teams: updatedTeams,
-        currentWord: nextWord,
-        usedWords: [...state.usedWords, nextWord],
+        currentWord: result.word,
+        // 🔥 Se o banco zerou (didReset), a lista de usadas começa limpa só com essa palavra!
+        usedWords: result.didReset ? [result.word] : [...state.usedWords, result.word],
         skipsLeft: newSkips,
-        lastActionTime: now // Reinicia o relógio pro próximo swipe
+        lastActionTime: now
       };
     }
 
     case "FINISH_INFILTRATION_TURN": {
-      const isLastTeam = state.currentTeamIndex >= state.teams.length - 1;
+      const nextTeamIndex = (state.currentTeamIndex + 1) % state.teams.length;
+      const isLastTeam = nextTeamIndex === state.startingTeamIndex;
 
       if (isLastTeam) {
         return { ...state, phase: "round-result", roundEndTime: undefined, lastActionTime: undefined };
       }
 
-      const nextTeamIndex = state.currentTeamIndex + 1;
-      const nextWord = getUniqueWord(state.config.categories, state.usedWords);
+      const result = getUniqueWord(state.config.categories, state.usedWords);
 
-      if (!nextWord) {
+      if (!result.word) {
         return { ...state, phase: "round-result", roundEndTime: undefined, lastActionTime: undefined };
       }
 
       return {
         ...state,
         currentTeamIndex: nextTeamIndex,
-        currentWord: nextWord,
-        usedWords: [...state.usedWords, nextWord],
+        currentWord: result.word,
+        usedWords: result.didReset ? [result.word] : [...state.usedWords, result.word],
         skipsLeft: MAX_SKIPS,
         roundEndTime: undefined,
-        lastActionTime: undefined // O próximo time que começa do zero ao dar o play
+        lastActionTime: undefined
       };
     }
 

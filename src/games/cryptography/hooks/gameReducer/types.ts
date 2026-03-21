@@ -3,7 +3,7 @@ import { CryptoConfig, CryptoPlayer } from "../../types/game";
 
 export type GameAction =
   // Ações Comuns
-  | { type: "START_GAME"; players: CryptoPlayer[]; config: CryptoConfig; manualAssignments?: Record<string, number> }
+  | { type: "START_GAME"; players: CryptoPlayer[]; config: CryptoConfig; manualAssignments?: Record<string, number>; globalUsedWords: string[] }
   | { type: "SET_OPERATOR"; teamId: string; playerId: string }
     | { type: "SET_STARTING_TEAM"; teamIndex: number }
   | { type: "SET_RANDOM_OPERATORS" }

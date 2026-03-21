@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { View, StyleSheet, TouchableOpacity, Dimensions, LayoutAnimation } from "react-native";
 import Animated, {
   useSharedValue,
@@ -15,8 +15,9 @@ import Animated, {
 import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
 import { useTranslation } from "react-i18next";
+import { PlayerAvatar } from "@/games/common/components/PlayerAvatar";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { CryptoGameState, CryptoTeam } from "@/games/cryptography/types/game";
+import { CryptoGameState, CryptoPlayer, CryptoTeam } from "@/games/cryptography/types/game";
 import { ImpostorBackground } from "@/components/Background/Background";
 
 interface Props {
@@ -27,7 +28,7 @@ interface Props {
 const { width, height } = Dimensions.get("window");
 
 // =========================================================
-// 🎇 EFEITO DE FOGOS DE ARTIFÍCIO
+// 🎇 FOGOS DE ARTIFÍCIO E EMOJIS ANIMADOS
 // =========================================================
 const Particle = ({ color }: { color: string }) => {
   const translateY = useSharedValue(0);
@@ -37,10 +38,7 @@ const Particle = ({ color }: { color: string }) => {
 
   useEffect(() => {
     const delay = Math.random() * 500;
-    // O tamanho da partícula varia para dar realismo
     scale.value = withDelay(delay, withSpring(Math.random() * 0.6 + 0.4));
-
-    // Dispara para cima e para os lados aleatoriamente
     translateY.value = withDelay(
       delay,
       withTiming(-500 - Math.random() * 300, { duration: 1500, easing: Easing.out(Easing.cubic) })
@@ -49,8 +47,6 @@ const Particle = ({ color }: { color: string }) => {
       delay,
       withTiming((Math.random() - 0.5) * width * 1.5, { duration: 1500, easing: Easing.out(Easing.cubic) })
     );
-
-    // Desaparece suavemente no ar
     opacity.value = withDelay(delay + 800, withTiming(0, { duration: 700 }));
   }, []);
 
@@ -62,14 +58,10 @@ const Particle = ({ color }: { color: string }) => {
   return <Animated.View style={[styles.particle, { backgroundColor: color }, animatedStyle]} />;
 };
 
-// =========================================================
-// 😃 EMOJIS ANIMADOS DA EQUIPE VENCEDORA
-// =========================================================
 const AnimatedEmoji = ({ emoji, index, teamColor }: { emoji: string; index: number; teamColor: string }) => {
   const translateY = useSharedValue(0);
 
   useEffect(() => {
-    // Cada emoji pula em tempos diferentes para dar um efeito de "onda"
     translateY.value = withDelay(
       index * 150,
       withRepeat(withTiming(-20, { duration: 600, easing: Easing.inOut(Easing.ease) }), -1, true)
@@ -95,15 +87,61 @@ export const RoundResult = ({ gameState, onNextRound }: Props) => {
     scrollY.value = event.contentOffset.y;
   });
 
-  // 🏆 ORDENAÇÃO GERAL (Por pontos totais para o Bottom Sheet)
-  const sortedTeams = useMemo(() => {
-    return [...gameState.teams].sort((a, b) => b.score - a.score);
-  }, [gameState.teams]);
+  // =========================================================
+  // ⚖️ LÓGICA DE DESEMPATE MATEMÁTICO (Acertos -> Eficiência -> Tempo)
+  // =========================================================
+  const getTeamStats = useCallback((team: CryptoTeam, type: "round" | "global") => {
+    const hits = type === "round" ? team.roundScore || 0 : team.score || 0;
+    // @ts-ignore - Fallback caso os reducers não estejam atualizados
+    const errors = type === "round" ? team.roundErrors || 0 : team.totalErrors || 0;
+    // @ts-ignore
+    const timeSpent = type === "round" ? team.roundTimeSpent || 0 : team.totalTimeSpent || 0;
 
-  // ⭐ VENCEDOR DA RODADA (Destaque do Topo)
-  const roundWinnerTeam = useMemo(() => {
-    return [...gameState.teams].sort((a, b) => b.roundScore - a.roundScore)[0];
-  }, [gameState.teams]);
+    const totalAttempts = hits + errors;
+    const efficiency = totalAttempts > 0 ? Math.round((hits / totalAttempts) * 100) : 0;
+
+    // 🔥 O SEGREDO DO EMPATE: Transforma os milissegundos em segundos com 1 casa decimal.
+    // Ex: 345ms vira 0.3s. Se o outro time fez 310ms, ele também vira 0.3s.
+    // Assim, o computador considera um Empate Absoluto!
+    const rawAvgTime = hits > 0 ? timeSpent / hits : 0;
+    const avgTime = Number((rawAvgTime / 1000).toFixed(1));
+
+    return { hits, efficiency, avgTime };
+  }, []);
+
+  const sortTeams = useCallback(
+    (a: CryptoTeam, b: CryptoTeam, type: "round" | "global") => {
+      const statsA = getTeamStats(a, type);
+      const statsB = getTeamStats(b, type);
+
+      // 1. Mais Acertos ganha
+      if (statsA.hits !== statsB.hits) return statsB.hits - statsA.hits;
+      // 2. Maior Eficiência ganha
+      if (statsA.efficiency !== statsB.efficiency) return statsB.efficiency - statsA.efficiency;
+      // 3. Menor Tempo Médio ganha
+      if (statsA.avgTime !== statsB.avgTime) return statsA.avgTime - statsB.avgTime;
+
+      return 0; // Empate Absoluto
+    },
+    [getTeamStats]
+  );
+
+  // 🏆 RANKING GERAL ORDENADO
+  const sortedTeams = useMemo(() => {
+    return [...gameState.teams].sort((a, b) => sortTeams(a, b, "global"));
+  }, [gameState.teams, sortTeams]);
+
+  // ⭐ VENCEDOR(ES) DA RODADA ATUAL
+  const roundWinners = useMemo(() => {
+    const sorted = [...gameState.teams].sort((a, b) => sortTeams(a, b, "round"));
+    const topStats = getTeamStats(sorted[0], "round");
+
+    // Filtra todas as equipes que tiverem exatamente os mesmos stats que o 1º lugar
+    return sorted.filter((t) => {
+      const stats = getTeamStats(t, "round");
+      return stats.hits === topStats.hits && stats.efficiency === topStats.efficiency && stats.avgTime === topStats.avgTime;
+    });
+  }, [gameState.teams, sortTeams, getTeamStats]);
 
   // Animação de esconder o cabeçalho ao rolar a tela
   const topContentStyle = useAnimatedStyle(() => {
@@ -118,8 +156,16 @@ export const RoundResult = ({ gameState, onNextRound }: Props) => {
 
       {/* 🔥 FOGOS DE ARTIFÍCIO NO FUNDO */}
       <View style={StyleSheet.absoluteFill} pointerEvents="none">
-        {Array.from({ length: 30 }).map((_, i) => {
-          const colors = [COLORS.cyan, COLORS.danger, COLORS.amber, COLORS.success, COLORS.white, roundWinnerTeam.color];
+        {Array.from({ length: 40 }).map((_, i) => {
+          // Pega as cores dos times que ganharam para pintar os fogos
+          const colors = [
+            COLORS.cyan,
+            COLORS.danger,
+            COLORS.amber,
+            COLORS.success,
+            COLORS.white,
+            ...roundWinners.map((w) => w.color)
+          ];
           const color = colors[i % colors.length];
           return <Particle key={i} color={color} />;
         })}
@@ -131,23 +177,27 @@ export const RoundResult = ({ gameState, onNextRound }: Props) => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingTop: 60, paddingBottom: 140, minHeight: height + 1 }}
       >
-        {/* Altura para a StatusBar transparente*/}
         <View style={{ height: 90 }} />
         <Animated.View style={topContentStyle}>
           {/* BANNER DE VITÓRIA DA RODADA */}
           <View style={styles.victoryBanner}>
             <CustomText variant="h1" style={styles.victoryTitle}>
-              EQUIPE VENCEDORA
+              {roundWinners.length > 1 ? "EMPATE NA RODADA" : "EQUIPE DESTAQUE"}
             </CustomText>
-            <CustomText
-              variant="h1"
-              style={[styles.victoryTitle2, { color: roundWinnerTeam.color, textShadowColor: roundWinnerTeam.color }]}
-            >
-              {roundWinnerTeam.name.toUpperCase()}
-            </CustomText>
+
+            {/* Renderiza todos os times empatados (ou apenas o 1º) */}
+            <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 10 }}>
+              {roundWinners.map((w, idx) => (
+                <CustomText key={w.id} variant="h1" style={[styles.victoryTitle2, { color: w.color, textShadowColor: w.color }]}>
+                  {w.name.toUpperCase()}
+                  <CustomText variant="h1">{idx < roundWinners.length - 1 ? " & " : ""}</CustomText>
+                </CustomText>
+              ))}
+            </View>
+
             <View style={styles.winnerScoreContainer}>
               <CustomText variant="h3" style={styles.winnerScore}>
-                +{roundWinnerTeam.roundScore}
+                +{getTeamStats(roundWinners[0], "round").hits}
               </CustomText>
               <CustomText variant="label" style={{ color: COLORS.white }}>
                 {" "}
@@ -156,11 +206,13 @@ export const RoundResult = ({ gameState, onNextRound }: Props) => {
             </View>
           </View>
 
-          {/* EMOJIS ANIMADOS DA EQUIPE */}
+          {/* EMOJIS ANIMADOS DAS EQUIPES VENCEDORAS */}
           <View style={styles.winnerEmojisContainer}>
-            {roundWinnerTeam.players.map((p, idx) => (
-              <AnimatedEmoji key={p.id} emoji={p.emoji || "👤"} index={idx} teamColor={roundWinnerTeam.color} />
-            ))}
+            {roundWinners.map((team) =>
+              team.players.map((p, idx) => (
+                <AnimatedEmoji key={p.id} emoji={p.emoji || "👤"} index={idx} teamColor={team.color} />
+              ))
+            )}
           </View>
         </Animated.View>
 
@@ -181,7 +233,6 @@ export const RoundResult = ({ gameState, onNextRound }: Props) => {
         </View>
       </Animated.ScrollView>
 
-      {/* FOOTER FIXO */}
       <View style={styles.footer}>
         <TouchableOpacity style={styles.nextBtn} onPress={onNextRound} activeOpacity={0.8}>
           <CustomText variant="h3" style={styles.btnText}>
@@ -299,7 +350,7 @@ const TeamReportCard = ({ team, rank }: { team: CryptoTeam; rank: number }) => {
         </View>
       </View>
 
-      {/* 🔥 O OPERADOR DESTAQUE DA EQUIPE VEM AQUI */}
+      {/* 🔥 O OPERADOR DESTAQUE DA EQUIPE */}
       {teamMvp && (
         <View style={styles.teamMvpContainer}>
           <MaterialCommunityIcons name="star-shooting" size={16} color={COLORS.amber} />
@@ -359,8 +410,8 @@ const styles = StyleSheet.create({
 
   particle: {
     position: "absolute",
-    bottom: height * 0.35, // Começa do limite do Bottom Sheet
-    left: width / 2, // Nasce do centro
+    bottom: height * 0.35,
+    left: width / 2,
     width: 12,
     height: 12,
     borderRadius: 6,
@@ -371,9 +422,17 @@ const styles = StyleSheet.create({
     elevation: 5
   },
 
-  victoryBanner: { alignItems: "center", marginBottom: 40, gap: 10 },
-  victoryTitle: { color: COLORS.textSecondary, fontSize: 18, letterSpacing: 2 },
-  victoryTitle2: { fontSize: 40, fontWeight: "900", letterSpacing: 1, textShadowRadius: 10, shadowOpacity: 0.5, marginTop: -5 },
+  victoryBanner: { alignItems: "center", marginBottom: 40, gap: 10, paddingHorizontal: 20 },
+  victoryTitle: { color: COLORS.textSecondary, fontSize: 18, letterSpacing: 2, textAlign: "center" },
+  victoryTitle2: {
+    fontSize: 40,
+    fontWeight: "900",
+    letterSpacing: 1,
+    textShadowRadius: 10,
+    shadowOpacity: 0.5,
+    marginTop: -5,
+    textAlign: "center"
+  },
 
   winnerScoreContainer: {
     flexDirection: "row",

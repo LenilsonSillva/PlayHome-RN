@@ -13,13 +13,13 @@ import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
 import { usePlayers } from "@/contexts/contextHook";
 import { categories as ALL_CATEGORIES } from "@/games/common/data/words";
+import { loadGlobalUsedWords } from "@/games/common/utils/wordStorage";
 import { useNavigation } from "@react-navigation/native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useTranslation } from "react-i18next";
 import { useAlert } from "@/contexts/alertContext";
 import { CryptoConfig, CryptoMode } from "@/games/cryptography/types/game";
 import { PLAYER_ICONS } from "@/games/common/constants/icons";
-import { PLAYER_COLORS } from "@/games/common/constants/colors";
 import { pickRandom } from "@/games/common/utils/array";
 
 export const LobbyOffline = () => {
@@ -91,7 +91,7 @@ export const LobbyOffline = () => {
     setSelectedCategories((prev) => (prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]));
   };
 
-  const handleStartMission = () => {
+  const handleStartMission = async () => {
     if (players.length < teamCount) {
       showAlert(t("alerts.error"), "Número de jogadores inferior ao número de esquadrões.");
       return;
@@ -115,7 +115,9 @@ export const LobbyOffline = () => {
       categories: selectedCategories
     };
 
-    navigation.navigate("OfflineCryptographyGame", { config, manualAssignments });
+    const globalUsedWords = await loadGlobalUsedWords();
+
+    navigation.navigate("OfflineCryptographyGame", { config, manualAssignments, globalUsedWords });
   };
 
   return (
