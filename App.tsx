@@ -23,9 +23,9 @@ export type RootStackParamList = {
   Home: undefined;
   ImpostorLobby: undefined;
   CryptographyLobby: undefined;
-  ImpostorGame: { config: any }; // Você pode definir o tipo correto para config conforme necessário;
+  ImpostorGame: { config: any; globalUsedWords?: string[] }; // Você pode definir o tipo correto para config conforme necessário;
   OnlineImpostorGame: { config: any };
-  OfflineCryptographyGame: { config: any }
+  OfflineCryptographyGame: { config: any; manualAssignments?: any; globalUsedWords?: string[] };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -36,10 +36,7 @@ export default function App() {
       <SocketProvider>
         <PlayersProvider>
           <NavigationContainer>
-            <StatusBar
-              barStyle="light-content"
-              backgroundColor={COLORS.background}
-            />
+            <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
 
             <Stack.Navigator
               initialRouteName="Splash"
@@ -52,18 +49,9 @@ export default function App() {
               <Stack.Screen name="Home" component={HomeScreen} />
               <Stack.Screen name="ImpostorLobby" component={ImpostorLobby} />
               <Stack.Screen name="CryptographyLobby" component={CryptographyLobby} />
-              <Stack.Screen
-                name="OfflineCryptographyGame"
-                component={OfflineCryptographyGameScreen}
-              />
-              <Stack.Screen
-                name="ImpostorGame"
-                component={OfflineImpostorGameScreen}
-              />
-              <Stack.Screen
-                name="OnlineImpostorGame"
-                component={OnlineImpostorGameScreen}
-              />
+              <Stack.Screen name="OfflineCryptographyGame" component={OfflineCryptographyGameScreen} />
+              <Stack.Screen name="ImpostorGame" component={OfflineImpostorGameScreen} />
+              <Stack.Screen name="OnlineImpostorGame" component={OnlineImpostorGameScreen} />
             </Stack.Navigator>
           </NavigationContainer>
         </PlayersProvider>

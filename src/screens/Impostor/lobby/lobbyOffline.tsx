@@ -21,7 +21,9 @@ import { RootStackParamList } from "App";
 import { PLAYER_ICONS } from "@/games/impostor/constants/icons";
 import { pickRandom } from "@/games/common/utils/array";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { useTranslation } from "react-i18next";
+import { loadGlobalUsedWords } from "@/games/common/utils/wordStorage";
 
 export const LobbyOffline = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -42,6 +44,7 @@ export const LobbyOffline = () => {
   const [showCategories, setShowCategories] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([...ALL_CATEGORIES]);
+  const [impostorsUnited, setImpostorsUnited] = useState(false);
 
   // Calcula o limite máximo permitido de impostores
   const maxImpostors = useMemo(() => getImpostorCount(players.length), [players.length]);
@@ -50,6 +53,9 @@ export const LobbyOffline = () => {
   useEffect(() => {
     if (impostorCount > maxImpostors) {
       setImpostorCount(maxImpostors);
+    }
+    if (impostorCount <= 1) {
+      setImpostorsUnited(false);
     }
   }, [maxImpostors]);
 
@@ -88,7 +94,7 @@ export const LobbyOffline = () => {
     updatePlayer(id, { emoji: getUnusedEmoji() });
   };
 
-  const handleStartMission = () => {
+  const handleStartMission = async () => {
     // 1. Preparamos o objeto de configuração
     const config = {
       impostorCount,
@@ -98,13 +104,89 @@ export const LobbyOffline = () => {
       whoStartButton: whoStarts,
       impostorCanStart,
       impostorTrap,
-      impostorCat
+      impostorCat,
+      impostorsUnited
     };
+
+    const globalUsedWords = await loadGlobalUsedWords();
 
     // 2. Navegamos para a tela da Partida passando os parâmetros
     // No React Native, o ideal é passar os dados iniciais via Params
-    navigation.navigate("ImpostorGame", { config });
+    navigation.navigate("ImpostorGame", { config, globalUsedWords });
   };
+
+  const tacticalOptions = [
+    {
+      id: "twoWords",
+      label: t("games.impostor_lobby_twoWords"),
+      sub: t("games.impostor_lobby_twoWordsSub"),
+      val: twoWords,
+      set: () => setTwoWords(!twoWords),
+      icon: "people-pulling",
+      disable: false,
+      show: true
+    },
+    {
+      id: "whoStarts",
+      label: t("games.impostor_lobby_whoStart"),
+      sub: t("games.impostor_lobby_whoStartSub"),
+      val: whoStarts,
+      set: () => setWhoStarts(!whoStarts),
+      icon: "dice",
+      disable: false,
+      show: true
+    },
+    {
+      id: "impostorStarts",
+      label: t("games.impostor_lobby_impostorStarts"),
+      sub: t("games.impostor_lobby_impostorStartsSub"),
+      val: impostorCanStart,
+      set: () => setImpostorCanStart(!impostorCanStart),
+      icon: "masks-theater",
+      disable: !whoStarts,
+      show: whoStarts
+    },
+    {
+      id: "impostorsUnited",
+      label: t("Impostores Unidos"),
+      sub: t("Os impostores sabem quem são seus aliados no início."),
+      val: impostorsUnited,
+      set: () => setImpostorsUnited(!impostorsUnited),
+      icon: "users-viewfinder", // Ícone de FontAwesome6
+      disable: impostorCount <= 1,
+      show: impostorCount > 1
+    },
+    {
+      id: "hasHint",
+      label: t("games.impostor_lobby_impostorHint"),
+      sub: t("games.impostor_lobby_impostorHintSub"),
+      val: hasHint,
+      set: () => setHasHint(!hasHint),
+      icon: "lightbulb",
+      disable: false,
+      show: true
+    },
+    {
+      id: "impostorCat",
+      label: t("games.impostor_lobby_impostorCat"),
+      sub: t("games.impostor_lobby_impostorCatSub"),
+      val: impostorCat,
+      set: () => setImpostorCat(!impostorCat),
+      icon: "spell-check",
+      disable: !hasHint,
+      show: hasHint
+    },
+    {
+      id: "impostorTrap",
+      label: t("games.impostor_lobby_impostorTrap"),
+      sub: t("games.impostor_lobby_impostorTrapSub"),
+      val: impostorTrap,
+      set: () => setImpostorTrap(!impostorTrap),
+      icon: "skull",
+      disable: !hasHint,
+      show: hasHint
+    }
+  ];
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
@@ -204,93 +286,44 @@ export const LobbyOffline = () => {
               </View>
             </View>
 
-            {/* SWITCHES TÁTICOS */}
+            {/* OPÇÕES DO JOGO */}
             <TouchableOpacity
               style={[styles.categoryToggle, showOptions && styles.categoryToggleActive]}
               onPress={() => setShowOptions(!showOptions)}
             >
               <CustomText variant="label" style={{ color: showOptions ? COLORS.black : COLORS.cyan }}>
-                {showOptions
-                  ? t("games.impostor_lobby_gameOptClose") + " ⇡"
-                  : t("games.impostor_lobby_gameOpt") + " ⇣"}
+                {showOptions ? t("games.impostor_lobby_gameOptClose") + " ⇡" : t("games.impostor_lobby_gameOpt") + " ⇣"}
               </CustomText>
             </TouchableOpacity>
 
-            {showOptions &&
-              [
-                {
-                  label: t("games.impostor_lobby_twoWords"),
-                  sub: t("games.impostor_lobby_twoWordsSub"),
-                  val: twoWords,
-                  set: setTwoWords,
-                  disable: false,
-                  show: true
-                },
-                {
-                  label: t("games.impostor_lobby_whoStart"),
-                  sub: t("games.impostor_lobby_whoStartSub"),
-                  val: whoStarts,
-                  set: setWhoStarts,
-                  disable: false,
-                  show: true
-                },
-                {
-                  label: t("games.impostor_lobby_impostorStarts"),
-                  sub: t("games.impostor_lobby_impostorStartsSub"),
-                  val: impostorCanStart,
-                  set: setImpostorCanStart,
-                  disable: !whoStarts,
-                  show: whoStarts
-                },
-                {
-                  label: t("games.impostor_lobby_impostorHint"),
-                  sub: t("games.impostor_lobby_impostorHintSub"),
-                  val: hasHint,
-                  set: setHasHint,
-                  disable: false,
-                  show: true
-                },
-                {
-                  label: t("games.impostor_lobby_impostorCat"),
-                  sub: t("games.impostor_lobby_impostorCatSub"),
-                  val: impostorCat,
-                  set: setImpostorCat,
-                  disable: !hasHint,
-                  show: hasHint
-                },
-                {
-                  label: t("games.impostor_lobby_impostorTrap"),
-                  sub: t("games.impostor_lobby_impostorTrapSub"),
-                  val: impostorTrap,
-                  set: setImpostorTrap,
-                  disable: !hasHint,
-                  show: hasHint
-                }
-              ].map(
-                (item, index) =>
-                  item.show && (
-                    <View key={index} style={styles.settingRow}>
-                      <View style={{ flex: 1 }}>
-                        <CustomText variant="h3" style={{ fontSize: 16 }}>
+            {/* GRID DE OPÇÕES TÁTICAS */}
+            {showOptions && (
+              <View style={styles.optionsGrid}>
+                {tacticalOptions.map((item) => {
+                  if (!item.show) return null;
+
+                  return (
+                    <View key={item.id} style={[styles.optionWrapper, item.disable && { opacity: 0.3 }]}>
+                      <TouchableOpacity
+                        activeOpacity={0.7}
+                        disabled={item.disable}
+                        onPress={item.set}
+                        style={[styles.optionSquare, item.val && styles.optionSquareActive]}
+                      >
+                        <FontAwesome6 name={item.icon as any} size={32} color={item.val ? COLORS.black : COLORS.cyan} />
+                        <CustomText variant="label" style={[styles.optionTitle, { color: item.val ? COLORS.black : "#FFF" }]}>
                           {item.label}
                         </CustomText>
-                        <CustomText variant="hint" style={{ fontSize: 11 }}>
-                          {item.sub}
-                        </CustomText>
-                      </View>
-                      <Switch
-                        value={item.val}
-                        onValueChange={item.set}
-                        trackColor={{
-                          false: COLORS.surfaceLight,
-                          true: COLORS.danger
-                        }}
-                        thumbColor={item.val ? COLORS.white : COLORS.textSecondary}
-                        disabled={item.disable}
-                      />
+                      </TouchableOpacity>
+
+                      <CustomText variant="hint" style={styles.optionDescription}>
+                        {item.sub}
+                      </CustomText>
                     </View>
-                  )
-              )}
+                  );
+                })}
+              </View>
+            )}
           </View>
 
           {/* SEÇÃO: CATEGORIAS (BANCO DE DADOS) */}
@@ -463,6 +496,54 @@ const styles = StyleSheet.create({
   },
   cValue: { minWidth: 30, textAlign: "center", color: COLORS.danger },
   btnDisabled: { opacity: 0.2 },
+
+  // options grid
+
+  optionsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    marginTop: 15
+  },
+  optionWrapper: {
+    width: "48%", // 2 colunas
+    marginBottom: 20,
+    alignItems: "center"
+  },
+  optionSquare: {
+    width: "100%",
+    aspectRatio: 1, // Mantém quadrado
+    backgroundColor: "rgba(255,255,255,0.05)",
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "rgba(0, 242, 255, 0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 10,
+    marginBottom: 8
+  },
+  optionSquareActive: {
+    backgroundColor: COLORS.cyan,
+    borderColor: COLORS.white,
+    elevation: 10,
+    shadowColor: COLORS.cyan,
+    shadowRadius: 10,
+    shadowOpacity: 0.4
+  },
+  optionTitle: {
+    marginTop: 10,
+    textAlign: "center",
+    fontSize: 14,
+    fontWeight: "bold",
+    textTransform: "uppercase"
+  },
+  optionDescription: {
+    textAlign: "center",
+    fontSize: 12,
+    lineHeight: 12,
+    color: COLORS.textSecondary,
+    paddingHorizontal: 5
+  },
 
   //Categories styles
 

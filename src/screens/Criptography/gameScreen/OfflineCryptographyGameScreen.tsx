@@ -15,6 +15,7 @@ import { InfiltrationAction } from "../phasesScreen/InfiltrationAction";
 import { SettingsModal } from "@/components/SettingsModal/SettingsModal";
 import { RoundResult } from "../phasesScreen/RoundResult";
 import { InterceptionAction } from "../phasesScreen/InterceptionAction";
+import { saveGlobalUsedWords } from "@/games/common/utils/wordStorage";
 
 export function OfflineCryptographyGameScreen() {
   const route = useRoute<any>();
@@ -65,6 +66,16 @@ export function OfflineCryptographyGameScreen() {
     return () => navigation.setOptions({ gestureEnabled: true });
   }, [navigation]);
 
+  useEffect(() => {
+    // Esse código roda quando o componente "morre" (unmount)
+    return () => {
+      if (gameState?.usedWords && gameState.usedWords.length > 0) {
+        // Chamada direta para garantir o salvamento ao sair da tela
+        saveGlobalUsedWords(gameState.usedWords);
+      }
+    };
+  }, [gameState?.usedWords]);
+
   // 2. Função Central de Alerta para confirmar a saída
   const handleExitGame = useMemo(
     () => () => {
@@ -74,6 +85,7 @@ export function OfflineCryptographyGameScreen() {
           text: t("alerts.quit", "SAIR"),
           style: "destructive",
           onPress: () => {
+            quitGame();
             // Como é offline, apenas destruímos a tela atual e forçamos o recarregamento do Lobby
             navigation.reset({
               index: 1,
@@ -83,7 +95,7 @@ export function OfflineCryptographyGameScreen() {
         }
       ]);
     },
-    [navigation, showAlert, t]
+    [navigation, showAlert, t, quitGame]
   );
 
   // 3. Trava o botão físico de voltar do celular (Android)

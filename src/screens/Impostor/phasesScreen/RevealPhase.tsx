@@ -20,6 +20,7 @@ import { useTranslation } from "react-i18next";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { PlayerStatusModal } from "./components/PlayerStatusModal";
 import { useAlert } from "@/contexts/alertContext";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 const { width } = Dimensions.get("window");
 // Math.floor para evitar erros de precisão aritmética no iOS
@@ -341,6 +342,35 @@ export const RevealPhase = ({ player, data, isOnline, onNext, isLast, revealedAf
                     )}
                   </View>
 
+                  {/* Lógica de Impostores Unidos */}
+                  {player.isImpostor && data.impostorsUnited && data.impostorCount > 1 && (
+                    <View style={styles.unitedContainer}>
+                      {/* Header com estilo de Scanner/Alerta */}
+                      <View style={styles.unitedHeader}>
+                        <MaterialCommunityIcons name="access-point-network" size={16} color={COLORS.danger} />
+                        <CustomText variant="label" style={styles.unitedTitle}>
+                          {t("SEUS ALIADOS")}
+                        </CustomText>
+                        <View style={styles.redDot} />
+                      </View>
+
+                      <View style={styles.alliesGrid}>
+                        {data.players
+                          .filter((p) => p.isImpostor && p.id !== player.id)
+                          .map((ally) => (
+                            <View key={ally.id} style={styles.allyCard}>
+                              <View style={[styles.allyEmojiBg, { borderColor: ally.color }]}>
+                                <Text style={styles.allyEmoji}>{ally.emoji}</Text>
+                              </View>
+                              <CustomText variant="body" numberOfLines={1} style={styles.allyNameLabel}>
+                                {ally.name.split(" ")[0]}
+                              </CustomText>
+                            </View>
+                          ))}
+                      </View>
+                    </View>
+                  )}
+
                   {data.whoStart === player.name && (
                     <View style={styles.starterFlag}>
                       <CustomText variant="body" style={styles.starterText}>
@@ -563,6 +593,73 @@ const styles = StyleSheet.create({
     elevation: 5
   },
   mainWord: { color: "#000", fontSize: 36, textAlign: "center" },
+
+  // Show impostor names
+
+  unitedContainer: {
+    width: "100%",
+    backgroundColor: "rgba(0,0,0,0.0)", // Fundo sutil para destacar do branco da carta
+    borderRadius: 20,
+    alignItems: "center",
+    marginBottom: 10
+  },
+  unitedHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+    gap: 6
+  },
+  unitedTitle: {
+    fontSize: 10,
+    fontWeight: "900",
+    color: COLORS.danger,
+    letterSpacing: 1
+  },
+  redDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: COLORS.danger
+    // Efeito de "pulsar" opcional se você quiser animar depois
+  },
+  alliesGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: 12,
+    marginBottom: 8
+  },
+  allyCard: {
+    alignItems: "center",
+    width: 80
+  },
+  allyEmojiBg: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: COLORS.surface, // Fundo escuro para o emoji saltar
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    // A cor da borda vem do inline style (cor do jogador)
+    shadowColor: COLORS.surfaceLight,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 4
+  },
+  allyEmoji: {
+    fontSize: 22
+  },
+  allyNameLabel: {
+    fontSize: 10,
+    color: COLORS.textPrimary,
+    marginTop: 4,
+    fontWeight: "700",
+    textAlign: "center",
+    textTransform: "uppercase"
+  },
+
   hintText: {
     color: COLORS.white,
     marginTop: 10,

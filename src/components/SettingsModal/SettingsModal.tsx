@@ -1,17 +1,14 @@
 import React, { useState } from "react";
-import {
-  Modal,
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Pressable
-} from "react-native";
+import { Modal, View, StyleSheet, TouchableOpacity, Pressable } from "react-native";
 import { useTranslation } from "react-i18next";
 import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
 import { Cards } from "@/components/Cards/Cards";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { clearGlobalUsedWords } from "@/games/common/utils/wordStorage";
+import { useAlert } from "@/contexts/alertContext";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 interface SettingsModalProps {
   visible: boolean;
@@ -21,6 +18,7 @@ interface SettingsModalProps {
   reviewEnabled?: boolean;
   onToggleReview?: (val: boolean) => void;
   showReviewWordBtn?: boolean;
+  showResetWords?: boolean;
 }
 
 export const SettingsModal = ({
@@ -30,10 +28,13 @@ export const SettingsModal = ({
   onReroll,
   reviewEnabled,
   onToggleReview,
-  showReviewWordBtn
+  showReviewWordBtn,
+  showResetWords
 }: SettingsModalProps) => {
   const { t, i18n } = useTranslation();
-  const [changeIcon, setChangeIcon] = useState(false);
+  const { showAlert } = useAlert();
+  const [changeRevealIcon, setChangeRevealIcon] = useState(false);
+  const [changeDBIcon, setChangeDBIcon] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
 
   const changeLanguage = () => {
@@ -44,18 +45,19 @@ export const SettingsModal = ({
   };
 
   const changeWordBtn = () => {
-    setChangeIcon(true);
+    setChangeRevealIcon(true);
     onReroll && onReroll();
-    setTimeout(() => setChangeIcon(false), 2000);
+    setTimeout(() => setChangeRevealIcon(false), 2000);
+  };
+
+  const handleResetHistory = () => {
+    setChangeDBIcon(true);
+    clearGlobalUsedWords();
+    setTimeout(() => setChangeDBIcon(false), 2000);
   };
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       {/* Overlay escuro */}
       <View style={styles.overlay}>
         {/* Área externa para fechar ao clicar fora */}
@@ -67,46 +69,28 @@ export const SettingsModal = ({
             <View style={styles.innerLayout}>
               {/* CABEÇALHO */}
               <View style={styles.header}>
-                <CustomText
-                  variant="label"
-                  style={{ color: COLORS.amber, fontSize: 14 }}
-                >
+                <CustomText variant="label" style={{ color: COLORS.amber, fontSize: 14 }}>
                   {t("home.settings_title")}
                 </CustomText>
-                <View
-                  style={[styles.line, { backgroundColor: COLORS.amber }]}
-                />
+                <View style={[styles.line, { backgroundColor: COLORS.amber }]} />
               </View>
 
               {/* OPÇÕES */}
               <View style={styles.optionsBody}>
                 {showChangeWordBtn && (
-                  <TouchableOpacity
-                    style={styles.optionRow}
-                    onPress={changeWordBtn}
-                  >
+                  <TouchableOpacity style={styles.optionRow} onPress={changeWordBtn}>
                     <View>
                       <CustomText variant="h3" style={styles.whiteText}>
                         {t("games.impostor_reveal_changeWord")}
                       </CustomText>
-                      <CustomText variant="hint">
-                        {t("games.impostor_reveal_changeWord_sub")}
-                      </CustomText>
+                      <CustomText variant="hint">{t("games.impostor_reveal_changeWord_sub")}</CustomText>
                     </View>
                     <View style={styles.badge}>
                       <CustomText variant="h3" style={{ color: COLORS.cyan }}>
-                        {changeIcon ? (
-                          <MaterialIcons
-                            name="done-outline"
-                            size={24}
-                            color={COLORS.cyan}
-                          />
+                        {changeRevealIcon ? (
+                          <MaterialIcons name="done-outline" size={24} color={COLORS.cyan} />
                         ) : (
-                          <FontAwesome5
-                            name="exchange-alt"
-                            size={24}
-                            color={COLORS.cyan}
-                          />
+                          <FontAwesome5 name="exchange-alt" size={24} color={COLORS.cyan} />
                         )}
                       </CustomText>
                     </View>
@@ -114,10 +98,7 @@ export const SettingsModal = ({
                 )}
 
                 {showReviewWordBtn && (
-                  <TouchableOpacity
-                    style={styles.optionRow}
-                    onPress={() => onToggleReview?.(!reviewEnabled)}
-                  >
+                  <TouchableOpacity style={styles.optionRow} onPress={() => onToggleReview?.(!reviewEnabled)}>
                     <View>
                       <CustomText variant="h3" style={styles.whiteText}>
                         {t("games.impostor_discuss_reviewWord")}
@@ -129,9 +110,7 @@ export const SettingsModal = ({
                       style={[
                         styles.switch,
                         {
-                          borderColor: reviewEnabled
-                            ? COLORS.success
-                            : COLORS.textSecondary
+                          borderColor: reviewEnabled ? COLORS.success : COLORS.textSecondary
                         }
                       ]}
                     >
@@ -139,9 +118,7 @@ export const SettingsModal = ({
                         style={[
                           styles.switchDot,
                           {
-                            backgroundColor: reviewEnabled
-                              ? COLORS.success
-                              : COLORS.textSecondary,
+                            backgroundColor: reviewEnabled ? COLORS.success : COLORS.textSecondary,
                             marginLeft: reviewEnabled ? 22 : 2
                           }
                         ]}
@@ -150,10 +127,7 @@ export const SettingsModal = ({
                   </TouchableOpacity>
                 )}
 
-                <TouchableOpacity
-                  style={styles.optionRow}
-                  onPress={changeLanguage}
-                >
+                <TouchableOpacity style={styles.optionRow} onPress={changeLanguage}>
                   <View>
                     <CustomText variant="h3" style={styles.whiteText}>
                       {t("home.lang_label")}
@@ -167,10 +141,7 @@ export const SettingsModal = ({
                   </View>
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                  style={styles.optionRow}
-                  onPress={() => setSoundEnabled(!soundEnabled)}
-                >
+                <TouchableOpacity style={styles.optionRow} onPress={() => setSoundEnabled(!soundEnabled)}>
                   <View>
                     <CustomText variant="h3" style={styles.whiteText}>
                       {t("home.settings_audioTitle")}
@@ -182,9 +153,7 @@ export const SettingsModal = ({
                     style={[
                       styles.switch,
                       {
-                        borderColor: soundEnabled
-                          ? COLORS.success
-                          : COLORS.textSecondary
+                        borderColor: soundEnabled ? COLORS.success : COLORS.textSecondary
                       }
                     ]}
                   >
@@ -192,23 +161,38 @@ export const SettingsModal = ({
                       style={[
                         styles.switchDot,
                         {
-                          backgroundColor: soundEnabled
-                            ? COLORS.success
-                            : COLORS.textSecondary,
+                          backgroundColor: soundEnabled ? COLORS.success : COLORS.textSecondary,
                           marginLeft: soundEnabled ? 22 : 2
                         }
                       ]}
                     />
                   </View>
                 </TouchableOpacity>
+                {showResetWords && (
+                  <TouchableOpacity style={styles.optionRow} onPress={handleResetHistory}>
+                    <View>
+                      <CustomText variant="h3" style={styles.whiteText}>
+                        {t("home.settings_clearDBTitle")}
+                      </CustomText>
+                      <CustomText variant="hint">{t("home.settings_clearDBSub")}</CustomText>
+                    </View>
+
+                    <View style={styles.badge}>
+                      <CustomText variant="h3" style={{ color: COLORS.cyan }}>
+                        {changeDBIcon ? (
+                          <MaterialIcons name="done-outline" size={24} color={COLORS.cyan} />
+                        ) : (
+                          <MaterialCommunityIcons name="database-refresh" size={24} color={COLORS.cyan} />
+                        )}
+                      </CustomText>
+                    </View>
+                  </TouchableOpacity>
+                )}
               </View>
 
               {/* BOTÃO FECHAR */}
               <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-                <CustomText
-                  variant="label"
-                  style={{ color: COLORS.background, fontWeight: "900" }}
-                >
+                <CustomText variant="label" style={{ color: COLORS.background, fontWeight: "900" }}>
                   {t("home.back_btn")}
                 </CustomText>
               </TouchableOpacity>

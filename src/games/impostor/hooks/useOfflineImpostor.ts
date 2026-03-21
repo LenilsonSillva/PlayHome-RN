@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import type { ImpostorGame, ImpostorPlayer } from "../types/game";
 import type { LobbyState, LobbyConfig } from "../types/lobbyOffline";
 import { initializeGame } from "../logic/initializeGame";
+import { saveGlobalUsedWords, loadGlobalUsedWords } from "@/games/common/utils/wordStorage";
 import { getRoundPoints } from "../utils/scoringUtils";
 
 export type UseOfflineImpostorReturn = {
@@ -10,16 +11,14 @@ export type UseOfflineImpostorReturn = {
   addPlayer: (player: ImpostorPlayer) => void;
   removePlayer: (playerId: string) => void;
   setLobbyConfig: (config: Partial<LobbyConfig>) => void;
-  startGame: (initialPlayers?: any[], initialConfig?: LobbyConfig) => void;
+  startGame: (initialPlayers?: any[], initialConfig?: LobbyConfig, globalUsedWords?: string[]) => void;
   nextPhase: (newPhase: ImpostorGame["phase"]) => void;
   handleReroll: () => void;
   eliminatePlayer: (playerId: string | null) => void;
   resolveElimination: () => void;
   votes: Record<string, string | null>;
   submitVote: (voterId: string, targetId: string | null) => void;
-  processVotingResult: (
-    finalVotes?: Record<string, string | null>
-  ) => string | null;
+  processVotingResult: (finalVotes?: Record<string, string | null>) => string | null;
 };
 
 export function useOfflineImpostor(): UseOfflineImpostorReturn {
@@ -33,7 +32,8 @@ export function useOfflineImpostor(): UseOfflineImpostorReturn {
       selectedCategories: [],
       whoStartButton: false,
       impostorTrap: false,
-      impostorCat: false 
+      impostorCat: false,
+      impostorsUnited: false 
     }
   });
 
@@ -41,7 +41,12 @@ export function useOfflineImpostor(): UseOfflineImpostorReturn {
   const [votes, setVotes] = useState<Record<string, string | null>>({});
 
   const impostorHistoryRef = useRef<string[][]>([]);
-  const wordHistoryRef = useRef<string[]>([]);
+
+  useEffect(() => {
+    if (game?.usedWords) {
+      saveGlobalUsedWords(game.usedWords);
+    }
+  }, [game?.usedWords]);
 
   const addPlayer = useCallback((player: ImpostorPlayer) => {
     setLobby((prev) => ({ ...prev, players: [...prev.players, player] }));
@@ -59,9 +64,7 @@ export function useOfflineImpostor(): UseOfflineImpostorReturn {
   }, []);
 
   const startGame = useCallback(
-    (initialPlayers?: any[], initialConfig?: LobbyConfig) => {
-      // 1. PRIORIDADE: Se já existe um jogo, usamos as configurações DELE para manter a consistência
-      // Se não houver (primeira vez), usamos o que veio do parâmetro ou do lobby.
+    async (initialPlayers?: any[], initialConfig?: LobbyConfig, globalUsedWords?: string[]) => {
       const playersToUse = initialPlayers || game?.players || lobby.players;
 
       const configToUse =
@@ -75,11 +78,24 @@ export function useOfflineImpostor(): UseOfflineImpostorReturn {
               selectedCategories: game.selectedCategories,
               whoStartButton: !!game.whoStart,
               impostorTrap: game.impostorTrap,
-              impostorCat: game.impostorCat
+              impostorCat: game.impostorCat,
+              impostorsUnited: game.impostorsUnited
             }
           : lobby.config);
 
       if (!playersToUse.length) return;
+
+      // 🔥 MÁGICA AQUI: Se globalUsedWords não foi enviado (ex: botão de Nova Rodada),
+      // ele puxa o histórico atual da partida. Se o jogo for novo, ele usa[]
+      let wordsToUse = globalUsedWords;
+
+      if (!wordsToUse) {
+        wordsToUse = game?.usedWords;
+
+        if (!wordsToUse) {
+          wordsToUse = await loadGlobalUsedWords(); // fallback final
+        }
+      }
 
       const initialized = initializeGame(
         playersToUse,
@@ -92,20 +108,18 @@ export function useOfflineImpostor(): UseOfflineImpostorReturn {
         configToUse.impostorTrap,
         configToUse.impostorCat,
         impostorHistoryRef.current,
-        wordHistoryRef.current
+        wordsToUse || []
       );
 
-      const currentImps = initialized.players
-        .filter((p) => p.isImpostor)
-        .map((p) => p.id);
+      const currentImps = initialized.players.filter((p) => p.isImpostor).map((p) => p.id);
       impostorHistoryRef.current.push(currentImps);
-      wordHistoryRef.current.push(...initialized.chosenWord);
 
       setGame({
         ...initialized,
         phase: "reveal",
         impostorHistory: impostorHistoryRef.current,
-        usedWords: wordHistoryRef.current
+        impostorsUnited: configToUse.impostorsUnited || false,
+        usedWords: initialized.didReset ? initialized.chosenWord : [...(wordsToUse || []), ...initialized.chosenWord]
       });
     },
     [lobby, game]
@@ -113,7 +127,7 @@ export function useOfflineImpostor(): UseOfflineImpostorReturn {
 
   const handleReroll = useCallback(() => {
     if (!game) return;
-    // O Reroll já usa as propriedades de 'game', então ele já se mantinha.
+
     const newGame = initializeGame(
       game.players,
       game.impostorCount,
@@ -125,16 +139,15 @@ export function useOfflineImpostor(): UseOfflineImpostorReturn {
       game.impostorTrap,
       game.impostorCat,
       impostorHistoryRef.current,
-      wordHistoryRef.current
+      game.usedWords
     );
-
-    wordHistoryRef.current.push(...newGame.chosenWord);
 
     setGame({
       ...newGame,
       phase: "reveal",
       impostorHistory: impostorHistoryRef.current,
-      usedWords: wordHistoryRef.current
+      impostorsUnited: game.impostorsUnited, 
+      usedWords: newGame.didReset ? newGame.chosenWord : [...game.usedWords, ...newGame.chosenWord]
     });
   }, [game]);
 
@@ -145,9 +158,7 @@ export function useOfflineImpostor(): UseOfflineImpostorReturn {
   const eliminatePlayer = useCallback((playerId: string | null) => {
     setGame((prev) => {
       if (!prev) return null;
-      const updatedPlayers = prev.players.map((p) =>
-        p.id === playerId ? { ...p, isAlive: false } : p
-      );
+      const updatedPlayers = prev.players.map((p) => (p.id === playerId ? { ...p, isAlive: false } : p));
       return { ...prev, players: updatedPlayers };
     });
   }, []);

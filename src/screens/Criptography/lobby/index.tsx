@@ -31,7 +31,7 @@ export function CryptographyLobby() {
             setOpenModal(true);
           }}
         />
-        <SettingsModal visible={openModal} onClose={() => setOpenModal(false)} />
+        <SettingsModal visible={openModal} onClose={() => setOpenModal(false)} showResetWords={true} />
 
         {/* HEADER: Toggle Principal Offline / Online */}
         <View style={styles.toggleWrapper}>

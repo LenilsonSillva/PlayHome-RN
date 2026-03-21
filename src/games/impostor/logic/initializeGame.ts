@@ -40,7 +40,7 @@ export function initializeGame(
   const impostorPlayers = createImpostorPlayers(allPlayers, impostorCount, impostorHistory);
 
   // 2. Distribui as palavras
-  const { updatedPlayers, chosenWord } = distributeWords(
+  const { updatedPlayers, chosenWord, didReset } = distributeWords(
     impostorPlayers,
     twoWordsMode,
     selectedCategories,
@@ -68,6 +68,7 @@ export function initializeGame(
     whoStart,
     phase: "reveal",
     impostorHistory,
-    usedWords
+    usedWords,
+    didReset,
   };
 }

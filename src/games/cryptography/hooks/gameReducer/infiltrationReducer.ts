@@ -16,7 +16,7 @@ export function infiltrationReducer(state: CryptoGameState | null, action: GameA
 
       let newScore = 0;
       let newErrors = 0;
-      let newWords: string[] =[];
+      let newWords: string[] = [];
       let newSkips = state.skipsLeft;
 
       if (action.success) {
@@ -40,7 +40,7 @@ export function infiltrationReducer(state: CryptoGameState | null, action: GameA
           ...t,
           score: t.score + newScore,
           roundScore: t.roundScore + newScore,
-          wordsGuessed:[...t.wordsGuessed, ...newWords],
+          wordsGuessed: [...t.wordsGuessed, ...newWords],
           roundErrors: t.roundErrors + newErrors,
           totalErrors: t.totalErrors + newErrors,
           roundTimeSpent: t.roundTimeSpent + timeSpentOnWord,

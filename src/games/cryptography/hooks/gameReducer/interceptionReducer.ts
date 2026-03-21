@@ -27,7 +27,7 @@ export function interceptionReducer(state: CryptoGameState | null, action: GameA
             ...t,
             score: t.score + 1,
             roundScore: t.roundScore + 1,
-            wordsGuessed: state.currentWord ?[...t.wordsGuessed, state.currentWord] : t.wordsGuessed,
+            wordsGuessed: state.currentWord ? [...t.wordsGuessed, state.currentWord] : t.wordsGuessed,
             roundTimeSpent: t.roundTimeSpent + timeSpentOnWord,
             totalTimeSpent: t.totalTimeSpent + timeSpentOnWord,
             operatorStats: opStats
@@ -74,7 +74,7 @@ export function interceptionReducer(state: CryptoGameState | null, action: GameA
 
       const updatedTeams = state.teams.map((t, i) => {
         if (i !== state.currentTeamIndex) return t;
-        
+
         return {
           ...t,
           roundErrors: t.roundErrors + 1,

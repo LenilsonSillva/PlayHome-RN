@@ -6,7 +6,7 @@ const GLOBAL_WORDS_KEY = "@playhome_used_words_history";
 export const loadGlobalUsedWords = async (): Promise<string[]> => {
   try {
     const data = await AsyncStorage.getItem(GLOBAL_WORDS_KEY);
-    return data ? JSON.parse(data) :[];
+    return data ? JSON.parse(data) : [];
   } catch (error) {
     console.error("Erro ao carregar palavras:", error);
     return [];
@@ -16,7 +16,11 @@ export const loadGlobalUsedWords = async (): Promise<string[]> => {
 // Salva o histórico atualizado
 export const saveGlobalUsedWords = async (words: string[]) => {
   try {
-    await AsyncStorage.setItem(GLOBAL_WORDS_KEY, JSON.stringify(words));
+    // Mantém apenas as últimas 500 palavras, por exemplo, para o histórico não ficar gigante
+    const limit = 500;
+    const limitedWords = words.length > limit ? words.slice(-limit) : words;
+
+    await AsyncStorage.setItem(GLOBAL_WORDS_KEY, JSON.stringify(limitedWords));
   } catch (error) {
     console.error("Erro ao salvar palavras:", error);
   }

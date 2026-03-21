@@ -23,36 +23,22 @@ export default function ImpostorLobby() {
 
   return (
     <View style={styles.container}>
-      <ImpostorBackground/>
+      <ImpostorBackground />
       <Header
         centerElement={LobbyTitle}
         onOpenSettings={() => {
           setOpenModal(true);
         }}
       />
-      <SettingsModal visible={openModal} onClose={() => setOpenModal(false)} />
+      <SettingsModal visible={openModal} onClose={() => setOpenModal(false)} showResetWords={true} />
 
       {/* SELETOR DE MODO (Segmented Control) */}
       <View style={styles.tabContainer}>
-        <TouchableOpacity
-          style={[styles.tab, mode === "local" && styles.activeTab]}
-          onPress={() => setMode("local")}
-        >
-          <CustomText
-            style={[styles.tabText, mode === "local" && styles.activeTabText]}
-          >
-            LOCAL 🏠
-          </CustomText>
+        <TouchableOpacity style={[styles.tab, mode === "local" && styles.activeTab]} onPress={() => setMode("local")}>
+          <CustomText style={[styles.tabText, mode === "local" && styles.activeTabText]}>LOCAL 🏠</CustomText>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tab, mode === "online" && styles.activeTab]}
-          onPress={() => setMode("online")}
-        >
-          <CustomText
-            style={[styles.tabText, mode === "online" && styles.activeTabText]}
-          >
-            ONLINE 🌏
-          </CustomText>
+        <TouchableOpacity style={[styles.tab, mode === "online" && styles.activeTab]} onPress={() => setMode("online")}>
+          <CustomText style={[styles.tabText, mode === "online" && styles.activeTabText]}>ONLINE 🌏</CustomText>
         </TouchableOpacity>
       </View>
 

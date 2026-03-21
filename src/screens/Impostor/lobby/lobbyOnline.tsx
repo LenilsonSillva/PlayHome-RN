@@ -8,6 +8,7 @@ import { useOnlineImpostorLobby } from "@/games/impostor/hooks/useOnlineImpostor
 import { useNavigation } from "@react-navigation/native";
 import { useAlert } from "@/contexts/alertContext";
 import { useTranslation } from "react-i18next";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
 export const LobbyOnline = () => {
   const { t } = useTranslation();
@@ -41,6 +42,79 @@ export const LobbyOnline = () => {
       showAlert(t("alerts.alert"), error as string);
     }
   };
+
+  const tacticalOptions = [
+    {
+      id: "twoWords",
+      label: t("games.impostor_lobby_twoWords"),
+      sub: t("games.impostor_lobby_twoWordsSub"),
+      val: state.twoGroups,
+      set: () => actions.setTwoGroups(!state.twoGroups),
+      icon: "people-pulling",
+      disable: false,
+      show: true
+    },
+    {
+      id: "whoStarts",
+      label: t("games.impostor_lobby_whoStart"),
+      sub: t("games.impostor_lobby_whoStartSub"),
+      val: state.whoStart,
+      set: () => actions.setWhoStart(!state.whoStart),
+      icon: "dice",
+      disable: false,
+      show: true
+    },
+    {
+      id: "impostorStarts",
+      label: t("games.impostor_lobby_impostorStarts"),
+      sub: t("games.impostor_lobby_impostorStartsSub"),
+      val: state.impostorCanStart,
+      set: () => actions.setImpostorCanStart(!state.impostorCanStart),
+      icon: "masks-theater",
+      disable: !state.whoStart,
+      show: state.whoStart
+    },
+    {
+      id: "impostorsUnited",
+      label: t("Impostores Unidos"),
+      sub: t("Impostores se conhecem no início."),
+      val: state.impostorsUnited,
+      set: () => actions.setImpostorsUnited(!state.impostorsUnited),
+      icon: "users-viewfinder",
+      disable: state.selectImpostorNumbers <= 1,
+      show: state.selectImpostorNumbers > 1
+    },
+    {
+      id: "hasHint",
+      label: t("games.impostor_lobby_impostorHint"),
+      sub: t("games.impostor_lobby_impostorHintSub"),
+      val: state.impostorHint,
+      set: () => actions.setImpostorHint(!state.impostorHint),
+      icon: "lightbulb",
+      disable: false,
+      show: true
+    },
+    {
+      id: "impostorCat",
+      label: t("games.impostor_lobby_impostorCat"),
+      sub: t("games.impostor_lobby_impostorCatSub"),
+      val: state.impostorCat,
+      set: () => actions.setImpostorCat(!state.impostorCat),
+      icon: "spell-check",
+      disable: !state.impostorHint,
+      show: state.impostorHint
+    },
+    {
+      id: "impostorTrap",
+      label: t("games.impostor_lobby_impostorTrap"),
+      sub: t("games.impostor_lobby_impostorTrapSub"),
+      val: state.impostorTrap,
+      set: () => actions.setImpostorTrap(!state.impostorTrap),
+      icon: "skull",
+      disable: !state.impostorHint,
+      show: state.impostorHint
+    }
+  ];
 
   // --- TELA DE ACESSO (FORA DA SALA) ---
   if (!state.inRoom) {
@@ -230,81 +304,31 @@ export const LobbyOnline = () => {
               </CustomText>
             </TouchableOpacity>
 
-            {showOptions &&
-              [
-                {
-                  label: t("games.impostor_lobby_twoWords"),
-                  sub: t("games.impostor_lobby_twoWordsSub"),
-                  val: state.twoGroups,
-                  set: actions.setTwoGroups,
-                  disable: false,
-                  show: true
-                },
-                {
-                  label: t("games.impostor_lobby_whoStart"),
-                  sub: t("games.impostor_lobby_whoStartSub"),
-                  val: state.whoStart,
-                  set: actions.setWhoStart,
-                  disable: false,
-                  show: true
-                },
-                {
-                  label: t("games.impostor_lobby_impostorStarts"),
-                  sub: t("games.impostor_lobby_impostorStartsSub"),
-                  val: state.impostorCanStart,
-                  set: actions.setImpostorCanStart,
-                  disable: !state.whoStart,
-                  show: state.whoStart
-                },
-                {
-                  label: t("games.impostor_lobby_impostorHint"),
-                  sub: t("games.impostor_lobby_impostorHintSub"),
-                  val: state.impostorHint,
-                  set: actions.setImpostorHint,
-                  disable: false,
-                  show: true
-                },
-                {
-                  label: t("games.impostor_lobby_impostorCat"),
-                  sub: t("games.impostor_lobby_impostorTrapSub"),
-                  val: state.impostorCat,
-                  set: actions.setImpostorCat,
-                  disable: !state.impostorHint,
-                  show: state.impostorHint
-                },
-                {
-                  label: t("games.impostor_lobby_impostorTrap"),
-                  sub: t("games.impostor_lobby_impostorTrapSub"),
-                  val: state.impostorTrap,
-                  set: actions.setImpostorTrap,
-                  disable: !state.impostorHint,
-                  show: state.impostorHint
-                }
-              ].map(
-                (item, index) =>
-                  item.show && (
-                    <View key={index} style={styles.switchBox}>
-                      <View style={{ flex: 1 }}>
-                        <CustomText variant="h3" style={{ fontSize: 16 }}>
+            {showOptions && (
+              <View style={styles.optionsGrid}>
+                {tacticalOptions.map((item) => {
+                  if (!item.show) return null;
+                  return (
+                    <View key={item.id} style={[styles.optionWrapper, item.disable && { opacity: 0.3 }]}>
+                      <TouchableOpacity
+                        activeOpacity={0.7}
+                        disabled={item.disable}
+                        onPress={item.set}
+                        style={[styles.optionSquare, item.val && styles.optionSquareActive]}
+                      >
+                        <FontAwesome6 name={item.icon as any} size={32} color={item.val ? COLORS.black : COLORS.cyan} />
+                        <CustomText variant="label" style={[styles.optionTitle, { color: item.val ? COLORS.black : "#FFF" }]}>
                           {item.label}
                         </CustomText>
-                        <CustomText variant="hint" style={{ fontSize: 11 }}>
-                          {item.sub}
-                        </CustomText>
-                      </View>
-                      <Switch
-                        value={item.val}
-                        onValueChange={item.set}
-                        trackColor={{
-                          false: COLORS.surfaceLight,
-                          true: COLORS.danger
-                        }}
-                        thumbColor={item.val ? COLORS.white : COLORS.textSecondary}
-                        disabled={item.disable}
-                      />
+                      </TouchableOpacity>
+                      <CustomText variant="hint" style={styles.optionDescription}>
+                        {item.sub}
+                      </CustomText>
                     </View>
-                  )
-              )}
+                  );
+                })}
+              </View>
+            )}
 
             {/* ABA DE CATEGORIAS */}
             <TouchableOpacity
@@ -549,6 +573,49 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: COLORS.textSecondary,
     fontWeight: "bold"
+  },
+
+  optionsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    marginTop: 15
+  },
+  optionWrapper: {
+    width: "48%",
+    marginBottom: 20,
+    alignItems: "center"
+  },
+  optionSquare: {
+    width: "100%",
+    aspectRatio: 1,
+    backgroundColor: "rgba(255,255,255,0.05)",
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "rgba(0, 242, 255, 0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 10,
+    marginBottom: 8
+  },
+  optionSquareActive: {
+    backgroundColor: COLORS.cyan,
+    borderColor: COLORS.white,
+    elevation: 10
+  },
+  optionTitle: {
+    marginTop: 10,
+    textAlign: "center",
+    fontSize: 14,
+    fontWeight: "bold",
+    textTransform: "uppercase"
+  },
+  optionDescription: {
+    textAlign: "center",
+    fontSize: 11,
+    lineHeight: 12,
+    color: COLORS.textSecondary,
+    paddingHorizontal: 5
   },
 
   categoryToggle: {

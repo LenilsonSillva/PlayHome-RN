@@ -6,11 +6,18 @@ import { saveGlobalUsedWords } from "@/games/common/utils/wordStorage";
 export function useOfflineCryptography() {
   const [gameState, dispatch] = useReducer(gameReducer, null);
 
-  useEffect(() => {
-    if (gameState && gameState.usedWords) {
+  const persistWords = useCallback(() => {
+    if (gameState?.usedWords && gameState.usedWords.length > 0) {
       saveGlobalUsedWords(gameState.usedWords);
     }
   }, [gameState?.usedWords]);
+
+  // Salva automaticamente quando a rodada acaba
+  useEffect(() => {
+    if (gameState?.phase === "round-result") {
+      persistWords();
+    }
+  }, [gameState?.phase, persistWords]);
 
   const startGame = useCallback(
     (
@@ -69,8 +76,9 @@ export function useOfflineCryptography() {
   }, []);
 
   const quitGame = useCallback(() => {
+    persistWords(); // 👈 Salva antes de limpar o estado
     dispatch({ type: "QUIT_GAME" });
-  }, []);
+  }, [persistWords]);
 
   return {
     gameState,
@@ -86,6 +94,7 @@ export function useOfflineCryptography() {
     passInterceptionTurn,
     rerollWord,
     nextRound,
+    persistWords,
     quitGame
   };
 }

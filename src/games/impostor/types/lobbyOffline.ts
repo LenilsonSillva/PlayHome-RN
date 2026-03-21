@@ -10,6 +10,7 @@ export type LobbyConfig = {
   whoStartButton: boolean;
   impostorTrap: boolean;
   impostorCat: boolean;
+  impostorsUnited: boolean;
 };
 
 // Estado do lobby offline

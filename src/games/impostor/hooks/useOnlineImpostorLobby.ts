@@ -26,6 +26,7 @@ export function useOnlineImpostorLobby() {
   const [twoGroups, setTwoGroups] = useState(false);
   const [whoStart, setWhoStart] = useState(true);
   const [impostorCanStart, setImpostorCanStart] = useState(true);
+  const [impostorsUnited, setImpostorsUnited] = useState(false);
   const [impostorHint, setImpostorHint] = useState(false);
   const [impostorTrap, setImpostorTrap] = useState(false);
   const [impostorCat, setImpostorCat] = useState(false);
@@ -48,6 +49,7 @@ export function useOnlineImpostorLobby() {
 
   useEffect(() => {
     setSelectImpostorNumbers((p) => Math.min(p, maxImpostors));
+    if (selectImpostorNumbers <= 1) setImpostorsUnited(false);
   }, [maxImpostors]);
 
   useEffect(() => {
@@ -119,6 +121,7 @@ export function useOnlineImpostorLobby() {
     setTwoGroups(false);
     setWhoStart(true);
     setImpostorCanStart(true);
+    setImpostorsUnited(false);
     setImpostorHint(false);
     setSelectedCategories(["Objetos", "Animais", "Ciência", "Natureza", "Comida", "Emoções"]);
   }, []);
@@ -206,6 +209,7 @@ export function useOnlineImpostorLobby() {
             impostorHasHint: impostorHint,
             impostorTrap,
             impostorCat,
+            impostorsUnited,
             selectedCategories
           }
         },
@@ -229,6 +233,7 @@ export function useOnlineImpostorLobby() {
       twoGroups,
       whoStart,
       impostorCanStart,
+      impostorsUnited, 
       impostorHint,
       impostorCat,
       impostorTrap,
@@ -246,6 +251,7 @@ export function useOnlineImpostorLobby() {
       setImpostorHint,
       setImpostorCat,
       setImpostorTrap,
+      setImpostorsUnited,
       setSelectedCategories,
       setSelectImpostorNumbers,
       handleCreate,

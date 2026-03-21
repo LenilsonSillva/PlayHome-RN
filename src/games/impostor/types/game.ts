@@ -34,6 +34,7 @@ export type ImpostorGame = {
   twoWordsMode: boolean;
   impostorHasHint: boolean;
   impostorCanStart: boolean;
+  impostorsUnited: boolean;
   selectedCategories: string[];
   chosenWord: string[];
   whoStart?: string;
@@ -43,6 +44,7 @@ export type ImpostorGame = {
   word?: string;
   impostorTrap: boolean;
   impostorCat: boolean;
+  didReset?: boolean;
 };
 
 /**
