@@ -16,7 +16,7 @@ export function CryptographyLobby() {
   const LobbyTitle = (
     <View style={styles.titleContainer}>
       <CustomText variant="label" style={{ color: COLORS.cyan }}>
-        PROTOCOLO
+        {t("home.header_protocol")}
       </CustomText>
       <CustomText variant="h3">{t("games.cryptography_title")}</CustomText>
     </View>
@@ -41,7 +41,9 @@ export function CryptographyLobby() {
               onPress={() => setIsOnlineMode(false)}
               activeOpacity={0.8}
             >
-              <CustomText style={[styles.segText, !isOnlineMode && styles.activeText]}>LOCAL (OFFLINE)</CustomText>
+              <CustomText style={[styles.segText, !isOnlineMode && styles.activeText]}>
+                {t("games.impostor_lobby_local")}
+              </CustomText>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -49,7 +51,9 @@ export function CryptographyLobby() {
               onPress={() => setIsOnlineMode(true)}
               activeOpacity={0.8}
             >
-              <CustomText style={[styles.segText, isOnlineMode && styles.activeText]}>REDE (ONLINE)</CustomText>
+              <CustomText style={[styles.segText, isOnlineMode && styles.activeText]}>
+                {t("games.impostor_lobby_online")}
+              </CustomText>
             </TouchableOpacity>
           </View>
         </View>

@@ -79,10 +79,10 @@ export function OfflineCryptographyGameScreen() {
   // 2. Função Central de Alerta para confirmar a saída
   const handleExitGame = useMemo(
     () => () => {
-      showAlert(t("SAIR DA PARTIDA"), t("Deseja realmente abandonar a partida atual?"), undefined, [
-        { text: t("alerts.cancel", "CANCELAR"), style: "cancel" },
+      showAlert(t("alerts.header_quitGame"), t("alerts.cryptography_leaveGameMessage"), undefined, [
+        { text: t("alerts.cancel"), style: "cancel" },
         {
-          text: t("alerts.quit", "SAIR"),
+          text: t("alerts.quit"),
           style: "destructive",
           onPress: () => {
             quitGame();
@@ -110,11 +110,11 @@ export function OfflineCryptographyGameScreen() {
 
   // ⭐ Header Memoizado + Nomes Traduzidos
   const PhaseHeader = useMemo(() => {
-    const phaseKey = gameState?.phase ? gameState.phase.replace(/-/g, "_") : "loading";
+    const phaseKey = gameState?.phase ? gameState.phase.replace(/-/g, "_") : t("home.loading");
     return (
       <View style={styles.titleContainer}>
         <CustomText variant="label" style={{ color: COLORS.cyan }}>
-          {t(`games.cryptography_title`, "CRIPTOGRAFIA")}
+          {t(`games.cryptography_title`)}
         </CustomText>
         <CustomText variant="h3" style={{ textTransform: "uppercase" }}>
           {gameState ? t(`games.cryptography_phase_${phaseKey}`) : "..."}
@@ -186,8 +186,6 @@ export function OfflineCryptographyGameScreen() {
         )}
 
         {gameState.phase === "round-result" && <RoundResult gameState={gameState} onNextRound={nextRound} />}
-
-        {/* ... outras fases ... */}
       </View>
     </View>
   );

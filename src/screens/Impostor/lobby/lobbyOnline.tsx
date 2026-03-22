@@ -76,8 +76,8 @@ export const LobbyOnline = () => {
     },
     {
       id: "impostorsUnited",
-      label: t("Impostores Unidos"),
-      sub: t("Impostores se conhecem no início."),
+      label: t("games.impostor_lobby_impostorUnion"),
+      sub: t("games.impostor_lobby_unionSub"),
       val: state.impostorsUnited,
       set: () => actions.setImpostorsUnited(!state.impostorsUnited),
       icon: "users-viewfinder",
@@ -254,7 +254,7 @@ export const LobbyOnline = () => {
           </View>
         </View>
 
-        {/* CONFIGURAÇÕES (APENAS PARA O HOST) */}
+        {/* SETTINGS (JUST FOR HOST) */}
         {state.isHost ? (
           <View style={styles.section}>
             <CustomText variant="label" style={styles.cyanLabel}>

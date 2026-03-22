@@ -17,6 +17,7 @@ import { CustomText } from "@/styles/customText";
 import { PlayerAvatar } from "@/games/common/components/PlayerAvatar";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { CryptoPlayer } from "@/games/cryptography/types/game";
+import { useTranslation } from "react-i18next";
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = Math.floor(width * 0.82);
@@ -46,7 +47,8 @@ export const CryptoCard = ({
   onAction,
   onStartTimer
 }: CryptoCardProps) => {
-  const [isRevealed, setIsRevealed] = useState(false);
+  const { t } = useTranslation();
+  const [, setIsRevealed] = useState(false);
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
 
@@ -193,7 +195,7 @@ export const CryptoCard = ({
 
               <View style={styles.wordSection}>
                 <CustomText variant="label" style={{ color: COLORS.textSecondary, marginBottom: 15 }}>
-                  SINAL DESCRIPTOGRAFADO
+                  {t("games.cryptography_card_wordIs")}
                 </CustomText>
                 <CustomText variant="h1" adjustsFontSizeToFit numberOfLines={2} style={[styles.theWord, { color: teamColor }]}>
                   {word}
@@ -206,10 +208,12 @@ export const CryptoCard = ({
                     variant="label"
                     style={{ color: skipsLeft && skipsLeft > 0 ? COLORS.danger : COLORS.textSecondary }}
                   >
-                    {mode === "interception" ? "← PASSAR" : "← PULAR"}
+                    {mode === "interception"
+                      ? "← " + t("games.cryptography_card_pass")
+                      : "← " + t("games.cryptography_card_skip")}
                   </CustomText>
                   <CustomText variant="label" style={{ color: COLORS.success }}>
-                    ACERTOU →
+                    {t("games.cryptography_card_correct")} →
                   </CustomText>
                 </View>
               ) : null}
@@ -231,7 +235,7 @@ export const CryptoCard = ({
                   {operator?.name.toUpperCase()}
                 </CustomText>
                 <CustomText variant="label" style={{ color: "rgba(0,0,0,0.35)", marginTop: 5 }}>
-                  OPERADOR TÁTICO
+                  {t("games.cryptography_card_taticalOperator")}
                 </CustomText>
               </View>
 
@@ -256,7 +260,11 @@ export const CryptoCard = ({
                     color={"rgba(255,255,255,0.7)"}
                   />
                   <CustomText variant="h3" style={{ color: teamColor, marginTop: 10 }}>
-                    {isTimerRunning ? "DESLIZE A CARTA" : mode === "infiltration" ? "SEGURE PARA INICIAR" : "SEGURE PARA VER"}
+                    {isTimerRunning
+                      ? t("games.cryptography_card_swipeCard")
+                      : mode === "infiltration"
+                        ? t("games.cryptography_card_holdToStart")
+                        : t("games.cryptography_card_holdToSee")}
                   </CustomText>
                 </View>
               </View>

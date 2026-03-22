@@ -349,7 +349,7 @@ export const RevealPhase = ({ player, data, isOnline, onNext, isLast, revealedAf
                       <View style={styles.unitedHeader}>
                         <MaterialCommunityIcons name="access-point-network" size={16} color={COLORS.danger} />
                         <CustomText variant="label" style={styles.unitedTitle}>
-                          {t("SEUS ALIADOS")}
+                          {t("games.impostor_reveal_ally")}
                         </CustomText>
                         <View style={styles.redDot} />
                       </View>

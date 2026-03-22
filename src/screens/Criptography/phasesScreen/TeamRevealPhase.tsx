@@ -29,10 +29,7 @@ export const TeamRevealPhase = ({
     // Valida se todos os times tem operador antes de prosseguir
     const missingOperators = gameState.teams.some((t) => !t.operatorId);
     if (missingOperators) {
-      showAlert(
-        "Atenção!",
-        t("games.cryptography_reveal_instruction", "Defina quem será o Operador de cada esquadrão antes de prosseguir.")
-      );
+      showAlert(t("alerts.warning"), t("games.cryptography_reveal_instruction"));
       return;
     }
     onConfirm();
@@ -47,11 +44,11 @@ export const TeamRevealPhase = ({
         <View style={styles.header}>
           <View style={styles.badge}>
             <CustomText variant="label" style={styles.badgeText}>
-              {t("games.cryptography_reveal_badge", "RECONHECIMENTO DE UNIDADES")}
+              {t("games.cryptography_reveal_badge")}
             </CustomText>
           </View>
           <CustomText variant="h2" style={styles.title}>
-            {t("games.cryptography_reveal_title", "ESQUADRÕES FORMADOS")}
+            {t("games.cryptography_reveal_title")}
           </CustomText>
         </View>
 
@@ -59,7 +56,7 @@ export const TeamRevealPhase = ({
         <TouchableOpacity style={styles.randomAllBtn} onPress={onRandomizeOperators} activeOpacity={0.8}>
           <MaterialCommunityIcons name="dice-multiple" size={20} color={COLORS.cyan} />
           <CustomText variant="h3" style={{ color: COLORS.cyan }}>
-            {t("games.cryptography_reveal_randomBtn", "SORTEAR OPERADORES")}
+            {t("games.cryptography_reveal_randomBtn")}
           </CustomText>
         </TouchableOpacity>
 
@@ -94,14 +91,16 @@ export const TeamRevealPhase = ({
                         fontSize: 9
                       }}
                     >
-                      {gameState.currentTeamIndex === idx ? "⭐ COMEÇA" : "DEFINIR 1º"}
+                      {gameState.currentTeamIndex === idx
+                        ? "⭐ " + t("games.cryptography_reveal_starts")
+                        : t("games.cryptography_reveal_setFirst")}
                     </CustomText>
                   </TouchableOpacity>
                 )}
               </View>
 
               <CustomText variant="label" style={styles.instruction}>
-                {t("games.cryptography_reveal_selectOperator", "SELECIONE O OPERADOR:")}
+                {t("games.cryptography_reveal_selectOperator")}
               </CustomText>
 
               {/* GRID DE AGENTES */}
@@ -122,7 +121,7 @@ export const TeamRevealPhase = ({
                       activeOpacity={0.7}
                     >
                       <CustomText variant="label" style={styles.operatorText}>
-                        {isOperator ? "OPERADOR" : ""}
+                        {isOperator ? t("games.cryptography_reveal_operator") : ""}
                       </CustomText>
                       <View style={styles.playerData}>
                         <CustomText style={styles.playerEmoji}>{player.emoji}</CustomText>
@@ -154,7 +153,7 @@ export const TeamRevealPhase = ({
       <View style={styles.footer}>
         <TouchableOpacity style={styles.confirmBtn} onPress={handleConfirm} activeOpacity={0.9}>
           <CustomText variant="h2" style={{ color: COLORS.background }}>
-            {t("games.cryptography_reveal_confirmBtn", "TUDO PRONTO 🚀")}
+            {t("games.cryptography_reveal_confirmBtn")}
           </CustomText>
         </TouchableOpacity>
       </View>

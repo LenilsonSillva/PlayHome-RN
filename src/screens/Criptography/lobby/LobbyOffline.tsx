@@ -93,7 +93,7 @@ export const LobbyOffline = () => {
 
   const handleStartMission = async () => {
     if (players.length < teamCount) {
-      showAlert(t("alerts.error"), "Número de jogadores inferior ao número de esquadrões.");
+      showAlert(t("alerts.error"), t("alerts.cryptography_lobby_feewPlayers"));
       return;
     }
 
@@ -136,7 +136,7 @@ export const LobbyOffline = () => {
               color={mode === "infiltration" ? COLORS.cyan : COLORS.textSecondary}
             />
             <CustomText variant="label" style={{ color: mode === "infiltration" ? COLORS.cyan : COLORS.textSecondary }}>
-              INFILTRAÇÃO
+              {t("games.cryptography_phase_infiltration_action")}
             </CustomText>
           </TouchableOpacity>
 
@@ -151,7 +151,7 @@ export const LobbyOffline = () => {
               color={mode === "interception" ? COLORS.danger : COLORS.textSecondary}
             />
             <CustomText variant="label" style={{ color: mode === "interception" ? COLORS.danger : COLORS.textSecondary }}>
-              INTERCEPTAÇÃO
+              {t("games.cryptography_phase_interception_action")}
             </CustomText>
           </TouchableOpacity>
         </View>
@@ -258,7 +258,7 @@ export const LobbyOffline = () => {
                   {distributionType === "manual" && (
                     <TouchableOpacity style={styles.teamTag} onPress={() => cycleTeamAssignment(p.id)}>
                       <CustomText variant="label" style={{ color: COLORS.background }}>
-                        GRUPO {(manualAssignments[p.id] || 0) + 1} ↻
+                        {t("games.cryptography_lobby_group")} {(manualAssignments[p.id] || 0) + 1} ↻
                       </CustomText>
                     </TouchableOpacity>
                   )}
@@ -269,7 +269,7 @@ export const LobbyOffline = () => {
                     style={[styles.removeBtn, distributionType === "manual" && styles.removeBtnSmall]}
                   >
                     <CustomText style={styles.removeText}>
-                      {distributionType === "manual" ? "X" : t("games.cryptography_lobby_remove", "REMOVER")}
+                      {distributionType === "manual" ? "X" : t("games.cryptography_lobby_remove")}
                     </CustomText>
                   </TouchableOpacity>
                 </View>

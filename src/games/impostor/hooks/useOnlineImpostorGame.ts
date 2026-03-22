@@ -215,7 +215,7 @@ export function useOnlineImpostorGame() {
   const handleExitAttempt = useCallback(() => {
     showAlert(
       t("alerts.impostor_leaveRoomTitle"),
-      t("alerts.impostor_realyLeave"),
+      t("alerts.impostor_reallyLeave"),
       undefined,
       [
         { text: t("alerts.cancel"), style: "cancel" },

@@ -15,7 +15,6 @@ import Animated, {
 import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
 import { useTranslation } from "react-i18next";
-import { PlayerAvatar } from "@/games/common/components/PlayerAvatar";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { CryptoGameState, CryptoPlayer, CryptoTeam } from "@/games/cryptography/types/game";
 import { ImpostorBackground } from "@/components/Background/Background";
@@ -182,7 +181,7 @@ export const RoundResult = ({ gameState, onNextRound }: Props) => {
           {/* BANNER DE VITÓRIA DA RODADA */}
           <View style={styles.victoryBanner}>
             <CustomText variant="h1" style={styles.victoryTitle}>
-              {roundWinners.length > 1 ? "EMPATE NA RODADA" : "EQUIPE DESTAQUE"}
+              {roundWinners.length > 1 ? t("games.cryptography_result_tie") : t("games.cryptography_result_teamWin")}
             </CustomText>
 
             {/* Renderiza todos os times empatados (ou apenas o 1º) */}
@@ -201,7 +200,7 @@ export const RoundResult = ({ gameState, onNextRound }: Props) => {
               </CustomText>
               <CustomText variant="label" style={{ color: COLORS.white }}>
                 {" "}
-                ACERTOS NESTA RODADA
+                {t("games.cryptography_result_hits")}
               </CustomText>
             </View>
           </View>
@@ -221,7 +220,7 @@ export const RoundResult = ({ gameState, onNextRound }: Props) => {
           <View style={styles.listHeader}>
             <View style={styles.handle} />
             <CustomText variant="label" style={styles.listTitle}>
-              RANKING GERAL DE MISSÃO
+              {t("games.cryptography_result_overall")}
             </CustomText>
           </View>
 
@@ -236,7 +235,7 @@ export const RoundResult = ({ gameState, onNextRound }: Props) => {
       <View style={styles.footer}>
         <TouchableOpacity style={styles.nextBtn} onPress={onNextRound} activeOpacity={0.8}>
           <CustomText variant="h3" style={styles.btnText}>
-            {t("games.cryptography_result_nextMission", "NOVA RODADA")} 🚀
+            {t("games.cryptography_result_nextMission")} 🚀
           </CustomText>
         </TouchableOpacity>
       </View>
@@ -248,7 +247,7 @@ export const RoundResult = ({ gameState, onNextRound }: Props) => {
 // 🚀 CARD DO RELATÓRIO DA EQUIPE
 // =========================================================
 const TeamReportCard = ({ team, rank }: { team: CryptoTeam; rank: number }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
 
   // ESTATÍSTICAS DA RODADA ATUAL
@@ -294,12 +293,23 @@ const TeamReportCard = ({ team, rank }: { team: CryptoTeam; rank: number }) => {
     setIsExpanded(!isExpanded);
   };
 
+  const rankEnglishAbrev = (rankValue: number) => {
+    if (i18n.language === "en") {
+      if (rankValue === 1) return t("games.impostor_result_first");
+      if (rankValue === 2) return t("games.impostor_result_second");
+      if (rankValue === 3) return t("games.impostor_result_third");
+      return t("games.impostor_result_moreRanking");
+    }
+    return t("games.impostor_result_moreRanking");
+  };
+
   return (
     <View style={styles.teamCard}>
       {/* Cabeçalho */}
       <View style={[styles.teamHeader, { borderLeftColor: team.color }]}>
         <CustomText variant="h2" style={styles.rankNumber}>
-          {rank}º
+          {rank}
+          {rankEnglishAbrev(rank)}
         </CustomText>
         <View style={{ flex: 1 }}>
           <CustomText variant="h3" style={{ color: team.color }}>
@@ -309,7 +319,7 @@ const TeamReportCard = ({ team, rank }: { team: CryptoTeam; rank: number }) => {
             {memberNames}
           </CustomText>
           <CustomText variant="hint" style={{ color: COLORS.success, marginTop: 4, fontSize: 16 }}>
-            {team.score} pts totais ({roundHits} na rodada)
+            {team.score} {t("games.cryptography_result_totalPts")} ({roundHits} {t("games.cryptography_result_roundPts")})
           </CustomText>
         </View>
       </View>
@@ -318,7 +328,7 @@ const TeamReportCard = ({ team, rank }: { team: CryptoTeam; rank: number }) => {
       <View style={styles.statsGrid}>
         <View style={styles.statItem}>
           <CustomText variant="label" style={styles.statLabel}>
-            Acertos
+            {t("games.cryptography_action_hits")}
           </CustomText>
           <CustomText variant="h3" style={{ color: COLORS.success }}>
             {roundHits}
@@ -326,7 +336,7 @@ const TeamReportCard = ({ team, rank }: { team: CryptoTeam; rank: number }) => {
         </View>
         <View style={styles.statItem}>
           <CustomText variant="label" style={styles.statLabel}>
-            Erros/Pulos
+            {t("games.cryptography_result_errorSkip")}
           </CustomText>
           <CustomText variant="h3" style={{ color: COLORS.danger }}>
             {roundErrors}
@@ -334,7 +344,7 @@ const TeamReportCard = ({ team, rank }: { team: CryptoTeam; rank: number }) => {
         </View>
         <View style={styles.statItem}>
           <CustomText variant="label" style={styles.statLabel}>
-            Eficiência
+            {t("games.cryptography_result_effc")}
           </CustomText>
           <CustomText variant="h3" style={{ color: roundEfficiency >= 70 ? COLORS.cyan : COLORS.amber }}>
             {roundEfficiency}%
@@ -342,7 +352,7 @@ const TeamReportCard = ({ team, rank }: { team: CryptoTeam; rank: number }) => {
         </View>
         <View style={styles.statItem}>
           <CustomText variant="label" style={styles.statLabel}>
-            Tempo Médio
+            {t("games.cryptography_result_avarageTime")}
           </CustomText>
           <CustomText variant="h3" style={{ color: COLORS.white }}>
             {roundAvgTime}s
@@ -355,7 +365,8 @@ const TeamReportCard = ({ team, rank }: { team: CryptoTeam; rank: number }) => {
         <View style={styles.teamMvpContainer}>
           <MaterialCommunityIcons name="star-shooting" size={16} color={COLORS.amber} />
           <CustomText variant="label" style={{ color: COLORS.textSecondary, marginLeft: 8, flex: 1 }}>
-            MELHOR OPERADOR: <CustomText style={{ color: COLORS.white }}>{teamMvp.player.name}</CustomText>
+            {t("games.cryptography_result_bestOp")}:{" "}
+            <CustomText style={{ color: COLORS.white }}>{teamMvp.player.name}</CustomText>
           </CustomText>
         </View>
       )}
@@ -364,8 +375,8 @@ const TeamReportCard = ({ team, rank }: { team: CryptoTeam; rank: number }) => {
       <TouchableOpacity style={styles.expandBtn} onPress={toggleExpand} activeOpacity={0.7}>
         <CustomText variant="label" style={{ color: COLORS.textSecondary }}>
           {isExpanded
-            ? `${t("games.cryptography_result_hideHits", "OCULTAR ACERTOS")} ▴`
-            : `${t("games.cryptography_result_viewHits", "VER ACERTOS")} (${totalWords.length}) ▾`}
+            ? `${t("games.cryptography_result_hideHits")} ▴`
+            : `${t("games.cryptography_result_viewHits")} (${totalWords.length}) ▾`}
         </CustomText>
       </TouchableOpacity>
 
@@ -395,7 +406,7 @@ const TeamReportCard = ({ team, rank }: { team: CryptoTeam; rank: number }) => {
             </View>
           ) : (
             <CustomText variant="hint" style={styles.noWordsText}>
-              Nenhum sinal interceptado.
+              {t("games.cryptography_result_noWord")}
             </CustomText>
           )}
         </View>

@@ -148,8 +148,8 @@ export const LobbyOffline = () => {
     },
     {
       id: "impostorsUnited",
-      label: t("Impostores Unidos"),
-      sub: t("Os impostores sabem quem são seus aliados no início."),
+      label: t("games.impostor_lobby_impostorUnion"),
+      sub: t("games.impostor_lobby_unionSub"),
       val: impostorsUnited,
       set: () => setImpostorsUnited(!impostorsUnited),
       icon: "users-viewfinder", // Ícone de FontAwesome6
@@ -216,7 +216,7 @@ export const LobbyOffline = () => {
               </TouchableOpacity>
             </View>
 
-            {/* LISTA DE JOGADORES */}
+            {/* PLAYERS LIST */}
 
             <View style={styles.playerList}>
               {players.map((p) => (
@@ -246,13 +246,13 @@ export const LobbyOffline = () => {
             </View>
           </View>
 
-          {/* SEÇÃO: PARÂMETROS DA MISSÃO */}
+          {/* SECTION: SETTINGS */}
           <View style={styles.section}>
             <CustomText variant="label" style={styles.cyanText}>
               {t("games.impostor_lobby_settingsTitle")}
             </CustomText>
 
-            {/* CONTADOR DE IMPOSTORES */}
+            {/* NO. OF IMPOSTORS */}
             <View style={styles.settingCard}>
               <View>
                 <CustomText variant="h3">{t("games.impostor_lobby_numberOfImpostors")}</CustomText>

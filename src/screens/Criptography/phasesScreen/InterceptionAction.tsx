@@ -80,7 +80,8 @@ export const InterceptionAction = ({ gameState, onFinishMatch, onPassTurn, onSta
       {/* 1. PROGRESSO DA PARTIDA NO TOPO */}
       <View style={styles.matchProgress}>
         <CustomText variant="label" style={styles.progressText}>
-          PALAVRA {gameState.currentMatchIndex + 1} DE {gameState.config.wordLimit}
+          {t("games.cryptography_action_wordOf")} {gameState.currentMatchIndex + 1} {t("games.cryptography_action_of")}{" "}
+          {gameState.config.wordLimit}
         </CustomText>
         <View style={styles.progressBarBg}>
           <View
@@ -93,14 +94,14 @@ export const InterceptionAction = ({ gameState, onFinishMatch, onPassTurn, onSta
       <View style={[styles.header, { borderColor: currentTeam.color, borderLeftColor: currentTeam.color }]}>
         <View style={styles.headerLeft}>
           <CustomText variant="label" style={{ color: COLORS.white, fontSize: 10, letterSpacing: 1 }}>
-            Vez da
+            {t("games.cryptography_action_turnOf")}
           </CustomText>
           <CustomText variant="h2" style={{ color: currentTeam.color, textTransform: "uppercase", marginVertical: 2 }}>
-            <CustomText variant="h2">EQUIPE </CustomText>
+            <CustomText variant="h2">{t("games.cryptography_action_team")} </CustomText>
             {currentTeam.name}
           </CustomText>
           <CustomText variant="hint" style={{ color: COLORS.textSecondary }}>
-            {currentTeam.players.length} jogadores
+            {currentTeam.players.length} {t("games.cryptography_action_players")}
           </CustomText>
         </View>
         <View style={styles.headerRight}>
@@ -143,7 +144,7 @@ export const InterceptionAction = ({ gameState, onFinishMatch, onPassTurn, onSta
             <TouchableOpacity style={styles.startBtn} onPress={startTurnTimer} activeOpacity={0.8}>
               <MaterialCommunityIcons name="timer-play-outline" size={24} color={COLORS.background} />
               <CustomText variant="h3" style={{ color: COLORS.background, marginLeft: 10 }}>
-                DICA DADA! INICIAR TEMPO
+                {t("games.cryptography_action_hintGivenBtn")}
               </CustomText>
             </TouchableOpacity>
           </View>
@@ -151,7 +152,7 @@ export const InterceptionAction = ({ gameState, onFinishMatch, onPassTurn, onSta
           <View style={styles.statsRow}>
             <View style={[styles.statBox, { alignItems: "center" }]}>
               <CustomText variant="label" style={styles.statTitle}>
-                TENTATIVAS
+                {t("games.cryptography_action_attempts")}
               </CustomText>
               <CustomText variant="h1" style={{ color: COLORS.amber }}>
                 {currentTeam.roundErrors}
@@ -159,7 +160,7 @@ export const InterceptionAction = ({ gameState, onFinishMatch, onPassTurn, onSta
             </View>
             <View style={styles.statBox}>
               <CustomText variant="label" style={styles.statTitle}>
-                ACERTOS
+                {t("games.cryptography_action_hits")}
               </CustomText>
               <CustomText variant="h1" style={{ color: COLORS.success }}>
                 {currentTeam.roundScore}

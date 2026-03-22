@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { View, StyleSheet } from "react-native";
+import React, { useEffect, useMemo, useState } from "react";
+import { View, StyleSheet, BackHandler } from "react-native";
 import { useOfflineImpostor } from "@/games/impostor/hooks/useOfflineImpostor";
 import { COLORS } from "@/styles/theme";
 import { RevealPhase } from "../phasesScreen/RevealPhase";
@@ -15,9 +15,14 @@ import { useTranslation } from "react-i18next";
 import { ImpostorPlayer } from "@/games/impostor/types/game";
 import { EliminatedReport } from "../phasesScreen/EliminatedReport";
 import { ReviewWordModal } from "../phasesScreen/components/ReviewWordModal";
+import { useNavigation } from "expo-router";
+import { saveGlobalUsedWords } from "@/games/common/utils/wordStorage";
+import { useAlert } from "@/contexts/alertContext";
 
 export const OfflineImpostorGameScreen = ({ route }: any) => {
   const { t } = useTranslation();
+  const navigation = useNavigation<any>();
+  const { showAlert } = useAlert();
   const { players } = usePlayers();
   const {
     game,
@@ -54,6 +59,46 @@ export const OfflineImpostorGameScreen = ({ route }: any) => {
       startGame(players, route.params.config);
     }
   }, [route.params?.config]);
+
+  // 1. Desativa gesto de voltar no iOS
+
+  useEffect(() => {
+    navigation.setOptions({ gestureEnabled: false });
+    return () => navigation.setOptions({ gestureEnabled: true });
+  }, [navigation]);
+
+  // 3. Função de Saída com Alerta
+  const handleExitGame = useMemo(
+    () => () => {
+      showAlert(t("alerts.header_quitGame"), t("alerts.impostor_reallyLeave"), undefined, [
+        { text: t("alerts.cancel"), style: "cancel" },
+        {
+          text: t("alerts.quit"),
+          style: "destructive",
+          onPress: () => {
+            // Salva antes de sair
+            if (game?.usedWords) saveGlobalUsedWords(game.usedWords);
+
+            navigation.reset({
+              index: 1,
+              routes: [{ name: "Home" }, { name: "ImpostorLobby" }] // Ajuste para o nome do seu Lobby
+            });
+          }
+        }
+      ]);
+    },
+    [navigation, showAlert, t, game?.usedWords]
+  );
+
+  // 4. Trava botão voltar do Android
+  useEffect(() => {
+    const handleExitAttempt = () => {
+      handleExitGame();
+      return true;
+    };
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", handleExitAttempt);
+    return () => backHandler.remove();
+  }, [handleExitGame]);
 
   // Função para avançar para o próximo jogador na fase de revelação ou para a próxima fase quando todos terminarem de revelar
   const handleNextReveal = () => {
@@ -133,6 +178,7 @@ export const OfflineImpostorGameScreen = ({ route }: any) => {
         onOpenSettings={() => {
           setOpenModal(true);
         }}
+        onGoBack={handleExitGame}
         position="absolute"
       />
       <View style={{ flex: 1 }}>

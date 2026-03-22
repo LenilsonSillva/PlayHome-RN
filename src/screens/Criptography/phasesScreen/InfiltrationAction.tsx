@@ -7,6 +7,7 @@ import { CircularTimer } from "@/components/Timer/CircularTimer";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { CryptoGameState } from "@/games/cryptography/types/game";
 import { CryptoCard } from "./components/CryptoCard";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   gameState: CryptoGameState;
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export const InfiltrationAction = ({ gameState, onAction, onTimeUp, onStartTimer }: Props) => {
+  const { t } = useTranslation();
   const currentTeam = gameState.teams[gameState.currentTeamIndex];
 
   const operator = useMemo(() => {
@@ -60,13 +62,13 @@ export const InfiltrationAction = ({ gameState, onAction, onTimeUp, onStartTimer
       <View style={[styles.header, { borderColor: currentTeam.color }]}>
         <View style={styles.headerLeft}>
           <CustomText variant="label" style={{ color: COLORS.white, fontSize: 10, letterSpacing: 1 }}>
-            JOGANDO AGORA
+            {t("games.cryptography_action_playingNow")}
           </CustomText>
           <CustomText variant="h2" style={{ color: currentTeam.color, textTransform: "uppercase", marginVertical: 2 }}>
-            <CustomText variant="h2">EQUIPE</CustomText> {currentTeam.name}
+            <CustomText variant="h2">{t("games.cryptography_action_team")}</CustomText> {currentTeam.name}
           </CustomText>
           <CustomText variant="hint" style={{ color: COLORS.textSecondary }}>
-            {currentTeam.players.length} jogadores
+            {currentTeam.players.length} {t("games.cryptography_action_players")}
           </CustomText>
         </View>
         <View style={styles.headerRight}>
@@ -92,7 +94,7 @@ export const InfiltrationAction = ({ gameState, onAction, onTimeUp, onStartTimer
         <View style={styles.statsRow}>
           <View style={[styles.statBox, { alignItems: "center" }]}>
             <CustomText variant="label" style={styles.statTitle}>
-              PULOS RESTANTES
+              {t("games.cryptography_action_skips")}
             </CustomText>
             <View style={styles.skipsIcons}>
               {Array.from({ length: 3 }).map((_, i) => (
@@ -107,7 +109,7 @@ export const InfiltrationAction = ({ gameState, onAction, onTimeUp, onStartTimer
           </View>
           <View style={styles.statBox}>
             <CustomText variant="label" style={styles.statTitle}>
-              ACERTOS
+              {t("games.cryptography_action_hits")}
             </CustomText>
             <CustomText variant="h1" style={{ color: COLORS.success }}>
               {currentTeam.roundScore}

@@ -7,15 +7,17 @@ import { SettingsModal } from "@/components/SettingsModal/SettingsModal";
 import { LobbyOffline } from "./LobbyOffline";
 import { LobbyOnline } from "./LobbyOnline";
 import { ImpostorBackground } from "@/components/Background/Background";
+import { useTranslation } from "react-i18next";
 
 export default function ImpostorLobby() {
+  const { t } = useTranslation();
   const [mode, setMode] = useState<"local" | "online">("local");
   const [openModal, setOpenModal] = useState<boolean>(false);
 
   const LobbyTitle = (
     <View style={styles.titleContainer}>
       <CustomText variant="label" style={{ color: COLORS.danger }}>
-        PROTOCOLO
+        {t("home.header_protocol")}
       </CustomText>
       <CustomText variant="h3">IMPOSTOR</CustomText>
     </View>
@@ -35,10 +37,14 @@ export default function ImpostorLobby() {
       {/* SELETOR DE MODO (Segmented Control) */}
       <View style={styles.tabContainer}>
         <TouchableOpacity style={[styles.tab, mode === "local" && styles.activeTab]} onPress={() => setMode("local")}>
-          <CustomText style={[styles.tabText, mode === "local" && styles.activeTabText]}>LOCAL 🏠</CustomText>
+          <CustomText style={[styles.tabText, mode === "local" && styles.activeTabText]}>
+            {t("games.impostor_lobby_local")} 🏠
+          </CustomText>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.tab, mode === "online" && styles.activeTab]} onPress={() => setMode("online")}>
-          <CustomText style={[styles.tabText, mode === "online" && styles.activeTabText]}>ONLINE 🌏</CustomText>
+          <CustomText style={[styles.tabText, mode === "online" && styles.activeTabText]}>
+            {t("games.impostor_lobby_online")} 🌏
+          </CustomText>
         </TouchableOpacity>
       </View>
 

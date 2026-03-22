@@ -38,9 +38,19 @@ export const SettingsModal = ({
   const [soundEnabled, setSoundEnabled] = useState(true);
 
   const changeLanguage = () => {
-    const langs = ["pt", "en", "es"];
-    const current = i18n.resolvedLanguage || "pt";
-    const nextIndex = (langs.indexOf(current) + 1) % langs.length;
+    // Lista completa com os 11 idiomas (sem o árabe por enquanto, como você planejou)
+    const langs = ["pt", "en", "es", "fr", "de", "it", "ja", "ko", "ru", "zh", "hi"];
+
+    // Pegamos apenas os primeiros 2 caracteres (ex: 'pt-BR' vira 'pt')
+    // Isso garante que o indexOf encontre o idioma no seu array
+    const currentRaw = i18n.language || "en";
+    const current = currentRaw.split("-")[0];
+
+    // Se o idioma atual não estiver na lista (ex: usuário fala Holandês),
+    // o index será -1, então começamos do 0 (Português)
+    const currentIndex = langs.indexOf(current);
+    const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % langs.length;
+
     i18n.changeLanguage(langs[nextIndex]);
   };
 
