@@ -1,0 +1,14 @@
+{
+  "alerts": {
+    "lostConnection": "Sin conexión al servidor. Revisa tu internet o espera un poco."
+  },
+  "games": {
+    "impostor_lobby_VideoGame": "Videojuegos",
+    "impostor_lobby_explainCreateRoom": "GENERA UN CÓDIGO E INVITA A LA TRIPULACIÓN A JUGAR CADA UNO EN SU CELULAR.",
+    "impostor_discuss_subtitle": "Debatan y analicen las pistas de cada tripulante. El infiltrado está entre ustedes.",
+    "cryptography_card_holdToStart": "MANTÉN PRESIONADO PARA INICIAR",
+    "cryptography_card_holdToSee": "MANTÉN PRESIONADO PARA VER",
+    "cryptography_action_holdToView": "MANTÉN PRESIONADO PARA VER",
+    "cryptography_action_turnOf": "TURNO DE"
+  }
+}

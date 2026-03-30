@@ -18,6 +18,7 @@ import { useTranslation } from "react-i18next";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { CryptoGameState, CryptoPlayer, CryptoTeam } from "@/games/cryptography/types/game";
 import { ImpostorBackground } from "@/components/Background/Background";
+import { useAudio } from "@/contexts/audioContext";
 
 interface Props {
   gameState: CryptoGameState;
@@ -80,11 +81,17 @@ const AnimatedEmoji = ({ emoji, index, teamColor }: { emoji: string; index: numb
 
 export const RoundResult = ({ gameState, onNextRound }: Props) => {
   const { t, i18n } = useTranslation();
+  const { playSound } = useAudio();
   const scrollY = useSharedValue(0);
 
   const scrollHandler = useAnimatedScrollHandler((event) => {
     scrollY.value = event.contentOffset.y;
   });
+
+  // Som de vitória inicia uma única vez
+  useEffect(() => {
+    playSound("win");
+  }, []);
 
   // =========================================================
   // ⚖️ LÓGICA DE DESEMPATE MATEMÁTICO (Acertos -> Eficiência -> Tempo)
@@ -233,7 +240,16 @@ export const RoundResult = ({ gameState, onNextRound }: Props) => {
       </Animated.ScrollView>
 
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.nextBtn} onPress={onNextRound} activeOpacity={0.8}>
+        <TouchableOpacity
+          style={styles.nextBtn}
+          onPress={() => {
+            playSound("click");
+            setTimeout(() => {
+              onNextRound();
+            }, 100);
+          }}
+          activeOpacity={0.8}
+        >
           <CustomText variant="h3" style={styles.btnText}>
             {t("games.cryptography_result_nextMission")} 🚀
           </CustomText>
@@ -248,6 +264,7 @@ export const RoundResult = ({ gameState, onNextRound }: Props) => {
 // =========================================================
 const TeamReportCard = ({ team, rank }: { team: CryptoTeam; rank: number }) => {
   const { t, i18n } = useTranslation();
+  const { playSound } = useAudio();
   const [isExpanded, setIsExpanded] = useState(false);
 
   // ESTATÍSTICAS DA RODADA ATUAL
@@ -372,7 +389,14 @@ const TeamReportCard = ({ team, rank }: { team: CryptoTeam; rank: number }) => {
       )}
 
       {/* Botão Expandir Palavras */}
-      <TouchableOpacity style={styles.expandBtn} onPress={toggleExpand} activeOpacity={0.7}>
+      <TouchableOpacity
+        style={styles.expandBtn}
+        onPress={() => {
+          toggleExpand();
+          playSound("click2");
+        }}
+        activeOpacity={0.7}
+      >
         <CustomText variant="label" style={{ color: COLORS.textSecondary }}>
           {isExpanded
             ? `${t("games.cryptography_result_hideHits")} ▴`

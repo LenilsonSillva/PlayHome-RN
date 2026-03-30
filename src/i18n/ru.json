@@ -220,6 +220,7 @@
     "impostor_statusModal_ready": "ГОТОВ",
     "impostor_statusModal_voted": "ПРОГОЛОСОВАЛ",
     "impostor_statusModal_waiting": "ОЖИДАНИЕ",
+    "impostor_statusModal_roomStatus": "СТАТУС КОМНАТЫ",
 
     "impostor_spectator_observer": "НАБЛЮДАТЕЛЬ",
     "impostor_spectator_tatical": "ТАКТИК",
@@ -254,6 +255,8 @@
     "cryptography_lobby_close": "ЗАКРЫТЬ",
     "cryptography_lobby_start": "ЗАПУСК МИССИИ",
     "cryptography_lobby_remove": "УДАЛИТЬ",
+    "cryptography_lobby_timeLimitText": "Выберите максимальное время, которое будет у каждого отряда, чтобы угадать слово.",
+    "cryptography_lobby_wordLimitText": "Выберите количество слов в каждом раунде.",
 
     "cryptography_card_wordIs": "ВАШЕ СЛОВО: ",
     "cryptography_card_pass": "ПАС",

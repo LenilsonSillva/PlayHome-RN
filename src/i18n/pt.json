@@ -220,6 +220,7 @@
     "impostor_statusModal_ready": "PRONTO",
     "impostor_statusModal_voted": "VOTOU",
     "impostor_statusModal_waiting": "AGUARDANDO",
+    "impostor_statusModal_roomStatus": "STATUS DA SALA",
 
     "impostor_spectator_observer": "OBSERVADOR",
     "impostor_spectator_tatical": "TÁTICO",
@@ -227,11 +228,9 @@
     "impostor_spectator_systemStatus": "ESTADO DO SISTEMA:",
     "impostor_spectator_waitingEnd": "AGUARDANDO O FIM DA MISSÃO...",
 
-
     "impostor_desc": "Fique esperto! Todos os tripulantes recebem uma palavra, menos o impostor. Descubra quem está fingindo e ejete-o da nave.",
     "cripto_title": "CRIPTOGRAFIA",
     "cripto_desc": "Comunicação tática! Dê dicas precisas para a sua equipe descriptografar a palavra",
-
 
     "cryptography_title": "CRIPTOGRAFIA",
     "cryptography_phase_team_reveal": "DEFINIÇÃO",
@@ -245,17 +244,19 @@
     "cryptography_lobby_distribution": "DISTRIBUIÇÃO DOS JOGADORES",
     "cryptography_lobby_random": "ALEATÓRIO",
     "cryptography_lobby_manual": "MANUAL",
-    "cryptography_lobby_groupCount": "Nº DE ESQUADRÕES",
-    "cryptography_lobby_crewmates": "TRIPULANTES",
-    "cryptography_lobby_playerName": "Nome do Tripulante",
+    "cryptography_lobby_groupCount": "Nº DE GRUPOS",
+    "cryptography_lobby_crewmates": "Jogadores",
+    "cryptography_lobby_playerName": "Nome do Jogador",
     "cryptography_lobby_add": "ADICIONAR",
     "cryptography_lobby_group": "GRUPO",
     "cryptography_lobby_timer": "TEMPO MÁXIMO",
     "cryptography_lobby_wordLimit": "QUANTIDADE DE PALAVRAS",
     "cryptography_lobby_db": "BANCO DE DADOS",
     "cryptography_lobby_close": "FECHAR",
-    "cryptography_lobby_start": "INICIALIZAR MISSÃO",
+    "cryptography_lobby_start": "INICIAR MISSÃO",
     "cryptography_lobby_remove": "REMOVER",
+    "cryptography_lobby_timeLimitText": "Selecione o tempo máximo que cada grupo terá para tentar acertar cada palavra.",
+    "cryptography_lobby_wordLimitText": "Selecione quantas palavras cada rodada terá.",
 
     "cryptography_card_wordIs": "A PALAVRA É: ",
     "cryptography_card_pass": "PASSAR",

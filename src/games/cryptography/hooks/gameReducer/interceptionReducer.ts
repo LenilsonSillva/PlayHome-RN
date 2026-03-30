@@ -50,7 +50,7 @@ export function interceptionReducer(state: CryptoGameState | null, action: GameA
         };
       }
 
-      const result = getUniqueWord(state.config.categories, state.usedWords);
+      const result = getUniqueWord(state.config.categories, state.usedWords, state.wordDatabase);
 
       if (!result.word) {
         return { ...state, phase: "round-result", roundEndTime: undefined, lastActionTime: undefined };

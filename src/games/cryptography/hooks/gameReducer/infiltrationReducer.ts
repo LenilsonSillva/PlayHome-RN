@@ -50,7 +50,7 @@ export function infiltrationReducer(state: CryptoGameState | null, action: GameA
       });
 
       // 🔥 CORREÇÃO: Lê o 'result.word' do novo formato
-      const result = getUniqueWord(state.config.categories, state.usedWords);
+      const result = getUniqueWord(state.config.categories, state.usedWords, state.wordDatabase);
 
       if (!result.word) {
         return {
@@ -81,7 +81,7 @@ export function infiltrationReducer(state: CryptoGameState | null, action: GameA
         return { ...state, phase: "round-result", roundEndTime: undefined, lastActionTime: undefined };
       }
 
-      const result = getUniqueWord(state.config.categories, state.usedWords);
+      const result = getUniqueWord(state.config.categories, state.usedWords, state.wordDatabase);
 
       if (!result.word) {
         return { ...state, phase: "round-result", roundEndTime: undefined, lastActionTime: undefined };

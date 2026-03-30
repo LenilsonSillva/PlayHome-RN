@@ -220,6 +220,7 @@
     "impostor_statusModal_ready": "完了",
     "impostor_statusModal_voted": "投票済",
     "impostor_statusModal_waiting": "待機中",
+    "impostor_statusModal_roomStatus": "ルームステータス",
 
     "impostor_spectator_observer": "オブザーバー",
     "impostor_spectator_tatical": "タクティカル",
@@ -254,6 +255,8 @@
     "cryptography_lobby_close": "閉じる",
     "cryptography_lobby_start": "ミッション初期化",
     "cryptography_lobby_remove": "削除",
+    "cryptography_lobby_timeLimitText": "各分隊が各単語を当てるための制限時間を選択してください。",
+    "cryptography_lobby_wordLimitText": "各ラウンドの単語数を選択してください。",
 
     "cryptography_card_wordIs": "単語は： ",
     "cryptography_card_pass": "パス",

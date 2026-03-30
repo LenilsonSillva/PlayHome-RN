@@ -1,0 +1,15 @@
+{
+  "alerts": {
+    "impostor_reallyLeave": "Do you really want to abandon the current match?"
+  },
+  "games": {
+    "impostor_lobby_explainCreateRoom": "GENERATE A CODE AND INVITE THE CREW TO PLAY ON THEIR OWN MOBILE PHONES.",
+    "impostor_lobby_explainJoinRoom": "ENTER YOUR LEADER'S CODE TO SYNCHRONISE YOUR DEVICE TO THE STATION.",
+    "impostor_discuss_subtitle": "Debate and analyse each crewmate's hints. The infiltrator is among you.",
+    "cryptography_lobby_start": "INITIALISE MISSION",
+    "cryptography_reveal_randomBtn": "🎲 RANDOMISE OPERATOR",
+    "cryptography_result_round": "END OF ROUND",
+    "cryptography_result_tie": "ROUND TIE",
+    "cryptography_result_roundPts": "this round"
+  }
+}

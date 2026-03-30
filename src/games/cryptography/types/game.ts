@@ -52,4 +52,6 @@ export interface CryptoGameState {
   skipsLeft: number; // Controle de pulos do modo Infiltration (Começa sempre em 3)
   roundEndTime?: number; // 🔥 NOVO: Timestamp de fim do turno para o Timer Seguro
   lastActionTime?: number; // 🔥 NOVO: Marca a hora em que a palavra apareceu na tela
+  wordDatabase: any[]; // Banco de palavras travado para o jogo
+  wordsLanguage: string; // Idioma do jogo travado
 }

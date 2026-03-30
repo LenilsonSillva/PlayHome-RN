@@ -220,6 +220,7 @@
     "impostor_statusModal_ready": "BEREIT",
     "impostor_statusModal_voted": "GEWÄHLT",
     "impostor_statusModal_waiting": "WARTET",
+    "impostor_statusModal_roomStatus": "RAUMSTATUS",
 
     "impostor_spectator_observer": "BEOBACHTER",
     "impostor_spectator_tatical": "TAKTIK",
@@ -254,6 +255,8 @@
     "cryptography_lobby_close": "SCHLIESSEN",
     "cryptography_lobby_start": "MISSION STARTEN",
     "cryptography_lobby_remove": "ENTFERNEN",
+    "cryptography_lobby_timeLimitText": "Wähle die maximale Zeit, die jeder Trupp hat, um jedes Wort zu erraten.",
+    "cryptography_lobby_wordLimitText": "Wähle aus, wie viele Wörter jede Runde enthalten soll.",
 
     "cryptography_card_wordIs": "DAS WORT IST: ",
     "cryptography_card_pass": "WEITER",

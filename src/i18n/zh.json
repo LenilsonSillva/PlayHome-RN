@@ -220,6 +220,7 @@
     "impostor_statusModal_ready": "就绪",
     "impostor_statusModal_voted": "已投",
     "impostor_statusModal_waiting": "等待中",
+    "impostor_statusModal_roomStatus": "房间状态",
 
     "impostor_spectator_observer": "观察者",
     "impostor_spectator_tatical": "战术员",
@@ -254,6 +255,8 @@
     "cryptography_lobby_close": "关闭",
     "cryptography_lobby_start": "初始化任务",
     "cryptography_lobby_remove": "移除",
+    "cryptography_lobby_timeLimitText": "选择每个小队猜测每个词语的最长时间。",
+    "cryptography_lobby_wordLimitText": "选择每回合包含的词语数量。",
 
     "cryptography_card_wordIs": "词汇是：",
     "cryptography_card_pass": "通过",

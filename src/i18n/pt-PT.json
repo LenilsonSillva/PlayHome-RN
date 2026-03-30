@@ -1,0 +1,24 @@
+{
+  "home": {
+    "loading": "A carregar..."
+  },
+  "alerts": {
+    "noConnection": "Sem ligação ao servidor.",
+    "lostConnection": "Sem ligação ao servidor. Verifique a sua internet ou aguarde um pouco.",
+    "impostor_closingRoom": "Jogadores insuficientes. A voltar ao lobby.",
+    "impostor_waitOthers": "Aguarde que todos fiquem prontos.",
+    "header_quitGame": "Sair da partida"
+  },
+  "games": {
+    "impostor_lobby_VideoGame": "Videojogos",
+    "impostor_lobby_explainCreateRoom": "GERE UM CÓDIGO E CONVIDE A TRIPULAÇÃO PARA JOGAR CADA UM NO SEU TELEMÓVEL.",
+    "impostor_discuss_subtitle": "Debatam e analisem as dicas de cada tripulante. O infiltrado está entre vós.",
+    "impostor_result_nextMission": "PRÓXIMA RONDA",
+    "cryptography_lobby_crewmates": "Jogadores",
+    "cryptography_action_team": "EQUIPA",
+    "cryptography_result_round": "FIM DA RONDA",
+    "cryptography_result_tie": "EMPATE NA RONDA",
+    "cryptography_result_roundPts": "na ronda",
+    "cryptography_alert_emptyTeam": "Atenção: Todos os esquadrões precisam de pelo menos um membro da tripulação!"
+  }
+}

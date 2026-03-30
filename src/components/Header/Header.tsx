@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { COLORS } from "@/styles/theme";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useAudio } from "@/contexts/audioContext";
 
 interface HeaderProps {
   centerElement: React.ReactNode;
@@ -19,6 +20,7 @@ export const Header = ({
   onGoBack // 🔥 2. Recebemos ela aqui
 }: HeaderProps) => {
   const navigation = useNavigation();
+  const { playSound } = useAudio();
   const canGoBack = navigation.canGoBack();
 
   // 🔥 3. Função que decide qual "voltar" usar
@@ -40,7 +42,10 @@ export const Header = ({
       <View style={styles.side}>
         {canGoBack && (
           <TouchableOpacity
-            onPress={handleBackPress} // 🔥 4. Usamos a nova função aqui
+            onPress={() => {
+              handleBackPress();
+              playSound("click2");
+            }} // 🔥 4. Usamos a nova função aqui
             style={styles.circleBtn}
           >
             <View style={styles.backArrow} />
@@ -53,12 +58,14 @@ export const Header = ({
 
       {/* DIREITA: Configurações */}
       <View style={styles.side}>
-        <TouchableOpacity onPress={onOpenSettings} style={styles.circleBtn}>
-          <Ionicons
-            name="settings-outline"
-            size={25}
-            color={COLORS.textPrimary}
-          />
+        <TouchableOpacity
+          onPress={() => {
+            onOpenSettings();
+            playSound("click2");
+          }}
+          style={styles.circleBtn}
+        >
+          <Ionicons name="settings-outline" size={25} color={COLORS.textPrimary} />
         </TouchableOpacity>
       </View>
     </LinearGradient>

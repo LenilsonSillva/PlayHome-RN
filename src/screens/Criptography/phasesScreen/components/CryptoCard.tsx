@@ -61,7 +61,9 @@ export const CryptoCard = ({
     if (!isTimerRunning) onStartTimer?.();
   };
   const handleReveal = (val: boolean) => setIsRevealed(val);
-  const handleAction = (type: "correct" | "skip") => onAction(type);
+  const handleAction = (type: "correct" | "skip") => {
+    onAction(type);
+  };
 
   useEffect(() => {
     waveOffset.value = 0;

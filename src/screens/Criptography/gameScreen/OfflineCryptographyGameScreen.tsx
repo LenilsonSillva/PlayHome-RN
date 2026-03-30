@@ -16,6 +16,7 @@ import { SettingsModal } from "@/components/SettingsModal/SettingsModal";
 import { RoundResult } from "../phasesScreen/RoundResult";
 import { InterceptionAction } from "../phasesScreen/InterceptionAction";
 import { saveGlobalUsedWords } from "@/games/common/utils/wordStorage";
+import { useAudio } from "@/contexts/audioContext";
 
 export function OfflineCryptographyGameScreen() {
   const route = useRoute<any>();
@@ -41,6 +42,7 @@ export function OfflineCryptographyGameScreen() {
     nextRound,
     quitGame
   } = useOfflineCryptography();
+  const { playSound } = useAudio();
 
   // ⭐ Proteção de Rota (Evita crash se recarregar a tela do nada)
   useEffect(() => {
@@ -52,9 +54,30 @@ export function OfflineCryptographyGameScreen() {
   // ⭐ Dependências Corrigidas (Inicia o jogo apenas 1x)
   useEffect(() => {
     if (route.params?.config && players.length > 0 && !gameState) {
-      startGame(players, route.params.config, route.params.manualAssignments, route.params.globalUsedWords);
+      console.log(
+        "🎮 Crypto: Iniciando jogo com wordDatabase?",
+        !!route.params?.wordDatabase,
+        "langCode:",
+        route.params?.langCode
+      );
+      startGame(
+        players,
+        route.params.config,
+        route.params.manualAssignments,
+        route.params.globalUsedWords,
+        route.params.wordDatabase || [],
+        route.params.langCode || ""
+      );
     }
-  }, [route.params?.config, route.params?.manualAssignments, players, startGame, gameState]);
+  }, [
+    route.params?.config,
+    route.params?.manualAssignments,
+    route.params?.wordDatabase,
+    route.params?.langCode,
+    players,
+    startGame,
+    gameState
+  ]);
 
   // ==========================================
   // 🔥 SEGURANÇA CONTRA SAÍDA ACIDENTAL
@@ -75,6 +98,35 @@ export function OfflineCryptographyGameScreen() {
       }
     };
   }, [gameState?.usedWords]);
+
+  const handleStartTimerWithSound = () => {
+    playSound("alert");
+    startTimer();
+  };
+
+  // Handler para o modo Infiltração
+  type CardActionHandler = (type: "correct" | "skip") => void;
+
+  const handleCardAction = (type: "correct" | "skip", originalOnAction: CardActionHandler) => {
+    playSound(type === "correct" ? "success" : "skip");
+    originalOnAction(type);
+  };
+
+  // 🔥 Handler para quando alguém pontua (Acerto) ou a rodada termina
+  const handleInterceptionFinishWithSound = (winnerTeamIndex: number | null) => {
+    // Se winnerTeamIndex for um número, alguém acertou (Success)
+    // Se for null, pode ser um empate/pulo (Skip)
+    playSound(winnerTeamIndex !== null ? "success" : "skip");
+
+    // Executa a lógica original imediatamente
+    handleInterceptionResult(winnerTeamIndex);
+  };
+
+  // 🔥 Handler para quando o turno passa (Erro/Pulo)
+  const handlePassTurnWithSound = () => {
+    playSound("skip");
+    passInterceptionTurn();
+  };
 
   // 2. Função Central de Alerta para confirmar a saída
   const handleExitGame = useMemo(
@@ -170,18 +222,18 @@ export function OfflineCryptographyGameScreen() {
         {gameState.phase === "infiltration-action" && (
           <InfiltrationAction
             gameState={gameState}
-            onAction={(type) => handleInfiltrationWord(type === "correct")} // 🔥 Mapeia 'correct' para true, 'skip' para false
+            onAction={(type) => handleCardAction(type, (actionType) => handleInfiltrationWord(actionType === "correct"))} // 🔥 Mapeia 'correct' para true, 'skip' para false
             onTimeUp={finishInfiltrationTurn}
-            onStartTimer={startTimer} // 🔥 onStartTimer no lugar de startTimer
+            onStartTimer={handleStartTimerWithSound} // 🔥 onStartTimer no lugar de startTimer
           />
         )}
 
         {gameState.phase === "interception-action" && (
           <InterceptionAction
             gameState={gameState}
-            onFinishMatch={handleInterceptionResult}
-            onPassTurn={passInterceptionTurn}
-            onStartTimer={startTimer}
+            onFinishMatch={handleInterceptionFinishWithSound}
+            onPassTurn={handlePassTurnWithSound}
+            onStartTimer={handleStartTimerWithSound}
           />
         )}
 

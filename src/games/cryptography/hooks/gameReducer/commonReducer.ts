@@ -17,6 +17,8 @@ export function commonReducer(state: CryptoGameState | null, action: GameAction)
 
       const initialTeamIndex = Math.floor(Math.random() * teams.length);
 
+      console.log("🎮 Crypto START_GAME: wordDatabase tamanho:", action.wordDatabase?.length || 0, "lang:", action.langCode);
+
       return {
         config: action.config,
         phase: "team-reveal",
@@ -28,7 +30,9 @@ export function commonReducer(state: CryptoGameState | null, action: GameAction)
         roundNumber: 1,
         currentMatchIndex: 0,
         skipsLeft: MAX_SKIPS,
-        roundEndTime: undefined
+        roundEndTime: undefined,
+        wordDatabase: action.wordDatabase || [],
+        wordsLanguage: action.langCode || ""
       };
     }
 
@@ -64,7 +68,7 @@ export function commonReducer(state: CryptoGameState | null, action: GameAction)
       const hasMissingOperator = state.teams.some((t) => !t.operatorId);
       if (hasMissingOperator) return state;
 
-      const firstWord = getUniqueWord(state.config.categories, state.usedWords);
+      const firstWord = getUniqueWord(state.config.categories, state.usedWords, state.wordDatabase);
 
       return {
         ...state,
@@ -97,13 +101,13 @@ export function commonReducer(state: CryptoGameState | null, action: GameAction)
 
     case "REROLL_WORD": {
       if (!state) return state;
-      const nextWord = getUniqueWord(state.config.categories, state.usedWords);
+      const nextWord = getUniqueWord(state.config.categories, state.usedWords, state.wordDatabase);
       if (!nextWord || !nextWord.word) return { ...state, phase: "round-result" };
 
       return {
         ...state,
         currentWord: nextWord.word,
-        usedWords: nextWord.didReset ?[nextWord.word] : [...state.usedWords, nextWord.word]
+        usedWords: nextWord.didReset ? [nextWord.word] : [...state.usedWords, nextWord.word]
       };
     }
 

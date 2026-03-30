@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet, TouchableOpacity, ScrollView, useWindowDimensions } from "react-native";
+import { useAudio } from "@/contexts/audioContext";
 import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
 import { ImpostorGame, ImpostorPlayer } from "@/games/impostor/types/game";
@@ -29,6 +30,7 @@ export const DiscussPhase = ({
   isOnline,
   onlinePlayer
 }: DiscussPhaseProps) => {
+  const { playSound } = useAudio();
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const isLargeScreen = width > 600;
@@ -37,6 +39,7 @@ export const DiscussPhase = ({
 
   // Cronômetro da discussão
   useEffect(() => {
+    playSound("alert");
     const interval = setInterval(() => {
       const seconds = Math.floor((Date.now() - startTime) / 1000);
       setElapsedTime(seconds);
@@ -122,13 +125,10 @@ export const DiscussPhase = ({
                   playerHasSeenWord.includes(player.id) ||
                   (isOnline && !(onlinePlayer?.id === player.id))
                 } // Desabilita se a revisão não estiver ativa, se o jogador estiver morto ou se já tiver visto a palavra
-                onPress={
-                  !isOnline
-                    ? () => onPlayerPress(player)
-                    : onlinePlayer?.id === player.id
-                      ? () => onPlayerPress(player)
-                      : undefined
-                }
+                onPress={() => {
+                  !isOnline ? onPlayerPress(player) : onlinePlayer?.id === player.id ? onPlayerPress(player) : undefined;
+                  playSound("click2");
+                }}
                 style={[styles.playerRow, { width: isLargeScreen ? "48.5%" : "100%" }, , !player.isAlive && styles.playerDead]}
               >
                 <View style={styles.playerMainInfo}>
@@ -183,7 +183,16 @@ export const DiscussPhase = ({
         {/* 7. BOTÕES DE AÇÃO */}
         <View style={styles.actionFooter}>
           {!isOnline || (isOnline && onlinePlayer?.isHost) ? (
-            <TouchableOpacity style={styles.primaryBtn} onPress={onNextVotingBtn} activeOpacity={0.8}>
+            <TouchableOpacity
+              style={styles.primaryBtn}
+              onPress={() => {
+                playSound("click");
+                setTimeout(() => {
+                  onNextVotingBtn();
+                }, 100);
+              }}
+              activeOpacity={0.8}
+            >
               <LinearGradient colors={[COLORS.danger, "#7f1d1d"]} style={styles.btnGradient}>
                 <CustomText variant="h3" style={styles.btnText}>
                   {t("games.impostor_discuss_startVote")}
@@ -202,7 +211,15 @@ export const DiscussPhase = ({
           )}
 
           {!isOnline && (
-            <TouchableOpacity style={styles.secondaryBtn} onPress={onNextEliminationBtn}>
+            <TouchableOpacity
+              style={styles.secondaryBtn}
+              onPress={() => {
+                playSound("click");
+                setTimeout(() => {
+                  onNextEliminationBtn?.();
+                }, 100);
+              }}
+            >
               <CustomText variant="label" style={styles.secondaryBtnText}>
                 {t("games.impostor_discuss_eliminate")}
               </CustomText>

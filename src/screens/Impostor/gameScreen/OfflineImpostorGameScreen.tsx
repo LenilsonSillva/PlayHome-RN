@@ -18,11 +18,13 @@ import { ReviewWordModal } from "../phasesScreen/components/ReviewWordModal";
 import { useNavigation } from "expo-router";
 import { saveGlobalUsedWords } from "@/games/common/utils/wordStorage";
 import { useAlert } from "@/contexts/alertContext";
+import { useAudio } from "@/contexts/audioContext";
 
 export const OfflineImpostorGameScreen = ({ route }: any) => {
   const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const { showAlert } = useAlert();
+  const { playSound } = useAudio();
   const { players } = usePlayers();
   const {
     game,
@@ -54,11 +56,14 @@ export const OfflineImpostorGameScreen = ({ route }: any) => {
   }, [game?.phase]);
 
   useEffect(() => {
-    // Dispara o início do jogo assim que a tela monta com os dados da rota
-    if (route.params?.config && players.length > 0) {
-      startGame(players, route.params.config);
+    // Extraímos os novos dados que o Lobby enviou
+    const { config, globalUsedWords, wordList, langCode } = route.params || {};
+
+    if (config && wordList && langCode && players.length > 0) {
+      // Injetamos a lista de palavras e o idioma fixo no Hook
+      startGame(players, config, wordList, langCode, globalUsedWords);
     }
-  }, [route.params?.config]);
+  }, [route.params]);
 
   // 1. Desativa gesto de voltar no iOS
 

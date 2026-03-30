@@ -8,9 +8,11 @@ import { LobbyOffline } from "./LobbyOffline";
 import { LobbyOnline } from "./LobbyOnline";
 import { ImpostorBackground } from "@/components/Background/Background";
 import { useTranslation } from "react-i18next";
+import { useAudio } from "@/contexts/audioContext";
 
 export default function ImpostorLobby() {
   const { t } = useTranslation();
+  const { playSound } = useAudio();
   const [mode, setMode] = useState<"local" | "online">("local");
   const [openModal, setOpenModal] = useState<boolean>(false);
 
@@ -36,12 +38,24 @@ export default function ImpostorLobby() {
 
       {/* SELETOR DE MODO (Segmented Control) */}
       <View style={styles.tabContainer}>
-        <TouchableOpacity style={[styles.tab, mode === "local" && styles.activeTab]} onPress={() => setMode("local")}>
+        <TouchableOpacity
+          style={[styles.tab, mode === "local" && styles.activeTab]}
+          onPress={() => {
+            setMode("local");
+            playSound("click2");
+          }}
+        >
           <CustomText style={[styles.tabText, mode === "local" && styles.activeTabText]}>
             {t("games.impostor_lobby_local")} 🏠
           </CustomText>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.tab, mode === "online" && styles.activeTab]} onPress={() => setMode("online")}>
+        <TouchableOpacity
+          style={[styles.tab, mode === "online" && styles.activeTab]}
+          onPress={() => {
+            setMode("online");
+            playSound("click2");
+          }}
+        >
           <CustomText style={[styles.tabText, mode === "online" && styles.activeTabText]}>
             {t("games.impostor_lobby_online")} 🌏
           </CustomText>

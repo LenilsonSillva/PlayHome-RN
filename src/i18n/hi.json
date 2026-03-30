@@ -220,6 +220,7 @@
     "impostor_statusModal_ready": "तैयार",
     "impostor_statusModal_voted": "वोट दिया",
     "impostor_statusModal_waiting": "प्रतीक्षा",
+    "impostor_statusModal_roomStatus": "कमरे की स्थिति",
 
     "impostor_spectator_observer": "पर्यवेक्षक",
     "impostor_spectator_tatical": "रणनीतिक",
@@ -254,6 +255,8 @@
     "cryptography_lobby_close": "बंद करें",
     "cryptography_lobby_start": "मिशन शुरू करें",
     "cryptography_lobby_remove": "हटाएं",
+    "cryptography_lobby_timeLimitText": "प्रत्येक शब्द का अनुमान लगाने के लिए प्रत्येक दस्ते के पास अधिकतम समय चुनें।",
+    "cryptography_lobby_wordLimitText": "चुनें कि प्रत्येक राउंड में कितने शब्द होंगे।",
 
     "cryptography_card_wordIs": "शब्द है: ",
     "cryptography_card_pass": "पास",

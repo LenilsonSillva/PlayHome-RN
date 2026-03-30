@@ -220,6 +220,7 @@
     "impostor_statusModal_ready": "PRONTO",
     "impostor_statusModal_voted": "HA VOTATO",
     "impostor_statusModal_waiting": "IN ATTESA",
+    "impostor_statusModal_roomStatus": "STATO DELLA SALA",
 
     "impostor_spectator_observer": "OSSERVATORE",
     "impostor_spectator_tatical": "TATTICO",
@@ -252,8 +253,10 @@
     "cryptography_lobby_wordLimit": "QUANTITÀ PAROLE",
     "cryptography_lobby_db": "DATABASE",
     "cryptography_lobby_close": "CHIUDI",
-    "cryptography_lobby_start": "INIZIALIZZA MISSIONE",
+    "cryptography_lobby_start": "INIZIA MISSIONE",
     "cryptography_lobby_remove": "RIMUOVI",
+    "cryptography_lobby_timeLimitText": "Seleziona il tempo massimo che ogni squadriglia avrà per indovinare ogni parola.",
+    "cryptography_lobby_wordLimitText": "Seleziona quante parole avrà ogni round.",
 
     "cryptography_card_wordIs": "LA PAROLA È: ",
     "cryptography_card_pass": "PASSA",

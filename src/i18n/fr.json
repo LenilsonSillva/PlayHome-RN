@@ -220,6 +220,7 @@
     "impostor_statusModal_ready": "PRÊT",
     "impostor_statusModal_voted": "A VOTÉ",
     "impostor_statusModal_waiting": "EN ATTENTE",
+    "impostor_statusModal_roomStatus": "STATUT DE LA SALLE",
 
     "impostor_spectator_observer": "OBSERVATEUR",
     "impostor_spectator_tatical": "TACTIQUE",
@@ -243,7 +244,7 @@
     "cryptography_lobby_distribution": "RÉPARTITION DES JOUEURS",
     "cryptography_lobby_random": "ALÉATOIRE",
     "cryptography_lobby_manual": "MANUELLE",
-    "cryptography_lobby_groupCount": "NB. D'ESCOUADES",
+    "cryptography_lobby_groupCount": "NB. D'GROUPES",
     "cryptography_lobby_crewmates": "ÉQUIPAGE",
     "cryptography_lobby_playerName": "Nom du Membre",
     "cryptography_lobby_add": "AJOUTER",
@@ -252,8 +253,10 @@
     "cryptography_lobby_wordLimit": "NOMBRE DE MOTS",
     "cryptography_lobby_db": "BASE DE DONNÉES",
     "cryptography_lobby_close": "FERMER",
-    "cryptography_lobby_start": "INITIALISER MISSION",
+    "cryptography_lobby_start": "DÉMARRER LA MISSION",
     "cryptography_lobby_remove": "SUPPRIMER",
+    "cryptography_lobby_timeLimitText": "Sélectionnez le temps maximum dont chaque escouade disposera pour deviner chaque mot.",
+    "cryptography_lobby_wordLimitText": "Sélectionnez le nombre de mots par manche.",
 
     "cryptography_card_wordIs": "LE MOT EST : ",
     "cryptography_card_pass": "PASSER",

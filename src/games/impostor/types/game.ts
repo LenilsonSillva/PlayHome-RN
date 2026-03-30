@@ -1,4 +1,4 @@
-import { GlobalPlayer } from "@/games/common/types/player";
+import { WordData } from "@/games/common/data/words/types";
 
 /**
  * Jogador do jogo Impostor
@@ -42,9 +42,11 @@ export type ImpostorGame = {
   impostorHistory: string[][];
   usedWords: string[];
   word?: string;
+  wordsLanguage: string;
   impostorTrap: boolean;
   impostorCat: boolean;
   didReset?: boolean;
+  activeWordList?: WordData[]; 
 };
 
 /**

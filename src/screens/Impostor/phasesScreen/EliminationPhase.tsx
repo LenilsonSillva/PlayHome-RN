@@ -1,17 +1,12 @@
 import React, { useState } from "react";
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Modal
-} from "react-native";
+import { View, StyleSheet, TouchableOpacity, ScrollView, Modal } from "react-native";
 import { COLORS, THEME } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
 import { Cards } from "@/components/Cards/Cards";
 import { ImpostorGame, ImpostorPlayer } from "@/games/impostor/types/game";
 import { PlayerAvatar } from "@/games/common/components/PlayerAvatar";
 import { useTranslation } from "react-i18next";
+import { useAudio } from "@/contexts/audioContext";
 
 interface Props {
   data: ImpostorGame;
@@ -20,15 +15,13 @@ interface Props {
 
 export const EliminationPhase = ({ data, onConfirmElimination }: Props) => {
   const { t } = useTranslation();
+  const { playSound } = useAudio();
   const [target, setTarget] = useState<ImpostorPlayer | null>(null);
   const alivePlayers = data.players.filter((p) => p.isAlive);
 
   return (
     <View style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.scroll}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Espaço para evitar sobreposição com o header fixo */}
         <View style={styles.header}>
           <CustomText variant="label" style={styles.cyanText}>
@@ -51,28 +44,19 @@ export const EliminationPhase = ({ data, onConfirmElimination }: Props) => {
               <TouchableOpacity
                 key={player.id}
                 style={styles.card}
-                onPress={() => setTarget(player)}
+                onPress={() => {
+                  setTarget(player);
+                  playSound("click2");
+                }}
               >
-                <View
-                  style={[
-                    styles.cardContainer,
-                    { borderTopColor: player.color, borderTopWidth: 2 }
-                  ]}
-                >
+                <View style={[styles.cardContainer, { borderTopColor: player.color, borderTopWidth: 2 }]}>
                   <View style={styles.cardContent}>
-                    <PlayerAvatar
-                      emoji={player.emoji}
-                      color={player.color}
-                      size={50}
-                      borderRadius={25}
-                    />
+                    <PlayerAvatar emoji={player.emoji} color={player.color} size={50} borderRadius={25} />
                     <CustomText variant="h3" numberOfLines={1}>
                       {player.name.toUpperCase()}
                     </CustomText>
                     <View style={styles.targetMark}>
-                      <CustomText style={styles.targetText}>
-                        [ {t("games.impostor_elimination_selectBtn")} ]
-                      </CustomText>
+                      <CustomText style={styles.targetText}>[ {t("games.impostor_elimination_selectBtn")} ]</CustomText>
                     </View>
                   </View>
                 </View>
@@ -83,7 +67,12 @@ export const EliminationPhase = ({ data, onConfirmElimination }: Props) => {
 
         <TouchableOpacity
           style={styles.skipBtn}
-          onPress={() => onConfirmElimination(null)}
+          onPress={() => {
+            playSound("click");
+            setTimeout(() => {
+              onConfirmElimination(null);
+            }, 100);
+          }}
         >
           <CustomText variant="label" style={styles.skipText}>
             {t("games.impostor_elimination_skipBtn")}
@@ -105,34 +94,31 @@ export const EliminationPhase = ({ data, onConfirmElimination }: Props) => {
                 </CustomText>
 
                 <View style={styles.preview}>
-                  <PlayerAvatar
-                    emoji={target?.emoji || ""}
-                    color={target?.color || ""}
-                    size={80}
-                  />
+                  <PlayerAvatar emoji={target?.emoji || ""} color={target?.color || ""} size={80} />
                   <CustomText variant="h1">{target?.name}</CustomText>
                 </View>
 
                 <View style={styles.modalActions}>
                   <TouchableOpacity
                     style={styles.cancel}
-                    onPress={() => setTarget(null)}
+                    onPress={() => {
+                      setTarget(null);
+                      playSound("click2");
+                    }}
                   >
-                    <CustomText variant="label">
-                      {t("games.impostor_elimination_back")}
-                    </CustomText>
+                    <CustomText variant="label">{t("games.impostor_elimination_back")}</CustomText>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.confirm}
                     onPress={() => {
-                      onConfirmElimination(target);
-                      setTarget(null);
+                      setTimeout(() => {
+                        onConfirmElimination(target);
+                        setTarget(null);
+                      }, 200);
+                      playSound("skip");
                     }}
                   >
-                    <CustomText
-                      variant="label"
-                      style={{ color: COLORS.background }}
-                    >
+                    <CustomText variant="label" style={{ color: COLORS.background }}>
                       {t("games.impostor_elimination_confirm")}
                     </CustomText>
                   </TouchableOpacity>

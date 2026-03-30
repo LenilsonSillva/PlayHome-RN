@@ -3,6 +3,7 @@ import { View, StyleSheet, Modal, TouchableOpacity } from "react-native";
 import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
 import { useTranslation } from "react-i18next";
+import { useAudio } from "@/contexts/audioContext";
 
 // 🔥 Definimos como os botões vão funcionar
 export interface AlertButtonProps {
@@ -23,6 +24,7 @@ interface AlertsModalProps {
 export const AlertsModal = ({ visible, emoji, title, message, buttons, onClose }: AlertsModalProps) => {
   // Se não passarem nenhum botão, usamos o padrão
   const { t } = useTranslation();
+  const { playSound } = useAudio();
   const showEmoji = emoji ?? "⚠️";
   const defaultButtons: AlertButtonProps[] = [{ text: t("alerts.gotIt"), onPress: onClose, style: "default" }];
   const titleText = title || t("alerts.warning");
@@ -63,6 +65,7 @@ export const AlertsModal = ({ visible, emoji, title, message, buttons, onClose }
                   onPress={() => {
                     if (btn.onPress) btn.onPress(); // Roda a função do botão (se existir)
                     onClose(); // Fecha o modal sempre
+                    playSound("click2");
                   }}
                 >
                   <CustomText

@@ -5,7 +5,6 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
-  Switch,
   KeyboardAvoidingView,
   Platform,
   useWindowDimensions
@@ -13,8 +12,8 @@ import {
 import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
 import { usePlayers } from "@/contexts/contextHook";
+import { useAudio } from "@/contexts/audioContext";
 import { getImpostorCount } from "@/games/impostor/logic/initializeGame";
-import { categories as ALL_CATEGORIES } from "@/games/common/data/words"; // Importando do seu caminho
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "App";
@@ -24,11 +23,13 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { useTranslation } from "react-i18next";
 import { loadGlobalUsedWords } from "@/games/common/utils/wordStorage";
+import { getWordDatabase } from "@/games/common/data/words";
 
 export const LobbyOffline = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { players, addPlayer, removePlayer, updatePlayer } = usePlayers();
-  const { t } = useTranslation();
+  const { playSound } = useAudio();
+  const { t, i18n } = useTranslation();
   const { width } = useWindowDimensions();
   const isLargeScreen = width > 600;
 
@@ -43,11 +44,25 @@ export const LobbyOffline = () => {
   const [impostorCat, setImpostorCat] = useState(false);
   const [showCategories, setShowCategories] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([...ALL_CATEGORIES]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [impostorsUnited, setImpostorsUnited] = useState(false);
-
   // Calcula o limite máximo permitido de impostores
   const maxImpostors = useMemo(() => getImpostorCount(players.length), [players.length]);
+
+  // Const de palavras
+
+  // 1. Monitora o idioma da UI para mostrar as categorias certas
+  const currentWords = useMemo(() => getWordDatabase(i18n.language), [i18n.language]);
+
+  // 2. Gera a lista de categorias baseada no idioma atual da UI
+  const ALL_CATEGORIES = useMemo(() => {
+    return Array.from(new Set(currentWords.map((w) => w.category))).sort();
+  }, [currentWords]);
+
+  // 3. Reseta categorias selecionadas se mudar o idioma (opcional)
+  useEffect(() => {
+    setSelectedCategories(ALL_CATEGORIES);
+  }, [ALL_CATEGORIES]);
 
   // Efeito para ajustar a contagem se jogadores forem removidos
   useEffect(() => {
@@ -74,12 +89,14 @@ export const LobbyOffline = () => {
 
   const toggleCategory = (cat: string) => {
     setSelectedCategories((prev) => (prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]));
+    playSound("click2");
   };
 
   const handleAddPlayer = () => {
     if (name.trim()) {
       addPlayer(name, getUnusedEmoji());
       setName("");
+      playSound("click2");
     }
   };
 
@@ -92,9 +109,15 @@ export const LobbyOffline = () => {
 
   const handleChangeEmoji = (id: string) => {
     updatePlayer(id, { emoji: getUnusedEmoji() });
+    playSound("click2");
   };
 
   const handleStartMission = async () => {
+    playSound("click");
+
+    const currentLang = i18n.language;
+    const selectedWords = getWordDatabase(currentLang);
+
     // 1. Preparamos o objeto de configuração
     const config = {
       impostorCount,
@@ -112,7 +135,7 @@ export const LobbyOffline = () => {
 
     // 2. Navegamos para a tela da Partida passando os parâmetros
     // No React Native, o ideal é passar os dados iniciais via Params
-    navigation.navigate("ImpostorGame", { config, globalUsedWords });
+    navigation.navigate("ImpostorGame", { config, globalUsedWords, wordList: selectedWords, langCode: currentLang });
   };
 
   const tacticalOptions = [
@@ -238,7 +261,13 @@ export const LobbyOffline = () => {
                     {p.name}
                   </CustomText>
 
-                  <TouchableOpacity onPress={() => removePlayer(p.id)} style={styles.removeBtn}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      removePlayer(p.id);
+                      playSound("click2");
+                    }}
+                    style={styles.removeBtn}
+                  >
                     <CustomText style={styles.removeText}>{t("games.impostor_lobby_removeBtn")}</CustomText>
                   </TouchableOpacity>
                 </View>
@@ -263,7 +292,10 @@ export const LobbyOffline = () => {
               </View>
               <View style={styles.counter}>
                 <TouchableOpacity
-                  onPress={() => setImpostorCount(Math.max(1, impostorCount - 1))}
+                  onPress={() => {
+                    setImpostorCount(Math.max(1, impostorCount - 1));
+                    playSound("click2");
+                  }}
                   style={[styles.cBtn, impostorCount === 1 && styles.btnDisabled]}
                   disabled={impostorCount === 1}
                 >
@@ -275,7 +307,10 @@ export const LobbyOffline = () => {
                   {impostorCount}
                 </CustomText>
                 <TouchableOpacity
-                  onPress={() => setImpostorCount(Math.min(maxImpostors, impostorCount + 1))}
+                  onPress={() => {
+                    setImpostorCount(Math.min(maxImpostors, impostorCount + 1));
+                    playSound("click2");
+                  }}
                   style={[styles.cBtn, impostorCount >= maxImpostors && styles.btnDisabled]}
                   disabled={impostorCount >= maxImpostors}
                 >
@@ -289,7 +324,10 @@ export const LobbyOffline = () => {
             {/* OPÇÕES DO JOGO */}
             <TouchableOpacity
               style={[styles.categoryToggle, showOptions && styles.categoryToggleActive]}
-              onPress={() => setShowOptions(!showOptions)}
+              onPress={() => {
+                setShowOptions(!showOptions);
+                playSound("click2");
+              }}
             >
               <CustomText variant="label" style={{ color: showOptions ? COLORS.black : COLORS.cyan }}>
                 {showOptions ? t("games.impostor_lobby_gameOptClose") + " ⇡" : t("games.impostor_lobby_gameOpt") + " ⇣"}
@@ -307,7 +345,10 @@ export const LobbyOffline = () => {
                       <TouchableOpacity
                         activeOpacity={0.7}
                         disabled={item.disable}
-                        onPress={item.set}
+                        onPress={() => {
+                          item.set();
+                          playSound("click2");
+                        }}
                         style={[styles.optionSquare, item.val && styles.optionSquareActive]}
                       >
                         <FontAwesome6 name={item.icon as any} size={32} color={item.val ? COLORS.black : COLORS.cyan} />
@@ -330,7 +371,10 @@ export const LobbyOffline = () => {
           <View style={styles.section}>
             <TouchableOpacity
               style={[styles.categoryToggle, showCategories && styles.categoryToggleActive]}
-              onPress={() => setShowCategories(!showCategories)}
+              onPress={() => {
+                setShowCategories(!showCategories);
+                playSound("click2");
+              }}
             >
               <CustomText variant="label" style={{ color: showCategories ? COLORS.black : COLORS.cyan }}>
                 {showCategories ? t("games.impostor_lobby_DBClose") + " ⇡" : t("games.impostor_lobby_DBSelect") + " ⇣"}

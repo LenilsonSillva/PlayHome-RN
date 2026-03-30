@@ -1,17 +1,11 @@
 import React from "react";
-import {
-  View,
-  StyleSheet,
-  Modal,
-  TouchableOpacity,
-  ScrollView
-} from "react-native";
+import { View, StyleSheet, Modal, TouchableOpacity, ScrollView } from "react-native";
 import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
 import { ImpostorPlayer } from "@/games/impostor/types/game";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useTranslation } from "react-i18next";
-
+import { useAudio } from "@/contexts/audioContext";
 interface PlayerStatusModalProps {
   visible: boolean;
   onClose: () => void;
@@ -19,14 +13,9 @@ interface PlayerStatusModalProps {
   statusType: keyof ImpostorPlayer;
 }
 
-export const PlayerStatusModal = ({
-  visible,
-  onClose,
-  players,
-  statusType
-}: PlayerStatusModalProps) => {
-
-  const {t} = useTranslation();
+export const PlayerStatusModal = ({ visible, onClose, players, statusType }: PlayerStatusModalProps) => {
+  const { t } = useTranslation();
+  const { playSound } = useAudio();
 
   const textStatus = () => {
     switch (statusType) {
@@ -51,22 +40,23 @@ export const PlayerStatusModal = ({
         <View style={styles.modal}>
           <View style={styles.header}>
             <CustomText variant="h2" style={styles.title}>
-              STATUS DA SALA
+              {t("games.impostor_statusModal_roomStatus")}
             </CustomText>
-            <TouchableOpacity onPress={onClose} hitSlop={20}>
-              <FontAwesome
-                name="close"
-                size={24}
-                color={COLORS.textSecondary}
-              />
+            <TouchableOpacity
+              onPress={() => {
+                onClose;
+                playSound("click2");
+              }}
+              hitSlop={20}
+            >
+              <FontAwesome name="close" size={24} color={COLORS.textSecondary} />
             </TouchableOpacity>
           </View>
 
           <ScrollView style={styles.list} showsVerticalScrollIndicator={false}>
             {players.map(
               (player, index) =>
-                ((statusType === "voted" && player.isAlive) ||
-                  statusType !== "voted") && (
+                ((statusType === "voted" && player.isAlive) || statusType !== "voted") && (
                   <View key={player.socketId || index} style={styles.playerRow}>
                     <View style={styles.playerInfo}>
                       <CustomText variant="h3" style={styles.playerName}>
@@ -74,29 +64,16 @@ export const PlayerStatusModal = ({
                       </CustomText>
                     </View>
 
-                    <View
-                      style={[
-                        styles.badge,
-                        player[statusType]
-                          ? styles.badgeReady
-                          : styles.badgeWaiting
-                      ]}
-                    >
+                    <View style={[styles.badge, player[statusType] ? styles.badgeReady : styles.badgeWaiting]}>
                       {player[statusType] ? (
-                        <FontAwesome
-                          name="check"
-                          size={14}
-                          color={COLORS.success}
-                        />
+                        <FontAwesome name="check" size={14} color={COLORS.success} />
                       ) : (
                         <View style={styles.dotWaiting} />
                       )}
                       <CustomText
                         variant="label"
                         style={{
-                          color: player[statusType]
-                            ? COLORS.success
-                            : COLORS.amber,
+                          color: player[statusType] ? COLORS.success : COLORS.amber,
                           fontSize: 10
                         }}
                       >
@@ -108,7 +85,13 @@ export const PlayerStatusModal = ({
             )}
           </ScrollView>
 
-          <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
+          <TouchableOpacity
+            style={styles.closeBtn}
+            onPress={() => {
+              onClose;
+              playSound("click2");
+            }}
+          >
             <CustomText variant="label" style={{ color: COLORS.white }}>
               {t("home.back_btn")}
             </CustomText>

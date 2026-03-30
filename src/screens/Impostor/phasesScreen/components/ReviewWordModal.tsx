@@ -1,16 +1,11 @@
 import React, { useEffect, useState } from "react";
-import {
-  Modal,
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Pressable
-} from "react-native";
+import { Modal, View, StyleSheet, TouchableOpacity, Pressable } from "react-native";
 import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
 import { Cards } from "@/components/Cards/Cards";
 import { ImpostorGame, ImpostorPlayer } from "@/games/impostor/types/game";
 import { useTranslation } from "react-i18next";
+import { useAudio } from "@/contexts/audioContext";
 
 interface Props {
   player: ImpostorPlayer | null;
@@ -20,6 +15,7 @@ interface Props {
 
 export const ReviewWordModal = ({ player, onClose, Onlinedata }: Props) => {
   const { t } = useTranslation();
+  const { playSound } = useAudio();
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -43,7 +39,10 @@ export const ReviewWordModal = ({ player, onClose, Onlinedata }: Props) => {
               {!show ? (
                 <TouchableOpacity
                   style={styles.decryptBtn}
-                  onPress={() => setShow(true)}
+                  onPress={() => {
+                    setShow(true);
+                    playSound("click2");
+                  }}
                 >
                   <CustomText variant="h3" style={{ color: COLORS.background }}>
                     {t("games.impostor_discuss__modalReview_unlockBtn")}
@@ -78,10 +77,14 @@ export const ReviewWordModal = ({ player, onClose, Onlinedata }: Props) => {
                 </View>
               )}
 
-              <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
-                <CustomText variant="label">
-                  {t("games.impostor_discuss__modalReview_closeBtn")}
-                </CustomText>
+              <TouchableOpacity
+                style={styles.closeBtn}
+                onPress={() => {
+                  onClose();
+                  playSound("click2");
+                }}
+              >
+                <CustomText variant="label">{t("games.impostor_discuss__modalReview_closeBtn")}</CustomText>
               </TouchableOpacity>
             </View>
           </Cards>

@@ -4,6 +4,7 @@ import type { LobbyState, LobbyConfig } from "../types/lobbyOffline";
 import { initializeGame } from "../logic/initializeGame";
 import { saveGlobalUsedWords, loadGlobalUsedWords } from "@/games/common/utils/wordStorage";
 import { getRoundPoints } from "../utils/scoringUtils";
+import { WordData } from "@/games/common/data/words/types";
 
 export type UseOfflineImpostorReturn = {
   lobby: LobbyState;
@@ -11,7 +12,7 @@ export type UseOfflineImpostorReturn = {
   addPlayer: (player: ImpostorPlayer) => void;
   removePlayer: (playerId: string) => void;
   setLobbyConfig: (config: Partial<LobbyConfig>) => void;
-  startGame: (initialPlayers?: any[], initialConfig?: LobbyConfig, globalUsedWords?: string[]) => void;
+   startGame: (initialPlayers?: any[], initialConfig?: LobbyConfig, wordList?: WordData[], langCode?: string, globalUsedWords?: string[]) => void;
   nextPhase: (newPhase: ImpostorGame["phase"]) => void;
   handleReroll: () => void;
   eliminatePlayer: (playerId: string | null) => void;
@@ -63,9 +64,19 @@ export function useOfflineImpostor(): UseOfflineImpostorReturn {
     setLobby((prev) => ({ ...prev, config: { ...prev.config, ...config } }));
   }, []);
 
-  const startGame = useCallback(
-    async (initialPlayers?: any[], initialConfig?: LobbyConfig, globalUsedWords?: string[]) => {
+const startGame = useCallback(
+    async (initialPlayers?: any[], initialConfig?: LobbyConfig, wordList?: WordData[], langCode?: string, globalUsedWords?: string[]) => {
       const playersToUse = initialPlayers || game?.players || lobby.players;
+
+       // ✅ Pegamos a lista e o código do idioma. 
+      // Se for um "Novo Round", pegamos do 'game' atual (que já estava travado)
+      const listToUse = wordList || game?.activeWordList;
+      const langToUse = langCode || game?.wordsLanguage;
+
+      if (!listToUse || !langToUse) {
+         console.error("Erro: Banco de palavras ou idioma não definido para iniciar.");
+         return;
+      }
 
       const configToUse =
         initialConfig ||
@@ -108,7 +119,9 @@ export function useOfflineImpostor(): UseOfflineImpostorReturn {
         configToUse.impostorTrap,
         configToUse.impostorCat,
         impostorHistoryRef.current,
-        wordsToUse || []
+        wordsToUse || [],
+        listToUse, // wordDatabase
+        langToUse  // wordsLanguage
       );
 
       const currentImps = initialized.players.filter((p) => p.isImpostor).map((p) => p.id);
@@ -126,7 +139,7 @@ export function useOfflineImpostor(): UseOfflineImpostorReturn {
   );
 
   const handleReroll = useCallback(() => {
-    if (!game) return;
+    if (!game || !game.activeWordList || !game.wordsLanguage) return;
 
     const newGame = initializeGame(
       game.players,
@@ -139,7 +152,9 @@ export function useOfflineImpostor(): UseOfflineImpostorReturn {
       game.impostorTrap,
       game.impostorCat,
       impostorHistoryRef.current,
-      game.usedWords
+      game.usedWords,
+      game.activeWordList, // Banco travado
+      game.wordsLanguage   // Idioma travado
     );
 
     setGame({

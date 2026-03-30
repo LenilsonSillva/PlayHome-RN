@@ -1,11 +1,18 @@
 import { CryptoConfig, CryptoPlayer } from "../../types/game";
 
-
 export type GameAction =
   // Ações Comuns
-  | { type: "START_GAME"; players: CryptoPlayer[]; config: CryptoConfig; manualAssignments?: Record<string, number>; globalUsedWords: string[] }
+  | {
+      type: "START_GAME";
+      players: CryptoPlayer[];
+      config: CryptoConfig;
+      manualAssignments?: Record<string, number>;
+      globalUsedWords: string[];
+      wordDatabase?: any[];
+      langCode?: string;
+    }
   | { type: "SET_OPERATOR"; teamId: string; playerId: string }
-    | { type: "SET_STARTING_TEAM"; teamIndex: number }
+  | { type: "SET_STARTING_TEAM"; teamIndex: number }
   | { type: "SET_RANDOM_OPERATORS" }
   | { type: "BEGIN_ACTION_PHASE" }
   | { type: "START_TIMER" }

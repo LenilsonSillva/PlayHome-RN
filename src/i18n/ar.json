@@ -220,6 +220,7 @@
     "impostor_statusModal_ready": "جاهز",
     "impostor_statusModal_voted": "صوّت",
     "impostor_statusModal_waiting": "بانتظار",
+    "impostor_statusModal_roomStatus": "حالة الغرفة",
 
     "impostor_spectator_observer": "مراقب",
     "impostor_spectator_tatical": "تكتيكي",
@@ -254,6 +255,8 @@
     "cryptography_lobby_close": "إغلاق",
     "cryptography_lobby_start": "بدء المهمة",
     "cryptography_lobby_remove": "إزالة",
+    "cryptography_lobby_timeLimitText": "حدد الحد الأقصى للوقت المتاح لكل فرقة لتخمين كل كلمة.",
+    "cryptography_lobby_wordLimitText": "حدد عدد الكلمات في كل جولة.",
 
     "cryptography_card_wordIs": "الكلمة هي: ",
     "cryptography_card_pass": "تمرير",

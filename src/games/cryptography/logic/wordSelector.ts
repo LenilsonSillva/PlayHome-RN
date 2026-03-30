@@ -1,8 +1,8 @@
 import { WORDS } from "@/games/common/data/words";
 
-export function getUniqueWord(selectedCategories: string[], usedWordsArray: string[]) {
+export function getUniqueWord(selectedCategories: string[], usedWordsArray: string[], wordDatabase: any[] = WORDS) {
   const usedSet = new Set(usedWordsArray);
-  const filteredWords = WORDS.filter((w) => selectedCategories.includes(w.category));
+  const filteredWords = wordDatabase.filter((w) => selectedCategories.includes(w.category));
 
   // A última palavra que foi usada (para evitar repetição imediata no reset)
   const lastWord = usedWordsArray.length > 0 ? usedWordsArray[usedWordsArray.length - 1] : null;

@@ -21,6 +21,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { PlayerStatusModal } from "./components/PlayerStatusModal";
 import { useAlert } from "@/contexts/alertContext";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { useAudio } from "@/contexts/audioContext";
 
 const { width } = Dimensions.get("window");
 // Math.floor para evitar erros de precisão aritmética no iOS
@@ -39,6 +40,7 @@ interface RevealPhaseProps {
 
 export const RevealPhase = ({ player, data, isOnline, onNext, isLast, revealedAfterReroll, onPlayerReady }: RevealPhaseProps) => {
   const { t } = useTranslation();
+  const { playSound } = useAudio();
   const [isFlipped, setIsFlipped] = useState(false);
 
   // Valores Animados
@@ -132,6 +134,7 @@ export const RevealPhase = ({ player, data, isOnline, onNext, isLast, revealedAf
       rotation.value = withSpring(180, { damping: 15, stiffness: 90 });
       setIsFlipped(true);
     }
+    playSound("click2");
   };
 
   // --- LÓGICA DO GESTO ATUALIZADA ---
@@ -170,6 +173,7 @@ export const RevealPhase = ({ player, data, isOnline, onNext, isLast, revealedAf
   };
 
   const handleNextAction = () => {
+    playSound("click2");
     return new Promise<void>((resolve, reject) => {
       // Some com a carta (Fade Out)
       cardOpacity.value = withTiming(isOnline ? 1 : 0, { duration: 200 }, (isDone) => {
@@ -387,7 +391,14 @@ export const RevealPhase = ({ player, data, isOnline, onNext, isLast, revealedAf
         {/* ÁREA DOS DOTS PARA MOSTRAR QUEM ESTÁ PRONTO */}
 
         {isOnline && (
-          <TouchableOpacity style={styles.statusReady} activeOpacity={0.8} onPress={() => setStatusModalVisible(true)}>
+          <TouchableOpacity
+            style={styles.statusReady}
+            activeOpacity={0.8}
+            onPress={() => {
+              setStatusModalVisible(true);
+              playSound("click2");
+            }}
+          >
             <CustomText variant="label" style={{ color: player.color }}>
               {t("games.impostor_reveal_statusBtn")}
             </CustomText>

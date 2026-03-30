@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { BackHandler, ActivityIndicator, View } from "react-native";
+import { BackHandler } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { useSocket } from "@/contexts/socketContext";
 import { useAlert } from "@/contexts/alertContext";

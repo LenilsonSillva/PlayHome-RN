@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   View,
   StyleSheet,
@@ -12,7 +12,7 @@ import {
 import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
 import { usePlayers } from "@/contexts/contextHook";
-import { categories as ALL_CATEGORIES } from "@/games/common/data/words";
+import { getWordDatabase } from "@/games/common/data/words";
 import { loadGlobalUsedWords } from "@/games/common/utils/wordStorage";
 import { useNavigation } from "@react-navigation/native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
@@ -21,14 +21,22 @@ import { useAlert } from "@/contexts/alertContext";
 import { CryptoConfig, CryptoMode } from "@/games/cryptography/types/game";
 import { PLAYER_ICONS } from "@/games/common/constants/icons";
 import { pickRandom } from "@/games/common/utils/array";
+import { useAudio } from "@/contexts/audioContext";
 
 export const LobbyOffline = () => {
   const navigation = useNavigation<any>();
   const { players, addPlayer, removePlayer, updatePlayer } = usePlayers();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const { playSound } = useAudio();
   const { width } = useWindowDimensions();
   const isLargeScreen = width > 600;
   const { showAlert } = useAlert();
+
+  // --- Palavras dinâmicas do idioma ---
+  const currentWords = useMemo(() => getWordDatabase(i18n.language), [i18n.language]);
+  const ALL_CATEGORIES = useMemo(() => {
+    return Array.from(new Set(currentWords.map((w) => w.category))).sort();
+  }, [currentWords]);
 
   // --- Estados de Configuração ---
   const [mode, setMode] = useState<CryptoMode>("infiltration");
@@ -38,12 +46,17 @@ export const LobbyOffline = () => {
   const [selectedTime, setSelectedTime] = useState(60);
   const [wordLimit, setWordLimit] = useState(5);
   const [showCategories, setShowCategories] = useState(false);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([...ALL_CATEGORIES]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   const [manualAssignments, setManualAssignments] = useState<Record<string, number>>({});
 
   const infiltrationTimes = [60, 90, 120];
   const interceptionTimes = [15, 30, 60];
+
+  // Atualiza categorias selecionadas quando o idioma muda
+  useEffect(() => {
+    setSelectedCategories([...ALL_CATEGORIES]);
+  }, [ALL_CATEGORIES]);
 
   useEffect(() => {
     setSelectedTime(mode === "infiltration" ? 60 : 15);
@@ -73,11 +86,13 @@ export const LobbyOffline = () => {
       // 🔥 Adicionado o sorteio de emoji para bater com o padrão
       addPlayer(name.trim(), getUnusedEmoji());
       setName("");
+      playSound("click2");
     }
   };
 
   const handleChangeEmoji = (id: string) => {
     updatePlayer(id, { emoji: getUnusedEmoji() });
+    playSound("click2");
   };
 
   const cycleTeamAssignment = (playerId: string) => {
@@ -85,10 +100,12 @@ export const LobbyOffline = () => {
       ...prev,
       [playerId]: ((prev[playerId] || 0) + 1) % teamCount
     }));
+    playSound("click2");
   };
 
   const toggleCategory = (cat: string) => {
     setSelectedCategories((prev) => (prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]));
+    playSound("click2");
   };
 
   const handleStartMission = async () => {
@@ -117,7 +134,21 @@ export const LobbyOffline = () => {
 
     const globalUsedWords = await loadGlobalUsedWords();
 
-    navigation.navigate("OfflineCryptographyGame", { config, manualAssignments, globalUsedWords });
+    console.log("🎮 Crypto Lobby: Enviando para jogo:", {
+      idioma: i18n.language,
+      palavrasCarregadas: currentWords.length,
+      categoriasDisponiveis: ALL_CATEGORIES.length
+    });
+
+    playSound("click");
+
+    navigation.navigate("OfflineCryptographyGame", {
+      config,
+      manualAssignments,
+      globalUsedWords,
+      wordDatabase: currentWords,
+      langCode: i18n.language
+    });
   };
 
   return (
@@ -127,7 +158,10 @@ export const LobbyOffline = () => {
         <View style={styles.modeSelector}>
           <TouchableOpacity
             style={[styles.modeBtn, mode === "infiltration" && styles.modeActive]}
-            onPress={() => setMode("infiltration")}
+            onPress={() => {
+              setMode("infiltration");
+              playSound("click2");
+            }}
             activeOpacity={0.8}
           >
             <MaterialCommunityIcons
@@ -142,7 +176,10 @@ export const LobbyOffline = () => {
 
           <TouchableOpacity
             style={[styles.modeBtn, mode === "interception" && styles.modeActive]}
-            onPress={() => setMode("interception")}
+            onPress={() => {
+              setMode("interception");
+              playSound("click2");
+            }}
             activeOpacity={0.8}
           >
             <MaterialCommunityIcons
@@ -170,7 +207,10 @@ export const LobbyOffline = () => {
           <View style={styles.segmentedControl}>
             <TouchableOpacity
               style={[styles.segBtn, distributionType === "random" && styles.activeSeg]}
-              onPress={() => setDistributionType("random")}
+              onPress={() => {
+                setDistributionType("random");
+                playSound("click2");
+              }}
             >
               <CustomText style={[styles.segText, distributionType === "random" && { color: COLORS.cyan }]}>
                 {t("games.cryptography_lobby_random")}
@@ -178,7 +218,10 @@ export const LobbyOffline = () => {
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.segBtn, distributionType === "manual" && styles.activeSeg]}
-              onPress={() => setDistributionType("manual")}
+              onPress={() => {
+                setDistributionType("manual");
+                playSound("click2");
+              }}
             >
               <CustomText style={[styles.segText, distributionType === "manual" && { color: COLORS.cyan }]}>
                 {t("games.cryptography_lobby_manual")}
@@ -194,7 +237,10 @@ export const LobbyOffline = () => {
           </View>
           <View style={styles.counter}>
             <TouchableOpacity
-              onPress={() => setTeamCount(Math.max(2, teamCount - 1))}
+              onPress={() => {
+                setTeamCount(Math.max(2, teamCount - 1));
+                playSound("click2");
+              }}
               style={[styles.cBtn, teamCount === 2 && styles.btnDisabled]}
               disabled={teamCount === 2}
             >
@@ -206,7 +252,10 @@ export const LobbyOffline = () => {
               {teamCount}
             </CustomText>
             <TouchableOpacity
-              onPress={() => setTeamCount(Math.min(players.length, teamCount + 1))}
+              onPress={() => {
+                setTeamCount(Math.min(players.length, teamCount + 1));
+                playSound("click2");
+              }}
               style={[styles.cBtn, teamCount >= players.length && styles.btnDisabled]}
               disabled={teamCount >= players.length}
             >
@@ -265,7 +314,10 @@ export const LobbyOffline = () => {
 
                   {/* Se for manual o botão vira apenas um "X", se for aleatório, mostra o botão "REMOVER" completo */}
                   <TouchableOpacity
-                    onPress={() => removePlayer(p.id)}
+                    onPress={() => {
+                      removePlayer(p.id);
+                      playSound("click2");
+                    }}
                     style={[styles.removeBtn, distributionType === "manual" && styles.removeBtnSmall]}
                   >
                     <CustomText style={styles.removeText}>
@@ -283,12 +335,18 @@ export const LobbyOffline = () => {
           <CustomText variant="label" style={styles.cyanText}>
             {t("games.cryptography_lobby_timer")}
           </CustomText>
+          <CustomText variant="body" style={styles.optText}>
+            {t("games.cryptography_lobby_timeLimitText")}
+          </CustomText>
           <View style={styles.optionsRow}>
             {(mode === "infiltration" ? infiltrationTimes : interceptionTimes).map((t) => (
               <TouchableOpacity
                 key={t}
                 style={[styles.optionChip, selectedTime === t && styles.optionActive]}
-                onPress={() => setSelectedTime(t)}
+                onPress={() => {
+                  setSelectedTime(t);
+                  playSound("click2");
+                }}
               >
                 <CustomText variant="h3" style={{ color: selectedTime === t ? COLORS.background : COLORS.textSecondary }}>
                   {t}s
@@ -302,12 +360,18 @@ export const LobbyOffline = () => {
               <CustomText variant="label" style={styles.cyanText}>
                 {t("games.cryptography_lobby_wordLimit")}
               </CustomText>
+              <CustomText variant="body" style={styles.optText}>
+                {t("games.cryptography_lobby_wordLimitText")}
+              </CustomText>
               <View style={styles.optionsRow}>
                 {[5, 10, 20].map((w) => (
                   <TouchableOpacity
                     key={w}
                     style={[styles.optionChip, wordLimit === w && styles.optionActive]}
-                    onPress={() => setWordLimit(w)}
+                    onPress={() => {
+                      setWordLimit(w);
+                      playSound("click2");
+                    }}
                   >
                     <CustomText variant="h3" style={{ color: wordLimit === w ? COLORS.background : COLORS.textSecondary }}>
                       {w}
@@ -323,7 +387,10 @@ export const LobbyOffline = () => {
         <View style={styles.section}>
           <TouchableOpacity
             style={[styles.categoryToggle, showCategories && styles.categoryToggleActive]}
-            onPress={() => setShowCategories(!showCategories)}
+            onPress={() => {
+              setShowCategories(!showCategories);
+              playSound("click2");
+            }}
           >
             <CustomText variant="label" style={{ color: showCategories ? COLORS.black : COLORS.cyan }}>
               {showCategories ? t("games.cryptography_lobby_close") + " ⇡" : t("games.cryptography_lobby_db") + " ⇣"}
@@ -390,12 +457,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.05)"
   },
-  descText: { color: COLORS.textSecondary, textAlign: "center", fontSize: 12 },
+  descText: { color: COLORS.textSecondary, textAlign: "center", fontSize: 14 },
 
   segmentedControl: { flexDirection: "row", backgroundColor: COLORS.surface, borderRadius: 14, padding: 4 },
   segBtn: { flex: 1, paddingVertical: 12, alignItems: "center", borderRadius: 10 },
   activeSeg: { backgroundColor: COLORS.surfaceLight },
-  segText: { fontSize: 12, fontWeight: "bold", color: COLORS.textSecondary },
+  segText: { fontSize: 13, fontWeight: "bold", color: COLORS.textSecondary },
 
   settingCard: {
     backgroundColor: "rgba(255,255,255,0.03)",
@@ -486,6 +553,12 @@ const styles = StyleSheet.create({
     paddingVertical: 0
   },
   removeText: { color: COLORS.danger, fontWeight: "bold", fontSize: 12 },
+
+  optText: {
+    color: COLORS.textSecondary,
+    fontSize: 14,
+    paddingBottom: 15
+  },
 
   optionsRow: { flexDirection: "row", gap: 10 },
   optionChip: {

@@ -220,6 +220,7 @@
     "impostor_statusModal_ready": "완료",
     "impostor_statusModal_voted": "투표함",
     "impostor_statusModal_waiting": "대기 중",
+    "impostor_statusModal_roomStatus": "방 상태",
 
     "impostor_spectator_observer": "관찰자",
     "impostor_spectator_tatical": "전술가",
@@ -254,6 +255,8 @@
     "cryptography_lobby_close": "닫기",
     "cryptography_lobby_start": "미션 초기화",
     "cryptography_lobby_remove": "제거",
+    "cryptography_lobby_timeLimitText": "각 분대가 단어를 맞히는 데 주어지는 최대 시간을 선택하세요.",
+    "cryptography_lobby_wordLimitText": "각 라운드에서 진행할 단어 수를 선택하세요.",
 
     "cryptography_card_wordIs": "단어는: ",
     "cryptography_card_pass": "패스",

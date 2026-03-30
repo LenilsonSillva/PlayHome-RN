@@ -6,6 +6,7 @@ import { LobbyOffline } from "./LobbyOffline";
 import { Header } from "@/components/Header/Header";
 import { SettingsModal } from "@/components/SettingsModal/SettingsModal";
 import { useTranslation } from "react-i18next";
+import { ImpostorBackground } from "@/components/Background/Background";
 // import { LobbyOnline } from "./LobbyOnline"; // 🔥 Descomente no futuro!
 
 export function CryptographyLobby() {
@@ -24,6 +25,7 @@ export function CryptographyLobby() {
 
   return (
     <View style={styles.safeArea}>
+      <ImpostorBackground />
       <View style={styles.container}>
         <Header
           centerElement={LobbyTitle}

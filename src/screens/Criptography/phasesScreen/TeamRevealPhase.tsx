@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { CryptoGameState } from "@/games/cryptography/types/game";
 import { useAlert } from "@/contexts/alertContext";
+import { useAudio } from "@/contexts/audioContext";
 
 interface TeamRevealProps {
   gameState: CryptoGameState;
@@ -23,16 +24,20 @@ export const TeamRevealPhase = ({
   onConfirm
 }: TeamRevealProps) => {
   const { t } = useTranslation();
+  const { playSound } = useAudio();
   const { showAlert } = useAlert();
 
   const handleConfirm = () => {
     // Valida se todos os times tem operador antes de prosseguir
-    const missingOperators = gameState.teams.some((t) => !t.operatorId);
-    if (missingOperators) {
-      showAlert(t("alerts.warning"), t("games.cryptography_reveal_instruction"));
-      return;
-    }
-    onConfirm();
+    playSound("click");
+    setTimeout(() => {
+      const missingOperators = gameState.teams.some((t) => !t.operatorId);
+      if (missingOperators) {
+        showAlert(t("alerts.warning"), t("games.cryptography_reveal_instruction"));
+        return;
+      }
+      onConfirm();
+    }, 100);
   };
 
   return (
@@ -53,7 +58,14 @@ export const TeamRevealPhase = ({
         </View>
 
         {/* 🔥 BOTAO PARA SORTEAR TODOS OS OPERADORES RAPIDAMENTE */}
-        <TouchableOpacity style={styles.randomAllBtn} onPress={onRandomizeOperators} activeOpacity={0.8}>
+        <TouchableOpacity
+          style={styles.randomAllBtn}
+          onPress={() => {
+            onRandomizeOperators();
+            playSound("click2");
+          }}
+          activeOpacity={0.8}
+        >
           <MaterialCommunityIcons name="dice-multiple" size={20} color={COLORS.cyan} />
           <CustomText variant="h3" style={{ color: COLORS.cyan }}>
             {t("games.cryptography_reveal_randomBtn")}
@@ -81,7 +93,10 @@ export const TeamRevealPhase = ({
                       styles.startTeamBtn,
                       gameState.currentTeamIndex === idx && { backgroundColor: team.color, borderColor: team.color }
                     ]}
-                    onPress={() => onSetStartingTeam(idx)}
+                    onPress={() => {
+                      onSetStartingTeam(idx);
+                      playSound("click2");
+                    }}
                     activeOpacity={0.7}
                   >
                     <CustomText
@@ -117,7 +132,10 @@ export const TeamRevealPhase = ({
                           ? { backgroundColor: team.color + "20", borderColor: team.color, borderWidth: 2 }
                           : { borderTopWidth: 1, borderTopColor: player.color }
                       ]}
-                      onPress={() => onSelectOperator(team.id, player.id)}
+                      onPress={() => {
+                        onSelectOperator(team.id, player.id);
+                        playSound("click2");
+                      }}
                       activeOpacity={0.7}
                     >
                       <CustomText variant="label" style={styles.operatorText}>

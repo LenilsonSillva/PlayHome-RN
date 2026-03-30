@@ -24,9 +24,11 @@ export function useOfflineCryptography() {
       players: CryptoPlayer[],
       config: CryptoConfig,
       manualAssignments?: Record<string, number>,
-      globalUsedWords: string[] = []
+      globalUsedWords: string[] = [],
+      wordDatabase: any[] = [],
+      langCode: string = ""
     ) => {
-      dispatch({ type: "START_GAME", players, config, manualAssignments, globalUsedWords });
+      dispatch({ type: "START_GAME", players, config, manualAssignments, globalUsedWords, wordDatabase, langCode });
     },
     []
   );

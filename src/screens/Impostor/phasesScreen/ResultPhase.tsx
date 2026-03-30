@@ -16,6 +16,7 @@ import { ImpostorGame, ImpostorPlayer, OnlineImpostorGame } from "@/games/impost
 import { useTranslation } from "react-i18next";
 import { formatScoreDisplay, getScoreColor } from "@/games/impostor/utils/scoringUtils";
 import { ImpostorBackground } from "@/components/Background/Background";
+import { useAudio } from "@/contexts/audioContext";
 
 interface Props {
   data: ImpostorGame | OnlineImpostorGame;
@@ -27,6 +28,7 @@ const ROW_HEIGHT = 77; // Altura exata da RankingRow (65 height + 12 margin)
 
 export const ResultPhase = ({ data, onNextRound, isOnline }: Props) => {
   const { t, i18n } = useTranslation();
+  const { playSound } = useAudio();
   const { width, height } = Dimensions.get("window");
 
   // 🔥 Única variável necessária: a posição do scroll
@@ -36,6 +38,10 @@ export const ResultPhase = ({ data, onNextRound, isOnline }: Props) => {
   const impostorsAlive = survivors.filter((p: ImpostorPlayer) => p.isImpostor).length;
   const crewAlive = survivors.length - impostorsAlive;
   const crewWon = impostorsAlive === 0;
+
+  useEffect(() => {
+    crewWon ? playSound("win") : playSound("impostor");
+  }, []);
 
   const sortedPlayers = useMemo(() => {
     return [...data.players].sort((a, b) => (b.globalScore || 0) - (a.globalScore || 0));
@@ -159,7 +165,16 @@ export const ResultPhase = ({ data, onNextRound, isOnline }: Props) => {
 
       <View style={styles.footer}>
         {!isOnline || (isOnline && ("isHost" in data ? data.isHost : true)) ? (
-          <TouchableOpacity style={styles.nextBtn} onPress={onNextRound} activeOpacity={0.8}>
+          <TouchableOpacity
+            style={styles.nextBtn}
+            onPress={() => {
+              playSound("click");
+              setTimeout(() => {
+                onNextRound();
+              }, 100);
+            }}
+            activeOpacity={0.8}
+          >
             <CustomText variant="h3" style={styles.btnText}>
               {t("games.impostor_result_nextMission")} 🚀
             </CustomText>

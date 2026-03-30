@@ -8,6 +8,7 @@ import { PlayerAvatar } from "@/games/common/components/PlayerAvatar";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
 import { useAlert } from "@/contexts/alertContext";
+import { useAudio } from "@/contexts/audioContext";
 
 interface Props {
   player: ImpostorPlayer | null;
@@ -21,6 +22,7 @@ interface Props {
 
 export const EliminatedReport = ({ player, allPlayers, votes, wasVoting, onNext, isOnline, onlinePlayer }: Props) => {
   const { t } = useTranslation();
+  const { playSound } = useAudio();
   const [showLogs, setShowLogs] = useState(false);
   const date = new Date().toLocaleDateString();
   const time = new Date().toLocaleTimeString([], {
@@ -208,7 +210,13 @@ export const EliminatedReport = ({ player, allPlayers, votes, wasVoting, onNext,
               </View>
             </View>
 
-            <TouchableOpacity style={styles.terminalBtn} onPress={() => setShowLogs(!showLogs)}>
+            <TouchableOpacity
+              style={styles.terminalBtn}
+              onPress={() => {
+                setShowLogs(!showLogs);
+                playSound("click2");
+              }}
+            >
               <CustomText variant="label" style={styles.terminalBtnText}>
                 {showLogs
                   ? "[-] " + t("games.impostor_eliminated_closeLogsAccess")
@@ -253,7 +261,12 @@ export const EliminatedReport = ({ player, allPlayers, votes, wasVoting, onNext,
         <View style={styles.footerNav}>
           <TouchableOpacity
             style={styles.nextBtn}
-            onPress={isOnline ? handleReturnCommand : onNext}
+            onPress={() => {
+              setTimeout(() => {
+                isOnline ? handleReturnCommand() : onNext();
+              }, 100);
+              playSound("click");
+            }}
             disabled={isWaiting}
             activeOpacity={0.8}
           >

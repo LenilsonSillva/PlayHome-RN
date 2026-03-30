@@ -1,17 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { View, StyleSheet, ScrollView, TextInput, TouchableOpacity, Switch, ActivityIndicator } from "react-native";
 import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
-import { categories as ALL_CATEGORIES } from "@/games/common/data/words";
+import { getWordDatabase } from "@/games/common/data/words";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useOnlineImpostorLobby } from "@/games/impostor/hooks/useOnlineImpostorLobby";
 import { useNavigation } from "@react-navigation/native";
 import { useAlert } from "@/contexts/alertContext";
 import { useTranslation } from "react-i18next";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { useAudio } from "@/contexts/audioContext";
 
 export const LobbyOnline = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const { playSound } = useAudio();
   const { state, actions } = useOnlineImpostorLobby();
   const [isCreating, setIsCreating] = useState(true);
   const [showCats, setShowCats] = useState(false);
@@ -19,6 +21,12 @@ export const LobbyOnline = () => {
   const navigation = useNavigation<any>();
   const [isWaiting, setIsWaiting] = useState(false);
   const { showAlert } = useAlert();
+
+  // Palavras dinâmicas do idioma
+  const currentWords = useMemo(() => getWordDatabase(i18n.language), [i18n.language]);
+  const ALL_CATEGORIES = useMemo(() => {
+    return Array.from(new Set(currentWords.map((w) => w.category))).sort();
+  }, [currentWords]);
 
   // 🔥 1. Mudou a aba? Desliga o loading na hora!
   useEffect(() => {
@@ -121,12 +129,24 @@ export const LobbyOnline = () => {
     return (
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.segmentedControl}>
-          <TouchableOpacity style={[styles.segBtn, isCreating && styles.activeSeg]} onPress={() => setIsCreating(true)}>
+          <TouchableOpacity
+            style={[styles.segBtn, isCreating && styles.activeSeg]}
+            onPress={() => {
+              setIsCreating(true);
+              playSound("click2");
+            }}
+          >
             <CustomText style={[styles.segText, isCreating && { color: COLORS.cyan }]}>
               {t("games.impostor_lobby_createRoom")}
             </CustomText>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.segBtn, !isCreating && styles.activeSeg]} onPress={() => setIsCreating(false)}>
+          <TouchableOpacity
+            style={[styles.segBtn, !isCreating && styles.activeSeg]}
+            onPress={() => {
+              setIsCreating(false);
+              playSound("click2");
+            }}
+          >
             <CustomText style={[styles.segText, !isCreating && { color: COLORS.cyan }]}>
               {t("games.impostor_lobby_joinRoom")}
             </CustomText>
@@ -177,7 +197,13 @@ export const LobbyOnline = () => {
 
               {/* EXIBIÇÃO DA ÚLTIMA SALA (Apenas se existir no estado) */}
               {state.lastRoomCode && (
-                <TouchableOpacity style={styles.lastRoomBadge} onPress={() => actions.setRoomCode(state.lastRoomCode!)}>
+                <TouchableOpacity
+                  style={styles.lastRoomBadge}
+                  onPress={() => {
+                    actions.setRoomCode(state.lastRoomCode!);
+                    playSound("click2");
+                  }}
+                >
                   <MaterialCommunityIcons name="history" size={14} color={COLORS.cyan} />
                   <CustomText variant="hint" style={styles.lastRoomText}>
                     {t("games.impostor_lobby_lastRoom")} {state.lastRoomCode}
@@ -189,7 +215,10 @@ export const LobbyOnline = () => {
 
           <TouchableOpacity
             style={styles.mainBtn}
-            onPress={() => (isCreating ? handleWaitAction("createRoom") : handleWaitAction("joinRoom"))}
+            onPress={() => {
+              isCreating ? handleWaitAction("createRoom") : handleWaitAction("joinRoom");
+              playSound("click2");
+            }}
           >
             <CustomText variant="h3" style={{ color: COLORS.background }}>
               {isWaiting ? (
@@ -219,7 +248,13 @@ export const LobbyOnline = () => {
             </CustomText>
           </View>
 
-          <TouchableOpacity style={styles.leaveBtn} onPress={actions.leaveRoom}>
+          <TouchableOpacity
+            style={styles.leaveBtn}
+            onPress={() => {
+              actions.leaveRoom();
+              playSound("click2");
+            }}
+          >
             <MaterialCommunityIcons name="power" size={28} color={COLORS.danger} />
             <CustomText style={styles.leaveText}>{t("games.impostor_lobby_leaveRoom")}</CustomText>
           </TouchableOpacity>
@@ -271,7 +306,10 @@ export const LobbyOnline = () => {
               </View>
               <View style={styles.counterRow}>
                 <TouchableOpacity
-                  onPress={() => actions.setSelectImpostorNumbers(Math.max(1, state.selectImpostorNumbers - 1))}
+                  onPress={() => {
+                    actions.setSelectImpostorNumbers(Math.max(1, state.selectImpostorNumbers - 1));
+                    playSound("click2");
+                  }}
                   style={[styles.cBtn, state.selectImpostorNumbers === 1 && styles.btnDisabled]}
                   disabled={state.selectImpostorNumbers === 1}
                 >
@@ -283,7 +321,10 @@ export const LobbyOnline = () => {
                   {state.selectImpostorNumbers}
                 </CustomText>
                 <TouchableOpacity
-                  onPress={() => actions.setSelectImpostorNumbers(Math.min(state.maxImpostors, state.selectImpostorNumbers + 1))}
+                  onPress={() => {
+                    actions.setSelectImpostorNumbers(Math.min(state.maxImpostors, state.selectImpostorNumbers + 1));
+                    playSound("click2");
+                  }}
                   style={[styles.cBtn, state.selectImpostorNumbers >= state.maxImpostors && styles.btnDisabled]}
                   disabled={state.selectImpostorNumbers >= state.maxImpostors}
                 >
@@ -297,7 +338,10 @@ export const LobbyOnline = () => {
             {/* OPTIONS SWITCH */}
             <TouchableOpacity
               style={[styles.categoryToggle, showOptions && styles.categoryToggleActive]}
-              onPress={() => setShowOptions(!showOptions)}
+              onPress={() => {
+                setShowOptions(!showOptions);
+                playSound("click2");
+              }}
             >
               <CustomText variant="label" style={{ color: showOptions ? COLORS.black : COLORS.cyan }}>
                 {showOptions ? t("games.impostor_lobby_gameOptClose") + " ⇡" : t("games.impostor_lobby_gameOpt") + " ⇣"}
@@ -313,7 +357,10 @@ export const LobbyOnline = () => {
                       <TouchableOpacity
                         activeOpacity={0.7}
                         disabled={item.disable}
-                        onPress={item.set}
+                        onPress={() => {
+                          item.set();
+                          playSound("click2");
+                        }}
                         style={[styles.optionSquare, item.val && styles.optionSquareActive]}
                       >
                         <FontAwesome6 name={item.icon as any} size={32} color={item.val ? COLORS.black : COLORS.cyan} />
@@ -333,7 +380,10 @@ export const LobbyOnline = () => {
             {/* ABA DE CATEGORIAS */}
             <TouchableOpacity
               style={[styles.categoryToggle, showCats && styles.categoryToggleActive]}
-              onPress={() => setShowCats(!showCats)}
+              onPress={() => {
+                setShowCats(!showCats);
+                playSound("click2");
+              }}
             >
               <CustomText variant="label" style={{ color: showCats ? COLORS.background : COLORS.cyan }}>
                 {showCats ? t("games.impostor_lobby_DBClose") : t("games.impostor_lobby_DBSelect")} {showCats ? "⇡" : "⇣"}
@@ -351,6 +401,7 @@ export const LobbyOnline = () => {
                         ? state.selectedCategories.filter((c) => c !== cat)
                         : [...state.selectedCategories, cat];
                       actions.setSelectedCategories(next);
+                      playSound("click2");
                     }}
                   >
                     <CustomText
@@ -381,7 +432,10 @@ export const LobbyOnline = () => {
           <TouchableOpacity
             style={[styles.startBtn, state.players.length < 3 && styles.startBtnDisabled]}
             disabled={state.players.length < 3 || isWaiting}
-            onPress={() => handleWaitAction("startGame")}
+            onPress={() => {
+              handleWaitAction("startGame");
+              playSound("click2");
+            }}
           >
             {isWaiting ? (
               <ActivityIndicator color="#FFF" size="small" />

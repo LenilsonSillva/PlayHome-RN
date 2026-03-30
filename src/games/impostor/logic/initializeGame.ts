@@ -3,7 +3,7 @@ import type { ImpostorGame, ImpostorPlayer } from "../types/game";
 import { createImpostorPlayers } from "./createPlayers";
 import { distributeWords } from "./distributeWords";
 import { pickRandom } from "../../common/utils/array";
-import { WORDS } from "../../common/data/words";
+import { WordData } from "@/games/common/data/words/types";
 
 export function getImpostorCount(playersCount: number): number {
   if (playersCount >= 7) return 3;
@@ -35,6 +35,8 @@ export function initializeGame(
   impostorCat: boolean,
   impostorHistory: string[][] = [],
   usedWords: string[] = [],
+   wordDatabase: WordData[],
+   wordsLanguage: string,
 ): ImpostorGame {
   // 1. Cria os jogadores (define quem é impostor, emoji e cor)
   const impostorPlayers = createImpostorPlayers(allPlayers, impostorCount, impostorHistory);
@@ -44,11 +46,11 @@ export function initializeGame(
     impostorPlayers,
     twoWordsMode,
     selectedCategories,
-    WORDS,
+    wordDatabase,
     impostorHasHint,
     impostorTrap,
     impostorCat,
-    usedWords,
+    usedWords
   );
 
   // 3. Define quem começa (usando a lista atualizada de jogadores)
@@ -62,6 +64,7 @@ export function initializeGame(
     impostorHasHint,
     impostorTrap,
     impostorCat,
+    impostorsUnited: false,
     impostorCanStart,
     selectedCategories,
     chosenWord,
@@ -70,5 +73,7 @@ export function initializeGame(
     impostorHistory,
     usedWords,
     didReset,
+    activeWordList: wordDatabase,
+    wordsLanguage,
   };
 }
