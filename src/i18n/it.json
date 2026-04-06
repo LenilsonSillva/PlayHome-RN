@@ -13,7 +13,26 @@
     "settings_clearDBTitle": "PULISCI DATI",
     "settings_clearDBSub": "CANCELLA LE PAROLE GIÀ USATE",
     "header_protocol": "PROTOCOLLO",
-    "loading": "Caricamento..."
+    "loading": "Caricamento...",
+    "card_suggestions": "SUGGERIMENTI",
+    "card_subTitleImpostor": "DEDUZIONE SOCIALE",
+    "card_playerIdea": "Hai un'idea per un nuovo gioco o dei miglioramenti? Condividila con lo sviluppatore!",
+    "card_subTitleCrypto": "LOGICA E STRATEGIA",
+    "card_subTitleSuggestion": "FEEDBACK",
+    "card_minSuggestion": "DIRECT",
+    "card_min": "MIN.",
+    "card_typeMystery": "MISTERO",
+    "card_typeParty": "PARTY",
+    "card_typeTeams": "SQUADRE",
+    "card_typeCode": "CODICE",
+    "card_typeCommu": "COMMUNITY",
+    "card_typeFuture": "PROSSIMAMENTE",
+    "card_playBtn": "GIOCA ORA",
+    "card_sendIdeaBtn": "INVIA IDEA",
+    "modal_newIdea": "NUOVA IDEA",
+    "modal_sugDesc": "Il tuo suggerimento sarà inviato direttamente allo sviluppatore.",
+    "modal_playerDesc": "Descrivi il tuo suggerimento o miglioramento...",
+    "modal_send": "INVIA"
   },
 
   "alerts": {
@@ -228,9 +247,9 @@
     "impostor_spectator_systemStatus": "STATO SISTEMA:",
     "impostor_spectator_waitingEnd": "IN ATTESA DELLA FINE MISSIONE...",
 
-    "impostor_desc": "Stai all'erta! Ogni membro riceve una parola, tranne l'impostore. Scopri chi sta fingendo ed espellilo dalla nave.",
+    "impostor_desc": "Stai all'erta! Tutti ricevono una parola segreta, tranne l'impostore. Scopri l'infiltrato prima che sia troppo tardi. Il gioco finisce quando gli impostori vengono eliminati o superano l'equipaggio.",
+    "cripto_desc": "Comunicazione tattica! La tua squadra deve decifrare la parola tramite indizi precisi dell'operatore. Vince la squadra con più centri.",
     "cripto_title": "CRITTOGRAFIA",
-    "cripto_desc": "Comunicazione tattica! Fornisci indizi precisi affinché la tua squadra decripti la parola.",
 
     "cryptography_title": "CRITTOGRAFIA",
     "cryptography_phase_team_reveal": "DEFINIZIONE",
@@ -325,7 +344,7 @@
     "cryptography_result_bestOp": "MIGLIOR OPERATORE",
     "cryptography_result_noWord": "NESSUNA PAROLA",
 
-    "cryptography_alert_emptyTeam": "Attenzione: Tutte le squadriglie devono avere almeno 1 membro!",
+    "cryptography_alert_emptyTeam": "Tutte le squadriglie devono avere almeno 2 membro!",
     "cryptography_alert_minPlayers": "Protocollo Invalido: Con 4 o più giocatori, ogni gruppo deve essere composto da almeno 2 persone."
   }
 }

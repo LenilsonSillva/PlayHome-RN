@@ -13,7 +13,26 @@
     "settings_clearDBTitle": "LIMPIAR DATOS",
     "settings_clearDBSub": "BORRA LAS PALABRAS YA USADAS",
     "header_protocol": "PROTOCOLO",
-    "loading": "Cargando..."
+    "loading": "Cargando...",
+    "card_suggestions": "SUGERENCIAS",
+    "card_subTitleImpostor": "DEDUCCIÓN SOCIAL",
+    "card_playerIdea": "¿Tienes alguna idea para un nuevo juego o mejoras? ¡Compártela con el desarrollador!",
+    "card_subTitleCrypto": "LÓGICA Y ESTRATEGIA",
+    "card_subTitleSuggestion": "FEEDBACK",
+    "card_minSuggestion": "DIRECTO",
+    "card_min": "MÍN.",
+    "card_typeMystery": "MISTERIO",
+    "card_typeParty": "FIESTA",
+    "card_typeTeams": "EQUIPOS",
+    "card_typeCode": "CÓDIGO",
+    "card_typeCommu": "COMUNIDAD",
+    "card_typeFuture": "PRÓXIMAMENTE",
+    "card_playBtn": "JUGAR AHORA",
+    "card_sendIdeaBtn": "ENVIAR IDEA",
+    "modal_newIdea": "NUEVA IDEA",
+    "modal_sugDesc": "Tu sugerencia será enviada directamente al desarrollador.",
+    "modal_playerDesc": "Describe tu sugerencia o mejoras...",
+    "modal_send": "ENVIAR"
   },
 
   "alerts": {
@@ -228,9 +247,10 @@
     "impostor_spectator_systemStatus": "ESTADO DEL SISTEMA:",
     "impostor_spectator_waitingEnd": "ESPERANDO EL FIN DE LA MISIÓN...",
 
-    "impostor_desc": "¡Mantente alerta! Todos los tripulantes reciben una palabra, excepto el impostor. Descubre quién está fingiendo y expúlsalo de la nave.",
+    "impostor_desc": "¡Mantente alerta! Todos reciben una palabra secreta excepto el impostor. Descubre al infiltrado antes de que sea tarde. El juego termina cuando los impostores caen o superan a la tripulación.",
+    "cripto_desc": "¡Comunicación táctica! Tu equipo debe descifrar la palabra mediante pistas precisas del operador. Gana el escuadrón con más aciertos.",
+
     "cripto_title": "CRIPTOGRAFÍA",
-    "cripto_desc": "¡Comunicación táctica! Da pistas precisas para que tu equipo descifre la palabra.",
 
     "cryptography_title": "CRIPTOGRAFÍA",
     "cryptography_phase_team_reveal": "DEFINICIÓN",
@@ -272,7 +292,7 @@
     "cryptography_reveal_selectOperator": "SELECCIONA EL OPERADOR (QUIEN DA LAS PISTAS):",
     "cryptography_reveal_operator": "OPERADOR",
     "cryptography_reveal_randomBtn": "🎲 SORTEAR OPERADOR",
-    "cryptography_reveal_instruction": "Define quién será el Operador de cada escuadrón antes de continuar.",
+    "cryptography_reveal_instruction": "Define quién será el operador de cada escuadrón antes de continuar.",
     "cryptography_reveal_editBtn": "⚙️ EDITAR ESCUADRONES",
     "cryptography_reveal_confirmBtn": "TODO LISTO 🚀",
     "cryptography_reveal_team": "REVELAR OPERADORES",
@@ -325,7 +345,7 @@
     "cryptography_result_bestOp": "MEJOR OPERADOR",
     "cryptography_result_noWord": "NINGUNA PALABRA",
 
-    "cryptography_alert_emptyTeam": "Atención: ¡Todos los escuadrones necesitan al menos 1 tripulante!",
+    "cryptography_alert_emptyTeam": "¡Todos los escuadrones necesitan al menos 2 jugadores!",
     "cryptography_alert_minPlayers": "Protocolo Inválido: Con 4 o más jugadores, cada grupo debe estar compuesto por un mínimo de 2 personas."
   }
 }

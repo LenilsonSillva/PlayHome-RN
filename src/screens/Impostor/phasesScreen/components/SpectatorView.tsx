@@ -20,6 +20,21 @@ export function SpectatorView({ gameData }: { gameData: OnlineImpostorGame }) {
     score: p.score ?? 0
   }));
 
+  const phase = () => {
+    switch (gameData.phase) {
+      case "discussion":
+        return t("games.impostor_phase_discuss");
+      case "voting":
+        return t("games.impostor_phase_voting");
+      case "elimination":
+        return t("games.impostor_phase_elimination");
+      case "result":
+        return t("games.impostor_phase_result");
+      default:
+        return t("games.impostor_phase_unknown");
+    }
+  };
+
   return (
     <View style={styles.wrapper}>
       {/* Simulação de Scanline com bordas */}
@@ -44,8 +59,7 @@ export function SpectatorView({ gameData }: { gameData: OnlineImpostorGame }) {
 
         <View style={styles.statusBox}>
           <CustomText variant="label">
-            {t("games.impostor_spectator_systemStatus")}{" "}
-            <CustomText style={{ color: COLORS.cyan }}>{gameData.phase?.toUpperCase()}</CustomText>
+            {t("games.impostor_spectator_systemStatus")} <CustomText style={{ color: COLORS.cyan }}>{phase()}</CustomText>
           </CustomText>
         </View>
 

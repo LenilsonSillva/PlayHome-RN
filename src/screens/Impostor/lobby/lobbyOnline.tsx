@@ -5,7 +5,6 @@ import { CustomText } from "@/styles/customText";
 import { getWordDatabase } from "@/games/common/data/words";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useOnlineImpostorLobby } from "@/games/impostor/hooks/useOnlineImpostorLobby";
-import { useNavigation } from "@react-navigation/native";
 import { useAlert } from "@/contexts/alertContext";
 import { useTranslation } from "react-i18next";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
@@ -18,7 +17,6 @@ export const LobbyOnline = () => {
   const [isCreating, setIsCreating] = useState(true);
   const [showCats, setShowCats] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
-  const navigation = useNavigation<any>();
   const [isWaiting, setIsWaiting] = useState(false);
   const { showAlert } = useAlert();
 
@@ -30,7 +28,9 @@ export const LobbyOnline = () => {
 
   // 🔥 1. Mudou a aba? Desliga o loading na hora!
   useEffect(() => {
-    setIsWaiting(false);
+    requestAnimationFrame(() => {
+      setIsWaiting(false);
+    });
   }, [isCreating, state.inRoom]);
 
   const handleWaitAction = async (action: string) => {

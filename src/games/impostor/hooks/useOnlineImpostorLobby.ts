@@ -6,6 +6,7 @@ import { PLAYER_ICONS } from "../constants/icons";
 import { ICON_COLORS } from "../constants/colors";
 import { pickRandom } from "@/games/common/utils/array";
 import { useTranslation } from "react-i18next";
+import i18n from "@/i18n";
 
 export function useOnlineImpostorLobby() {
   const socket = useSocket();
@@ -211,7 +212,8 @@ export function useOnlineImpostorLobby() {
             impostorCat,
             impostorsUnited,
             selectedCategories
-          }
+          },
+          language: i18n.language
         },
         (res: any) => {
           if (res?.error) return reject(res.error);

@@ -13,7 +13,26 @@
     "settings_clearDBTitle": "EFFACER LES DONNÉES",
     "settings_clearDBSub": "EFFACE LES MOTS DÉJÀ UTILISÉS",
     "header_protocol": "PROTOCOLE",
-    "loading": "Chargement..."
+    "loading": "Chargement...",
+    "card_suggestions": "SUGGESTIONS",
+    "card_subTitleImpostor": "DÉDUCTION SOCIALE",
+    "card_playerIdea": "Vous avez une idée pour un nouveau jeu ou des améliorations ? Partagez-la avec le développeur !",
+    "card_subTitleCrypto": "LOGIQUE & STRATÉGIE",
+    "card_subTitleSuggestion": "AVIS",
+    "card_minSuggestion": "DIRECT",
+    "card_min": "MIN.",
+    "card_typeMystery": "MYSTÈRE",
+    "card_typeParty": "FÊTE",
+    "card_typeTeams": "ÉQUIPES",
+    "card_typeCode": "CODE",
+    "card_typeCommu": "COMMUNAUTÉ",
+    "card_typeFuture": "À VENIR",
+    "card_playBtn": "JOUER MAINTENANT",
+    "card_sendIdeaBtn": "ENVOYER L'IDÉE",
+    "modal_newIdea": "NOUVELLE IDÉE",
+    "modal_sugDesc": "Votre suggestion sera envoyée directement au développeur.",
+    "modal_playerDesc": "Décrivez votre suggestion ou vos améliorations...",
+    "modal_send": "ENVOYER"
   },
 
   "alerts": {
@@ -228,9 +247,9 @@
     "impostor_spectator_systemStatus": "ÉTAT DU SYSTÈME :",
     "impostor_spectator_waitingEnd": "ATTENTE DE LA FIN DE MISSION...",
 
-    "impostor_desc": "Soyez vigilant ! Tous les membres reçoivent um mot, sauf l'imposteur. Trouvez qui fait semblant et éjectez-le.",
+    "impostor_desc": "Soyez vigilant ! Tout le monde reçoit un mot secret, sauf l'imposteur. Trouvez l'infiltré avant qu'il ne soit trop tard. La partie s'achève quand les imposteurs sont éliminés ou surpassent l'équipage.",
+    "cripto_desc": "Communication tactique ! Votre équipe doit décrypter le mot grâce aux indices précis de l'opérateur. L'escouade avec le plus de points l'emporte.",
     "cripto_title": "CRYPTOGRAPHIE",
-    "cripto_desc": "Communication tactique ! Donnez des indices précis pour que votre équipe décrypte le mot.",
 
     "cryptography_title": "CRYPTOGRAPHIE",
     "cryptography_phase_team_reveal": "DÉFINITION",
@@ -272,7 +291,7 @@
     "cryptography_reveal_selectOperator": "SÉLECTIONNEZ L'OPÉRATEUR (DONNE LES INDICES) :",
     "cryptography_reveal_operator": "OPÉRATEUR",
     "cryptography_reveal_randomBtn": "🎲 TIRER OPÉRATEUR",
-    "cryptography_reveal_instruction": "Définissez l'Opérateur de chaque escouade avant de continuer.",
+    "cryptography_reveal_instruction": "Définissez l'opérateur de chaque escouade avant de continuer.",
     "cryptography_reveal_editBtn": "⚙️ MODIFIER ESCOUADES",
     "cryptography_reveal_confirmBtn": "TOUT EST PRÊT 🚀",
     "cryptography_reveal_team": "RÉVÉLER OPÉRATEURS",
@@ -325,7 +344,7 @@
     "cryptography_result_bestOp": "MEILLEUR OPÉRATEUR",
     "cryptography_result_noWord": "AUCUN MOT",
 
-    "cryptography_alert_emptyTeam": "Attention : Chaque escouade doit avoir au moins 1 membre !",
+    "cryptography_alert_emptyTeam": "Chaque escouade doit avoir au moins 2 membre !",
     "cryptography_alert_minPlayers": "Protocole Invalide : Avec 4 joueurs ou plus, chaque groupe doit avoir au moins 2 personnes."
   }
 }

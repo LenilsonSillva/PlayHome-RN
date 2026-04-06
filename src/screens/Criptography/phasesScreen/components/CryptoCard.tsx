@@ -21,8 +21,8 @@ import { useTranslation } from "react-i18next";
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = Math.floor(width * 0.82);
-const CARD_HEIGHT = 440;
-const SWIPE_THRESHOLD = width * 0.25;
+const CARD_HEIGHT = Math.max(440, CARD_WIDTH); // Garante que height >= width
+const SWIPE_THRESHOLD = CARD_WIDTH * 0.25;
 
 interface CryptoCardProps {
   mode: "interception" | "infiltration";

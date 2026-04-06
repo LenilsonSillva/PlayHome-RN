@@ -13,7 +13,26 @@
     "settings_clearDBTitle": "데이터 초기화",
     "settings_clearDBSub": "이미 사용된 단어를 초기화합니다",
     "header_protocol": "프로토콜",
-    "loading": "로딩 중..."
+    "loading": "로딩 중...",
+    "card_suggestions": "제안",
+    "card_subTitleImpostor": "사회적 추론",
+    "card_playerIdea": "새로운 게임이나 개선에 대한 아이디어가 있나요? 개발자와 공유해 보세요!",
+    "card_subTitleCrypto": "논리 및 전략",
+    "card_subTitleSuggestion": "피드백",
+    "card_minSuggestion": "직접",
+    "card_min": "최소",
+    "card_typeMystery": "미스터리",
+    "card_typeParty": "파티",
+    "card_typeTeams": "팀전",
+    "card_typeCode": "코드",
+    "card_typeCommu": "커뮤니티",
+    "card_typeFuture": "출시 예정",
+    "card_playBtn": "지금 플레이",
+    "card_sendIdeaBtn": "아이디어 보내기",
+    "modal_newIdea": "새로운 아이디어",
+    "modal_sugDesc": "제안하신 내용은 개발자에게 직접 전송됩니다.",
+    "modal_playerDesc": "제안이나 개선 사항을 설명해 주세요...",
+    "modal_send": "보내기"
   },
 
   "alerts": {
@@ -228,9 +247,9 @@
     "impostor_spectator_systemStatus": "시스템 상태:",
     "impostor_spectator_waitingEnd": "미션 종료 대기 중...",
 
-    "impostor_desc": "정신 바짝 차리세요! 모든 크루원에게 단어가 주어지지만, 임포스터는 예외입니다. 누가 거짓말을 하는지 찾아내어 선체 밖으로 추방하세요.",
+    "impostor_desc": "정신 바짝 차리세요! 임포스터를 제외한 모든 플레이어가 비밀 단어를 받습니다. 너무 늦기 전에 침입자를 찾아내세요. 임포스터가 모두 제거되거나 크루 수와 같아지면 게임이 종료됩니다.",
+    "cripto_desc": "전술 통신! 오퍼레이터의 정확한 힌트를 통해 팀원들과 단어를 복호화하세요. 가장 많이 맞힌 팀이 승리합니다.",
     "cripto_title": "크립토그래피",
-    "cripto_desc": "전술 통신! 팀원들이 단어를 복호화할 수 있도록 정확한 힌트를 주어야 합니다.",
 
     "cryptography_title": "크립토그래피",
     "cryptography_phase_team_reveal": "팀 결정",
@@ -325,7 +344,7 @@
     "cryptography_result_bestOp": "베스트 오퍼레이터",
     "cryptography_result_noWord": "단어 없음",
 
-    "cryptography_alert_emptyTeam": "주의: 모든 분대에는 최소 1명의 크루원이 필요합니다!",
+    "cryptography_alert_emptyTeam": "각 팀은 최소 2명의 선수가 필요합니다!",
     "cryptography_alert_minPlayers": "부적절한 프로토콜: 4명 이상의 플레이어가 있는 경우, 각 그룹은 최소 2명으로 구성되어야 합니다."
   }
 }

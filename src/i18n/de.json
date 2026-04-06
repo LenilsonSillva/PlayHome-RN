@@ -13,7 +13,26 @@
     "settings_clearDBTitle": "DATEN LÖSCHEN",
     "settings_clearDBSub": "LÖSCHT BEREITS GENUTZTE WÖRTER",
     "header_protocol": "PROTOKOLL",
-    "loading": "Ladevorgang..."
+    "loading": "Ladevorgang...",
+    "card_suggestions": "VORSCHLÄGE",
+    "card_subTitleImpostor": "SOZIALE DEDUKTION",
+    "card_playerIdea": "Haben Sie eine Idee für ein neues Spiel oder Verbesserungen? Teilen Sie sie mit dem Entwickler!",
+    "card_subTitleCrypto": "LOGIK & STRATEGIE",
+    "card_subTitleSuggestion": "FEEDBACK",
+    "card_minSuggestion": "DM",
+    "card_min": "MIN.",
+    "card_typeMystery": "GEHEIMNIS",
+    "card_typeParty": "PARTY",
+    "card_typeTeams": "TEAMS",
+    "card_typeCode": "CODE",
+    "card_typeCommu": "COMMUNITY",
+    "card_typeFuture": "DEMNÄCHST",
+    "card_playBtn": "JETZT SPIELEN",
+    "card_sendIdeaBtn": "IDEE SENDEN",
+    "modal_newIdea": "NEUE IDEE",
+    "modal_sugDesc": "Ihr Vorschlag wird direkt an den Entwickler gesendet.",
+    "modal_playerDesc": "Beschreiben Sie Ihren Vorschlag oder Ihre Verbesserungen...",
+    "modal_send": "SENDEN"
   },
 
   "alerts": {
@@ -228,9 +247,9 @@
     "impostor_spectator_systemStatus": "SYSTEMSTATUS:",
     "impostor_spectator_waitingEnd": "WARTE AUF MISSIONSSCHLUSS...",
 
-    "impostor_desc": "Sei wachsam! Alle erhalten ein Wort, außer der Impostor. Finde heraus, wer nur so tut, und wirf ihn aus dem Schiff.",
+    "impostor_desc": "Bleib wachsam! Alle erhalten ein Geheimwort, außer dem Impostor. Entlarve den Verräter, bevor es zu spät ist. Das Spiel endet, wenn alle Impostoren eliminiert sind oder die Überzahl haben.",
+    "cripto_desc": "Taktische Kommunikation! Dein Team muss das Wort durch präzise Hinweise des Operators entschlüsseln. Der Trupp mit den meisten Treffern gewinnt.",
     "cripto_title": "KRYPTOGRAPHIE",
-    "cripto_desc": "Taktische Kommunikation! Gib präzise Hinweise, damit dein Team das Wort entschlüsselt.",
 
     "cryptography_title": "KRYPTOGRAPHIE",
     "cryptography_phase_team_reveal": "DEFINITION",
@@ -272,7 +291,7 @@
     "cryptography_reveal_selectOperator": "WÄHLE DEN OPERATOR (HINWEISGEBER):",
     "cryptography_reveal_operator": "OPERATOR",
     "cryptography_reveal_randomBtn": "🎲 OPERATOR AUSLOSEN",
-    "cryptography_reveal_instruction": "Lege den Operator für jeden Trupp fest, bevor du fortfährst.",
+    "cryptography_reveal_instruction": "Lege den operator für jeden Trupp fest, bevor du fortfährst.",
     "cryptography_reveal_editBtn": "⚙️ TRUPPS BEARBEITEN",
     "cryptography_reveal_confirmBtn": "ALLES BEREIT 🚀",
     "cryptography_reveal_team": "OPERATOREN ENTTARNEN",
@@ -325,7 +344,7 @@
     "cryptography_result_bestOp": "BESTER OPERATOR",
     "cryptography_result_noWord": "KEIN WORT",
 
-    "cryptography_alert_emptyTeam": "Achtung: Alle Trupps benötigen mindestens 1 Mitglied!",
+    "cryptography_alert_emptyTeam": "Alle Trupps benötigen mindestens 2 Mitglied!",
     "cryptography_alert_minPlayers": "Ungültiges Protokoll: Ab 4 Spielern muss jede Gruppe aus mindestens 2 Personen bestehen."
   }
 }

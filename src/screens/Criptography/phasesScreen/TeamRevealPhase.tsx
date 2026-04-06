@@ -129,7 +129,7 @@ export const TeamRevealPhase = ({
                       style={[
                         styles.gridItem,
                         isOperator
-                          ? { backgroundColor: team.color + "20", borderColor: team.color, borderWidth: 2 }
+                          ? { backgroundColor: team.color + "20", borderColor: team.color, borderWidth: 2, borderTopWidth: 2 }
                           : { borderTopWidth: 1, borderTopColor: player.color }
                       ]}
                       onPress={() => {
@@ -235,7 +235,8 @@ const styles = StyleSheet.create({
   playersGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 10
+    gap: 10,
+    justifyContent: "center"
   },
   gridItem: {
     width: "48%", // 🔥 Única alteração: Garante um grid de 2 colunas!
@@ -265,13 +266,13 @@ const styles = StyleSheet.create({
     borderColor: COLORS.surface // O contorno finge um "corte" no card base
   },
   operatorText: {
-    flex: 0.5,
-    top: 10,
+    position: "absolute",
+    top: 8,
     color: COLORS.textSecondary
   },
   playerData: {
-    flex: 1.5,
-    alignItems: "center"
+    alignItems: "center",
+    justifyContent: "center"
   },
 
   footer: {

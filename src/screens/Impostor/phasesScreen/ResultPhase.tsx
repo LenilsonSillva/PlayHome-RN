@@ -102,10 +102,10 @@ export const ResultPhase = ({ data, onNextRound, isOnline }: Props) => {
         <View style={{ height: 120 }} />
 
         <Animated.View style={topContentStyle}>
-          <View style={[styles.victoryBanner, i18n.language === "en" && { flexDirection: "column-reverse" }]}>
+          <View style={[styles.victoryBanner, i18n.language.startsWith("en") && { flexDirection: "column-reverse" }]}>
             <CustomText
               variant="h1"
-              style={[styles.victoryTitle, { color: COLORS.textPrimary }, i18n.language === "en" && { marginBottom: 0 }]}
+              style={[styles.victoryTitle, { color: COLORS.textPrimary }, i18n.language.startsWith("en") && { marginBottom: 0 }]}
             >
               {crewWon
                 ? t("games.impostor_result_victoryTitleFemi")

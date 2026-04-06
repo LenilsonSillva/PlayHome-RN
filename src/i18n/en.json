@@ -13,7 +13,26 @@
     "settings_clearDBTitle": "CLEAR DATA",
     "settings_clearDBSub": "CLEARS PREV. USED WORDS",
     "header_protocol": "PROTOCOL",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "card_suggestions": "SUGGESTIONS",
+    "card_subTitleImpostor": "SOCIAL DEDUCTION",
+    "card_playerIdea": "Do you have an idea for a new game or improvements? Share it with the developer!",
+    "card_subTitleCrypto": "LOGIC & STRATEGY",
+    "card_subTitleSuggestion": "FEEDBACK",
+    "card_minSuggestion": "DIRECT",
+    "card_min": "MIN.",
+    "card_typeMystery": "MYSTERY",
+    "card_typeParty": "PARTY",
+    "card_typeTeams": "TEAMS",
+    "card_typeCode": "CIPHER",
+    "card_typeCommu": "COMMUNITY",
+    "card_typeFuture": "COMING SOON",
+    "card_playBtn": "PLAY NOW",
+    "card_sendIdeaBtn": "SEND IDEA",
+    "modal_newIdea": "NEW IDEA",
+    "modal_sugDesc": "Your suggestion will be sent directly to the developer.",
+    "modal_playerDesc": "Describe your suggestion or improvements...",
+    "modal_send": "SEND"
   },
 
   "alerts": {
@@ -228,9 +247,9 @@
     "impostor_spectator_systemStatus": "SYSTEM STATUS:",
     "impostor_spectator_waitingEnd": "WAITING FOR MISSION TO END...",
 
-    "impostor_desc": "Stay alert! All crewmates receive a word, except the impostor. Find out who is faking it and eject them from the ship.",
+    "impostor_desc": "Stay sharp! Everyone gets a secret word except the impostor. Spot the mole before it's too late. The game ends when all impostors are eliminated or outnumber the crew.",
+    "cripto_desc": "Tactical communication! Your team must decrypt the word using precise hints from the operator. The squad with the most hits wins.",
     "cripto_title": "CRYPTOGRAPHY",
-    "cripto_desc": "Tactical communication! Give precise hints for your team to decrypt the word.",
 
     "cryptography_title": "CRYPTOGRAPHY",
     "cryptography_phase_team_reveal": "DEFINITION",
@@ -272,7 +291,7 @@
     "cryptography_reveal_selectOperator": "SELECT OPERATOR (WHO GIVES HINTS):",
     "cryptography_reveal_operator": "OPERATOR",
     "cryptography_reveal_randomBtn": "🎲 RANDOM OPERATOR",
-    "cryptography_reveal_instruction": "Define each squad's Operator before proceeding.",
+    "cryptography_reveal_instruction": "Define each squad's operator before proceeding.",
     "cryptography_reveal_editBtn": "⚙️ EDIT SQUADS",
     "cryptography_reveal_confirmBtn": "ALL READY 🚀",
     "cryptography_reveal_team": "REVEAL OPERATORS",
@@ -325,7 +344,7 @@
     "cryptography_result_bestOp": "BEST OPERATOR",
     "cryptography_result_noWord": "NO WORD",
 
-    "cryptography_alert_emptyTeam": "Attention: All squads need at least 1 crewmate!",
+    "cryptography_alert_emptyTeam": "All squads need at least 2 players!",
     "cryptography_alert_minPlayers": "Invalid Protocol: With 4 or more players, each group must consist of at least 2 people."
   }
 }

@@ -19,6 +19,7 @@ import { useNavigation } from "expo-router";
 import { saveGlobalUsedWords } from "@/games/common/utils/wordStorage";
 import { useAlert } from "@/contexts/alertContext";
 import { useAudio } from "@/contexts/audioContext";
+import { showRewardedAd, canShowAd } from "@/services/ads/adsService";
 
 export const OfflineImpostorGameScreen = ({ route }: any) => {
   const { t } = useTranslation();
@@ -48,6 +49,22 @@ export const OfflineImpostorGameScreen = ({ route }: any) => {
   const [reviewPlayer, setReviewPlayer] = useState<ImpostorPlayer | null>(null); // 2. Player selecionado
   const [storePlayer, setStorePlayer] = useState<string[]>([]); // 3. Player que já viu a palavra (pode ser usado para mostrar um indicador visual na lista de jogadores durante a discussão)
 
+  const confirmAd = (callback: () => void) => {
+    showAlert("Modo avançado", "Este modo usa anúncios para continuar. Deseja assistir?", undefined, [
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Assistir",
+        onPress: () => {
+          if (canShowAd()) {
+            showRewardedAd(callback);
+          } else {
+            callback(); // fallback sem anúncio
+          }
+        }
+      }
+    ]);
+  };
+
   useEffect(() => {
     // Reseta os estados quando a fase muda para evitar que informações do jogo anterior persistam
     setReviewEnabled(false);
@@ -56,12 +73,18 @@ export const OfflineImpostorGameScreen = ({ route }: any) => {
   }, [game?.phase]);
 
   useEffect(() => {
-    // Extraímos os novos dados que o Lobby enviou
     const { config, globalUsedWords, wordList, langCode } = route.params || {};
 
     if (config && wordList && langCode && players.length > 0) {
-      // Injetamos a lista de palavras e o idioma fixo no Hook
-      startGame(players, config, wordList, langCode, globalUsedWords);
+      const needsAd = config.twoWordsMode || config.impostorTrap;
+
+      if (needsAd) {
+        confirmAd(() => {
+          startGame(players, config, wordList, langCode, globalUsedWords);
+        });
+      } else {
+        startGame(players, config, wordList, langCode, globalUsedWords);
+      }
     }
   }, [route.params]);
 
@@ -117,11 +140,11 @@ export const OfflineImpostorGameScreen = ({ route }: any) => {
 
   // Função disparada pelo botão de reroll no modal de configurações durante a fase de revelação
   const onRerollPress = () => {
-    // 1. O Hook sorteia a nova palavra
-    handleReroll();
-    // 2. A Screen volta para o primeiro jogador
-    setCurrentPlayerIndex(0);
-    setReveal((prev) => !prev);
+    confirmAd(() => {
+      handleReroll();
+      setCurrentPlayerIndex(0);
+      setReveal((prev) => !prev);
+    });
   };
 
   // Função disparada pelo botão de confirmar eliminação no host ou pelo fim da votação (eliminationPhase)
@@ -243,10 +266,15 @@ export const OfflineImpostorGameScreen = ({ route }: any) => {
           <ResultPhase
             data={game}
             onNextRound={() => {
-              // 1. Reseta o índice de revelação para o primeiro jogador
               setCurrentPlayerIndex(0);
-              // 2. O hook sorteia novo impostor e palavra mantendo os scores
-              startGame();
+
+              const needsAd = game?.twoWordsMode || game?.impostorTrap;
+
+              if (needsAd) {
+                confirmAd(() => startGame());
+              } else {
+                startGame();
+              }
             }}
           />
         )}

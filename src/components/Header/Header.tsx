@@ -10,18 +10,20 @@ interface HeaderProps {
   centerElement: React.ReactNode;
   onOpenSettings: () => void;
   position?: "absolute" | "relative";
-  onGoBack?: () => void; // 🔥 1. Adicionamos a propriedade opcional
+  onGoBack?: () => void;
+  hideBack?: boolean;
 }
 
 export const Header = ({
   centerElement,
   onOpenSettings,
   position = "relative",
-  onGoBack // 🔥 2. Recebemos ela aqui
+  onGoBack,
+  hideBack = false
 }: HeaderProps) => {
   const navigation = useNavigation();
   const { playSound } = useAudio();
-  const canGoBack = navigation.canGoBack();
+  const canGoBack = navigation.canGoBack() && !hideBack;
 
   // 🔥 3. Função que decide qual "voltar" usar
   const handleBackPress = () => {

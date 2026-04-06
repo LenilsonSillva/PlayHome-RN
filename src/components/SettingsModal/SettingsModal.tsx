@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Modal, View, StyleSheet, TouchableOpacity, Pressable, ScrollView, LayoutAnimation } from "react-native";
+import { Modal, View, StyleSheet, TouchableOpacity, Pressable, LayoutAnimation } from "react-native";
 import { useTranslation } from "react-i18next";
 import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
@@ -9,6 +9,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { clearGlobalUsedWords } from "@/games/common/utils/wordStorage";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useAudio } from "@/contexts/audioContext";
+import { ScrollView, GestureHandlerRootView } from "react-native-gesture-handler";
 
 interface SettingsModalProps {
   visible: boolean;
@@ -96,180 +97,183 @@ export const SettingsModal = ({
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <View style={styles.overlay}>
-        <Pressable
-          style={styles.backdrop}
-          onPress={() => {
-            onClose();
-            playSound("click2");
-          }}
-        />
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <View style={styles.overlay}>
+          <Pressable
+            style={styles.backdrop}
+            onPress={() => {
+              onClose();
+              playSound("click2");
+            }}
+          />
 
-        <View style={styles.modalContent}>
-          {/* O Card muda de cor quando a lista de idiomas está aberta */}
-          <Cards accentColor={isLangListVisible ? COLORS.cyan : COLORS.amber}>
-            <View style={styles.innerLayout}>
-              {/* CABEÇALHO DINÂMICO */}
-              <View style={styles.header}>
-                <CustomText variant="label" style={{ color: isLangListVisible ? COLORS.cyan : COLORS.amber, fontSize: 14 }}>
-                  {isLangListVisible ? t("home.lang_label") : t("home.settings_title")}
-                </CustomText>
-                <View style={[styles.line, { backgroundColor: isLangListVisible ? COLORS.cyan : COLORS.amber }]} />
-              </View>
+          <View style={styles.modalContent}>
+            {/* O Card muda de cor quando a lista de idiomas está aberta */}
+            <Cards accentColor={isLangListVisible ? COLORS.cyan : COLORS.amber}>
+              <View style={styles.innerLayout}>
+                {/* CABEÇALHO DINÂMICO */}
+                <View style={styles.header}>
+                  <CustomText variant="label" style={{ color: isLangListVisible ? COLORS.cyan : COLORS.amber, fontSize: 14 }}>
+                    {isLangListVisible ? t("home.lang_label") : t("home.settings_title")}
+                  </CustomText>
+                  <View style={[styles.line, { backgroundColor: isLangListVisible ? COLORS.cyan : COLORS.amber }]} />
+                </View>
 
-              {!isLangListVisible ? (
-                // --- VISÃO ORIGINAL DAS CONFIGURAÇÕES ---
-                <View style={styles.optionsBody}>
-                  {showChangeWordBtn && (
-                    <TouchableOpacity style={styles.optionRow} onPress={changeWordBtn}>
+                {!isLangListVisible ? (
+                  // --- VISÃO ORIGINAL DAS CONFIGURAÇÕES ---
+                  <View style={styles.optionsBody}>
+                    {showChangeWordBtn && (
+                      <TouchableOpacity style={styles.optionRow} onPress={changeWordBtn}>
+                        <View>
+                          <CustomText variant="h3" style={styles.whiteText}>
+                            {t("games.impostor_reveal_changeWord")}
+                          </CustomText>
+                          <CustomText variant="hint">{t("games.impostor_reveal_changeWord_sub")}</CustomText>
+                        </View>
+                        <View style={styles.badge}>
+                          {changeRevealIcon ? (
+                            <MaterialIcons name="done-outline" size={24} color={COLORS.cyan} />
+                          ) : (
+                            <FontAwesome5 name="exchange-alt" size={24} color={COLORS.cyan} />
+                          )}
+                        </View>
+                      </TouchableOpacity>
+                    )}
+
+                    {showReviewWordBtn && (
+                      <TouchableOpacity
+                        style={styles.optionRow}
+                        onPress={() => {
+                          onToggleReview?.(!reviewEnabled);
+                          playSound("click2");
+                        }}
+                      >
+                        <View>
+                          <CustomText variant="h3" style={styles.whiteText}>
+                            {t("games.impostor_discuss_reviewWord")}
+                          </CustomText>
+                          <CustomText variant="hint">{t("games.impostor_discuss_reviewClick")}</CustomText>
+                        </View>
+                        <View style={[styles.switch, { borderColor: reviewEnabled ? COLORS.success : COLORS.textSecondary }]}>
+                          <View
+                            style={[
+                              styles.switchDot,
+                              {
+                                backgroundColor: reviewEnabled ? COLORS.success : COLORS.textSecondary,
+                                marginLeft: reviewEnabled ? 22 : 2
+                              }
+                            ]}
+                          />
+                        </View>
+                      </TouchableOpacity>
+                    )}
+
+                    {/* BOTÃO PARA ABRIR LISTA DE IDIOMAS */}
+                    <TouchableOpacity style={styles.optionRow} onPress={toggleLangList}>
                       <View>
                         <CustomText variant="h3" style={styles.whiteText}>
-                          {t("games.impostor_reveal_changeWord")}
+                          {t("home.lang_label")}
                         </CustomText>
-                        <CustomText variant="hint">{t("games.impostor_reveal_changeWord_sub")}</CustomText>
+                        <CustomText variant="hint">{t("home.lang_sub_label")}</CustomText>
                       </View>
                       <View style={styles.badge}>
-                        {changeRevealIcon ? (
-                          <MaterialIcons name="done-outline" size={24} color={COLORS.cyan} />
-                        ) : (
-                          <FontAwesome5 name="exchange-alt" size={24} color={COLORS.cyan} />
-                        )}
-                      </View>
-                    </TouchableOpacity>
-                  )}
-
-                  {showReviewWordBtn && (
-                    <TouchableOpacity
-                      style={styles.optionRow}
-                      onPress={() => {
-                        onToggleReview?.(!reviewEnabled);
-                        playSound("click2");
-                      }}
-                    >
-                      <View>
-                        <CustomText variant="h3" style={styles.whiteText}>
-                          {t("games.impostor_discuss_reviewWord")}
-                        </CustomText>
-                        <CustomText variant="hint">{t("games.impostor_discuss_reviewClick")}</CustomText>
-                      </View>
-                      <View style={[styles.switch, { borderColor: reviewEnabled ? COLORS.success : COLORS.textSecondary }]}>
-                        <View
-                          style={[
-                            styles.switchDot,
-                            {
-                              backgroundColor: reviewEnabled ? COLORS.success : COLORS.textSecondary,
-                              marginLeft: reviewEnabled ? 22 : 2
-                            }
-                          ]}
-                        />
-                      </View>
-                    </TouchableOpacity>
-                  )}
-
-                  {/* BOTÃO PARA ABRIR LISTA DE IDIOMAS */}
-                  <TouchableOpacity style={styles.optionRow} onPress={toggleLangList}>
-                    <View>
-                      <CustomText variant="h3" style={styles.whiteText}>
-                        {t("home.lang_label")}
-                      </CustomText>
-                      <CustomText variant="hint">{t("home.lang_sub_label")}</CustomText>
-                    </View>
-                    <View style={styles.badge}>
-                      <CustomText style={{ fontSize: 24 }}>
-                        {/* 
+                        <CustomText style={{ fontSize: 24 }}>
+                          {/* 
                           Procura o idioma atual. 
                           1. Tenta o código exato (ex: pt-PT)
                           2. Se não achar, tenta o simplificado (ex: pt)
                           3. Fallback para bandeira dos EUA
                       */}
-                        {LANGUAGES.find((l) => l.code === i18n.language)?.flag ||
-                          LANGUAGES.find((l) => l.code === i18n.language.split("-")[0])?.flag ||
-                          "🇺🇸"}
-                      </CustomText>
-                    </View>
-                  </TouchableOpacity>
-
-                  {/* CONFIGURAÇÃO DE ÁUDIO */}
-                  <TouchableOpacity style={styles.optionRow} onPress={handleToggleAudio}>
-                    <View>
-                      <CustomText variant="h3" style={styles.whiteText}>
-                        {t("home.settings_audioTitle")}
-                      </CustomText>
-                      <CustomText variant="hint">{t("home.settings_audioSubTitle")}</CustomText>
-                    </View>
-                    <View style={[styles.switch, { borderColor: isAudioEnabled ? COLORS.success : COLORS.textSecondary }]}>
-                      <View
-                        style={[
-                          styles.switchDot,
-                          {
-                            backgroundColor: isAudioEnabled ? COLORS.success : COLORS.textSecondary,
-                            marginLeft: isAudioEnabled ? 22 : 2
-                          }
-                        ]}
-                      />
-                    </View>
-                  </TouchableOpacity>
-
-                  {showResetWords && (
-                    <TouchableOpacity style={styles.optionRow} onPress={handleResetHistory}>
-                      <View style={{ width: "80%" }}>
-                        <CustomText variant="h3" style={styles.whiteText}>
-                          {t("home.settings_clearDBTitle")}
+                          {LANGUAGES.find((l) => l.code === i18n.language)?.flag ||
+                            LANGUAGES.find((l) => l.code === i18n.language.split("-")[0])?.flag ||
+                            "🇺🇸"}
                         </CustomText>
-                        <CustomText variant="hint">{t("home.settings_clearDBSub")}</CustomText>
-                      </View>
-                      <View style={styles.badge}>
-                        {changeDBIcon ? (
-                          <MaterialIcons name="done-outline" size={24} color={COLORS.cyan} />
-                        ) : (
-                          <MaterialCommunityIcons name="database-refresh" size={24} color={COLORS.cyan} />
-                        )}
                       </View>
                     </TouchableOpacity>
-                  )}
-                </View>
-              ) : (
-                // --- VISÃO DA LISTA DE IDIOMAS (SCROLL) ---
-                <View style={styles.langListContainer}>
-                  <ScrollView showsVerticalScrollIndicator={false}>
-                    {LANGUAGES.map((lang) => {
-                      // Compara o código exato para evitar duplicidade visual em variações regionais
-                      const isSelected = i18n.language === lang.code;
 
-                      return (
-                        <TouchableOpacity
-                          key={lang.code}
-                          style={[styles.langItem, isSelected && styles.langItemSelected]}
-                          onPress={() => handleSelectLanguage(lang.code)}
-                        >
-                          <CustomText style={{ fontSize: 20, marginRight: 15 }}>{lang.flag}</CustomText>
-                          <CustomText variant="h3" style={{ color: isSelected ? COLORS.cyan : COLORS.white, flex: 1 }}>
-                            {lang.label}
+                    {/* CONFIGURAÇÃO DE ÁUDIO */}
+                    <TouchableOpacity style={styles.optionRow} onPress={handleToggleAudio}>
+                      <View>
+                        <CustomText variant="h3" style={styles.whiteText}>
+                          {t("home.settings_audioTitle")}
+                        </CustomText>
+                        <CustomText variant="hint">{t("home.settings_audioSubTitle")}</CustomText>
+                      </View>
+                      <View style={[styles.switch, { borderColor: isAudioEnabled ? COLORS.success : COLORS.textSecondary }]}>
+                        <View
+                          style={[
+                            styles.switchDot,
+                            {
+                              backgroundColor: isAudioEnabled ? COLORS.success : COLORS.textSecondary,
+                              marginLeft: isAudioEnabled ? 22 : 2
+                            }
+                          ]}
+                        />
+                      </View>
+                    </TouchableOpacity>
+
+                    {showResetWords && (
+                      <TouchableOpacity style={styles.optionRow} onPress={handleResetHistory}>
+                        <View style={{ width: "80%" }}>
+                          <CustomText variant="h3" style={styles.whiteText}>
+                            {t("home.settings_clearDBTitle")}
                           </CustomText>
-                          {isSelected && <MaterialIcons name="check-circle" size={20} color={COLORS.cyan} />}
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </ScrollView>
-                </View>
-              )}
+                          <CustomText variant="hint">{t("home.settings_clearDBSub")}</CustomText>
+                        </View>
+                        <View style={styles.badge}>
+                          {changeDBIcon ? (
+                            <MaterialIcons name="done-outline" size={24} color={COLORS.cyan} />
+                          ) : (
+                            <MaterialCommunityIcons name="database-refresh" size={24} color={COLORS.danger} />
+                          )}
+                        </View>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                ) : (
+                  // --- VISÃO DA LISTA DE IDIOMAS (SCROLL) ---
+                  <View style={styles.langListContainer}>
+                    <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }} nestedScrollEnabled={true}>
+                      <View style={{ height: 30 }}></View>
+                      {LANGUAGES.map((lang) => {
+                        // Compara o código exato para evitar duplicidade visual em variações regionais
+                        const isSelected = i18n.language === lang.code;
 
-              {/* BOTÃO FECHAR / VOLTAR */}
-              <TouchableOpacity
-                style={[styles.closeButton, { backgroundColor: isLangListVisible ? COLORS.cyan : COLORS.amber }]}
-                onPress={() => {
-                  isLangListVisible ? toggleLangList() : onClose();
-                  playSound("click2");
-                }}
-              >
-                <CustomText variant="label" style={{ color: COLORS.background, fontWeight: "900" }}>
-                  {t("home.back_btn")}
-                </CustomText>
-              </TouchableOpacity>
-            </View>
-          </Cards>
+                        return (
+                          <TouchableOpacity
+                            key={lang.code}
+                            style={[styles.langItem, isSelected && styles.langItemSelected]}
+                            onPress={() => handleSelectLanguage(lang.code)}
+                          >
+                            <CustomText style={{ fontSize: 20, marginRight: 15 }}>{lang.flag}</CustomText>
+                            <CustomText variant="h3" style={{ color: isSelected ? COLORS.cyan : COLORS.white, flex: 1 }}>
+                              {lang.label}
+                            </CustomText>
+                            {isSelected && <MaterialIcons name="check-circle" size={20} color={COLORS.cyan} />}
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </ScrollView>
+                  </View>
+                )}
+
+                {/* BOTÃO FECHAR / VOLTAR */}
+                <TouchableOpacity
+                  style={[styles.closeButton, { backgroundColor: isLangListVisible ? COLORS.cyan : COLORS.amber }]}
+                  onPress={() => {
+                    isLangListVisible ? toggleLangList() : onClose();
+                    playSound("click2");
+                  }}
+                >
+                  <CustomText variant="label" style={{ color: COLORS.background, fontWeight: "900" }}>
+                    {t("home.back_btn")}
+                  </CustomText>
+                </TouchableOpacity>
+              </View>
+            </Cards>
+          </View>
         </View>
-      </View>
+      </GestureHandlerRootView>
     </Modal>
   );
 };
@@ -310,7 +314,7 @@ const styles = StyleSheet.create({
   },
   langListContainer: {
     flex: 1,
-    marginTop: 20,
+    maxHeight: 380,
     marginBottom: 10
   },
   langItem: {

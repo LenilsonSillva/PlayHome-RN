@@ -13,7 +13,26 @@
     "settings_clearDBTitle": "データを消去",
     "settings_clearDBSub": "使用済みの単語をリセットします",
     "header_protocol": "プロトコル",
-    "loading": "読み込み中..."
+    "loading": "読み込み中...",
+    "card_suggestions": "提案",
+    "card_subTitleImpostor": "正体隠匿ゲーム",
+    "card_playerIdea": "新しいゲームのアイデアや改善案がありますか？開発者に共有しましょう！",
+    "card_subTitleCrypto": "論理と戦略",
+    "card_subTitleSuggestion": "フィードバック",
+    "card_minSuggestion": "ダイレクト",
+    "card_min": "最小",
+    "card_typeMystery": "ミステリー",
+    "card_typeParty": "パーティー",
+    "card_typeTeams": "チーム戦",
+    "card_typeCode": "暗号",
+    "card_typeCommu": "コミュニティ",
+    "card_typeFuture": "近日公開",
+    "card_playBtn": "今すぐプレイ",
+    "card_sendIdeaBtn": "アイデアを送る",
+    "modal_newIdea": "新しいアイデア",
+    "modal_sugDesc": "提案は開発者に直接送信されます。",
+    "modal_playerDesc": "提案や改善点を記入してください...",
+    "modal_send": "送信"
   },
 
   "alerts": {
@@ -228,9 +247,9 @@
     "impostor_spectator_systemStatus": "システム状態:",
     "impostor_spectator_waitingEnd": "ミッション終了を待機中...",
 
-    "impostor_desc": "注意せよ！全クルーに単語が与えられるが、インポスターだけは例外だ。誰が嘘をついているか見抜き、船から追放せよ。",
+    "impostor_desc": "警戒せよ！インポスター以外の全員に秘密の単語が与えられます。手遅れになる前に潜入者を見つけ出せ。インポスターが全滅するか、クルーの数に並ぶとゲーム終了です。",
+    "cripto_desc": "タクティカル通信！オペレーターの的確なヒントを頼りに、チームで単語を解読せよ。最も多くの正解を出した部隊の勝利です。",
     "cripto_title": "暗号解読",
-    "cripto_desc": "タクティカル通信！チームが単語を復号できるよう、的確なヒントを与えよ。",
 
     "cryptography_title": "暗号解読",
     "cryptography_phase_team_reveal": "チーム決定",
@@ -325,7 +344,7 @@
     "cryptography_result_bestOp": "ベストオペレーター",
     "cryptography_result_noWord": "単語なし",
 
-    "cryptography_alert_emptyTeam": "注意：すべての分隊に少なくとも1名のクルーが必要です！",
+    "cryptography_alert_emptyTeam": "各チームには最低1人の選手が必要です！",
     "cryptography_alert_minPlayers": "無効なプロトコル：4名以上のプレイヤーがいる場合、各グループは2名以上である必要があります。"
   }
 }

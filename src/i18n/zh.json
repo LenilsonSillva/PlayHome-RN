@@ -13,7 +13,26 @@
     "settings_clearDBTitle": "清除数据",
     "settings_clearDBSub": "清除已使用的词汇",
     "header_protocol": "协议",
-    "loading": "加载中..."
+    "loading": "加载中...",
+    "card_suggestions": "建议",
+    "card_subTitleImpostor": "社交推理",
+    "card_playerIdea": "您有新游戏的主意或改进建议吗？请与开发者分享！",
+    "card_subTitleCrypto": "逻辑与策略",
+    "card_subTitleSuggestion": "反馈",
+    "card_minSuggestion": "私信",
+    "card_min": "最小",
+    "card_typeMystery": "悬疑",
+    "card_typeParty": "派对",
+    "card_typeTeams": "团队",
+    "card_typeCode": "代码",
+    "card_typeCommu": "社区",
+    "card_typeFuture": "敬请期待",
+    "card_playBtn": "立即开始",
+    "card_sendIdeaBtn": "发送想法",
+    "modal_newIdea": "新想法",
+    "modal_sugDesc": "您的建议将直接发送给开发者。",
+    "modal_playerDesc": "描述您的建议或改进内容...",
+    "modal_send": "发送"
   },
 
   "alerts": {
@@ -228,9 +247,9 @@
     "impostor_spectator_systemStatus": "系统状态：",
     "impostor_spectator_waitingEnd": "正在等待任务结束...",
 
-    "impostor_desc": "保持警惕！除了伪装者，所有船员都会收到一个词。找出谁在伪装并将其驱逐出飞船。",
+    "impostor_desc": "保持警惕！除了伪装者，所有人都会收到一个秘密词汇。在为时已晚之前找出潜伏者。当伪装者被全部淘汰，或人数达到船员数量时，游戏结束。",
+    "cripto_desc": "战术通讯！你的团队需要根据操作员的精准提示来破译词汇。猜对词汇最多的小队获胜。",
     "cripto_title": "暗号解读",
-    "cripto_desc": "战术通讯！提供精准提示，帮助你的团队破译暗号。",
 
     "cryptography_title": "暗号解读",
     "cryptography_phase_team_reveal": "团队定义",
@@ -325,7 +344,7 @@
     "cryptography_result_bestOp": "最佳操作员",
     "cryptography_result_noWord": "无词汇",
 
-    "cryptography_alert_emptyTeam": "注意：所有小队至少需要1名船员！",
+    "cryptography_alert_emptyTeam": "每个小队至少需要两名成员！",
     "cryptography_alert_minPlayers": "协议无效：当玩家人数达到4人或以上时，每组必须至少由2人组成。"
   }
 }

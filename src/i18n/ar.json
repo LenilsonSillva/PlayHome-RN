@@ -13,7 +13,26 @@
     "settings_clearDBTitle": "مسح البيانات",
     "settings_clearDBSub": "مسح الكلمات المستخدمة سابقاً",
     "header_protocol": "بروتوكول",
-    "loading": "جاري التحميل..."
+    "loading": "جاري التحميل...",
+    "card_suggestions": "اقتراحات",
+    "card_subTitleImpostor": "استنتاج اجتماعي",
+    "card_playerIdea": "هل لديك فكرة للعبة جديدة أو تحسينات؟ شاركها مع المطور!",
+    "card_subTitleCrypto": "منطق واستراتيجية",
+    "card_subTitleSuggestion": "آراء",
+    "card_minSuggestion": "خاص",
+    "card_min": "الأدنى",
+    "card_typeMystery": "غموض",
+    "card_typeParty": "حفلة",
+    "card_typeTeams": "فرق",
+    "card_typeCode": "كود",
+    "card_typeCommu": "مجتمع",
+    "card_typeFuture": "قريباً",
+    "card_playBtn": "العب الآن",
+    "card_sendIdeaBtn": "أرسل فكرة",
+    "modal_newIdea": "فكرة جديدة",
+    "modal_sugDesc": "سيتم إرسال اقتراحك مباشرة إلى المطور.",
+    "modal_playerDesc": "صف اقتراحك أو تحسيناتك...",
+    "modal_send": "إرسال"
   },
 
   "alerts": {
@@ -228,9 +247,9 @@
     "impostor_spectator_systemStatus": "حالة النظام:",
     "impostor_spectator_waitingEnd": "بانتظار نهاية المهمة...",
 
-    "impostor_desc": "كن حذراً! يحصل جميع أعضاء الطاقم على كلمة واحدة، ما عدا المنتحل. اكتشف من يتظاهر واطرده من السفينة.",
+    "impostor_desc": "كن حذراً! الجميع يحصل على كلمة سرية إلا المنتحل. اكشف المتسلل قبل فوات الأوان. تنتهي اللعبة عند القضاء على جميع المنتحلين أو عندما يتساوى عددهم مع عدد الطاقم.",
+    "cripto_desc": "اتصال تكتيكي! يجب على فريقك فك تشفير الكلمة عبر تلميحات دقيقة من المشغل. يفوز الفريق صاحب أكبر عدد من الإجابات الصحيحة.",
     "cripto_title": "التشفير",
-    "cripto_desc": "اتصال تكتيكي! أعطِ تلميحات دقيقة لفريقك لفك تشفير الكلمة.",
 
     "cryptography_title": "التشفير",
     "cryptography_phase_team_reveal": "تعريف",
@@ -325,7 +344,7 @@
     "cryptography_result_bestOp": "أفضل مشغل",
     "cryptography_result_noWord": "لا توجد كلمة",
 
-    "cryptography_alert_emptyTeam": "تنبيه: جميع الفرق تحتاج لعضو واحد على الأقل!",
+    "cryptography_alert_emptyTeam": "تنبيه: جميع الفرق تحتاج إلى عضو واحد على الأقل!",
     "cryptography_alert_minPlayers": "بروتوكول غير صالح: مع 4 لاعبين أو أكثر، يجب أن تتكون كل مجموعة من شخصين على الأقل."
   }
 }

@@ -44,7 +44,7 @@ export const PlayerStatusModal = ({ visible, onClose, players, statusType }: Pla
             </CustomText>
             <TouchableOpacity
               onPress={() => {
-                onClose;
+                onClose();
                 playSound("click2");
               }}
               hitSlop={20}
@@ -88,7 +88,7 @@ export const PlayerStatusModal = ({ visible, onClose, players, statusType }: Pla
           <TouchableOpacity
             style={styles.closeBtn}
             onPress={() => {
-              onClose;
+              onClose();
               playSound("click2");
             }}
           >

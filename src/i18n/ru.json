@@ -13,7 +13,26 @@
     "settings_clearDBTitle": "ОЧИСТИТЬ ДАННЫЕ",
     "settings_clearDBSub": "СБРОСИТЬ ИСПОЛЬЗОВАННЫЕ СЛОВА",
     "header_protocol": "ПРОТОКОЛ",
-    "loading": "Загрузка..."
+    "loading": "Загрузка...",
+    "card_suggestions": "ПРЕДЛОЖЕНИЯ",
+    "card_subTitleImpostor": "СОЦИАЛЬНАЯ ДЕДУКЦИЯ",
+    "card_playerIdea": "Есть идеи для новых игр или улучшений? Поделитесь ими с разработчиком!",
+    "card_subTitleCrypto": "ЛОГИКА И СТРАТЕГИЯ",
+    "card_subTitleSuggestion": "ОТЗЫВ",
+    "card_minSuggestion": "ЛИЧКА",
+    "card_min": "МИН.",
+    "card_typeMystery": "ТАЙНА",
+    "card_typeParty": "ВЕЧЕРИНКА",
+    "card_typeTeams": "КОМАНДЫ",
+    "card_typeCode": "ШИФР",
+    "card_typeCommu": "СООБЩЕСТВО",
+    "card_typeFuture": "СКОРО",
+    "card_playBtn": "ИГРАТЬ СЕЙЧАС",
+    "card_sendIdeaBtn": "ОТПРАВИТЬ ИДЕЮ",
+    "modal_newIdea": "НОВАЯ ИДЕЯ",
+    "modal_sugDesc": "Ваше предложение будет отправлено напрямую разработчику.",
+    "modal_playerDesc": "Опишите ваше предложение или улучшения...",
+    "modal_send": "ОТПРАВИТЬ"
   },
 
   "alerts": {
@@ -228,9 +247,9 @@
     "impostor_spectator_systemStatus": "СОСТОЯНИЕ СИСТЕМЫ:",
     "impostor_spectator_waitingEnd": "ОЖИДАНИЕ ЗАВЕРШЕНИЯ МИССИИ...",
 
-    "impostor_desc": "Будьте бдительны! Все получают слово, кроме самозванца. Узнайте, кто притворяется, и выбросьте его за борт.",
+    "impostor_desc": "Будьте бдительны! Все получают секретное слово, кроме самозванца. Найдите предателя, пока не стало слишком поздно. Игра заканчивается, когда самозванцы изгнаны или их число сравнялось с экипажем.",
+    "cripto_desc": "Тактическая связь! Ваша команда должна расшифровать слово по точным подсказкам оператора. Побеждает отряд с наибольшим количеством очков.",
     "cripto_title": "КРИПТОГРАФИЯ",
-    "cripto_desc": "Тактическая связь! Дайте точные подсказки, чтобы ваша команда расшифровала слово.",
 
     "cryptography_title": "КРИПТОГРАФИЯ",
     "cryptography_phase_team_reveal": "ФОРМИРОВАНИЕ",
@@ -325,7 +344,7 @@
     "cryptography_result_bestOp": "ЛУЧШИЙ ОПЕРАТОР",
     "cryptography_result_noWord": "НЕТ СЛОВ",
 
-    "cryptography_alert_emptyTeam": "Внимание: В каждом отряде должен быть минимум 1 боец!",
+    "cryptography_alert_emptyTeam": "В каждом отряде должен быть минимум 2 боец!",
     "cryptography_alert_minPlayers": "Нарушение протокола: Если игроков 4 и более, в каждой группе должно быть минимум 2 человека."
   }
 }

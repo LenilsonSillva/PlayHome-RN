@@ -109,16 +109,19 @@ export const LobbyOffline = () => {
   };
 
   const handleStartMission = async () => {
-    if (players.length < teamCount) {
-      showAlert(t("alerts.error"), t("alerts.cryptography_lobby_feewPlayers"));
+    if (players.length < teamCount * 2) {
+      showAlert(t("alerts.error"), t("alerts.cryptography_min_players_per_team"));
       return;
     }
 
+    // 2. Validação específica para distribuição Manual
     if (distributionType === "manual") {
       const teamCounts = new Array(teamCount).fill(0);
       players.forEach((p) => teamCounts[manualAssignments[p.id] || 0]++);
-      if (teamCounts.some((count) => count === 0)) {
-        showAlert(t("alerts.warning"), t("games.cryptography_alert_emptyTeam"));
+
+      const hasInvalidTeam = teamCounts.some((count) => count < 2);
+      if (hasInvalidTeam) {
+        showAlert(t("alerts.warning"), t("games.cryptography_alert_emptyTeam")); // "Cada esquadrão deve ter pelo menos 2 integrantes."
         return;
       }
     }
@@ -133,13 +136,6 @@ export const LobbyOffline = () => {
     };
 
     const globalUsedWords = await loadGlobalUsedWords();
-
-    console.log("🎮 Crypto Lobby: Enviando para jogo:", {
-      idioma: i18n.language,
-      palavrasCarregadas: currentWords.length,
-      categoriasDisponiveis: ALL_CATEGORIES.length
-    });
-
     playSound("click");
 
     navigation.navigate("OfflineCryptographyGame", {
@@ -253,11 +249,18 @@ export const LobbyOffline = () => {
             </CustomText>
             <TouchableOpacity
               onPress={() => {
-                setTeamCount(Math.min(players.length, teamCount + 1));
-                playSound("click2");
+                // Regra: Máximo de times é total de jogadores / 2
+                const maxPossibleTeams = Math.floor(players.length / 2);
+                if (teamCount < maxPossibleTeams) {
+                  setTeamCount(teamCount + 1);
+                  playSound("click2");
+                } else {
+                  showAlert(t("alerts.warning"), t("alerts.cryptography_max_teams_reached"));
+                }
               }}
-              style={[styles.cBtn, teamCount >= players.length && styles.btnDisabled]}
-              disabled={teamCount >= players.length}
+              // Desabilita se aumentar o time for violar a regra de 2 por grupo
+              style={[styles.cBtn, teamCount >= Math.floor(players.length / 2) && styles.btnDisabled]}
+              disabled={teamCount >= Math.floor(players.length / 2)}
             >
               <CustomText variant="h2" style={{ color: "#FFF" }}>
                 +
@@ -420,7 +423,7 @@ export const LobbyOffline = () => {
       <View style={styles.footer}>
         <TouchableOpacity
           style={[styles.startBtn, players.length < teamCount && { opacity: 0.5 }]}
-          disabled={players.length < teamCount}
+          disabled={players.length < 4 || players.length < teamCount * 2}
           onPress={handleStartMission}
         >
           <CustomText variant="h2" style={styles.startBtnText}>

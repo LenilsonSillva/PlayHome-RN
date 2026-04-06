@@ -17,8 +17,6 @@ export function commonReducer(state: CryptoGameState | null, action: GameAction)
 
       const initialTeamIndex = Math.floor(Math.random() * teams.length);
 
-      console.log("🎮 Crypto START_GAME: wordDatabase tamanho:", action.wordDatabase?.length || 0, "lang:", action.langCode);
-
       return {
         config: action.config,
         phase: "team-reveal",

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
-import { View, StyleSheet, Dimensions, TouchableOpacity, Text, ActivityIndicator } from "react-native";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { View, StyleSheet, Dimensions, TouchableOpacity, Text, ActivityIndicator, useWindowDimensions } from "react-native";
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, {
   useSharedValue,
@@ -23,11 +23,6 @@ import { useAlert } from "@/contexts/alertContext";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useAudio } from "@/contexts/audioContext";
 
-const { width } = Dimensions.get("window");
-// Math.floor para evitar erros de precisão aritmética no iOS
-const CARD_WIDTH = Math.floor(width * 0.82);
-const CARD_HEIGHT = 480;
-
 interface RevealPhaseProps {
   player: ImpostorPlayer;
   data: ImpostorGame | OnlineImpostorGame;
@@ -41,7 +36,37 @@ interface RevealPhaseProps {
 export const RevealPhase = ({ player, data, isOnline, onNext, isLast, revealedAfterReroll, onPlayerReady }: RevealPhaseProps) => {
   const { t } = useTranslation();
   const { playSound } = useAudio();
+  const { width, height } = useWindowDimensions();
   const [isFlipped, setIsFlipped] = useState(false);
+
+  // Dimensões responsivas: altura sempre maior que largura
+  const { CARD_WIDTH, CARD_HEIGHT } = useMemo(() => {
+    const isPortrait = height >= width;
+    let cardWidth: number;
+    let cardHeight: number;
+
+    if (isPortrait) {
+      // Celular em retrato: 85% da largura
+      cardWidth = Math.floor(width * 0.85);
+      cardHeight = Math.floor(cardWidth * 1.4); // Altura > largura
+    } else {
+      // Celular em paisagem: 85% da altura
+      cardHeight = Math.floor(height * 0.85);
+      cardWidth = Math.floor(cardHeight / 1.3); // Mantém proporção
+    }
+
+    return { CARD_WIDTH: cardWidth, CARD_HEIGHT: cardHeight };
+  }, [width, height]);
+
+  // Tamanhos responsivos para emoji e nome
+  const { avatarSize, playerNameFontSize } = useMemo(() => {
+    // Avatar: 25% da altura do card (reduzido mas não muito)
+    const avatar = Math.floor(CARD_HEIGHT * 0.27);
+    // Nome: escala de acordo com o tamanho da tela (fonte responsiva)
+    const scale = Math.min(width, height) / 375;
+    const fontSize = Math.floor(22 * scale);
+    return { avatarSize: avatar, playerNameFontSize: fontSize };
+  }, [CARD_WIDTH, CARD_HEIGHT, width, height]);
 
   // Valores Animados
   const rotation = useSharedValue(0); // 0 a 180
@@ -69,7 +94,7 @@ export const RevealPhase = ({ player, data, isOnline, onNext, isLast, revealedAf
         easing: Easing.out(Easing.quad) // Usei 'out' para ela parar suavemente
       });
     }
-  }, [player]); // Reinicia sempre que o jogador mudar
+  }, [player, CARD_WIDTH]); // Reinicia sempre que o jogador mudar ou dimensões mudarem
 
   // Reset instantâneo ao trocar de jogador
   useEffect(() => {
@@ -111,7 +136,7 @@ export const RevealPhase = ({ player, data, isOnline, onNext, isLast, revealedAf
       });
       startHandAnimation();
     }
-  }, [revealedAfterReroll, player.word]);
+  }, [revealedAfterReroll, player.word, CARD_WIDTH]);
 
   const handProgress = useSharedValue(0); // 0 = Início (Direita), 1 = Fim (Esquerda)
   const startHandAnimation = () => {
@@ -261,7 +286,7 @@ export const RevealPhase = ({ player, data, isOnline, onNext, isLast, revealedAf
       <View style={styles.container}>
         <View style={styles.cardArea}>
           <GestureDetector gesture={panGesture}>
-            <Animated.View style={[styles.cardContainer, containerFadeStyle]}>
+            <Animated.View style={[{ width: CARD_WIDTH, height: CARD_HEIGHT }, containerFadeStyle]}>
               {/* FACE FRONTAL (Oculta - Estilo Verso da Carta) */}
               <Animated.View style={[styles.cardBase, frontStyle, { backgroundColor: player.color }]}>
                 <View style={styles.cardBorder}>
@@ -279,18 +304,18 @@ export const RevealPhase = ({ player, data, isOnline, onNext, isLast, revealedAf
                       color={player.color}
                       bgColor="rgba(0,0,0,0.32)"
                       borderRadius={10}
-                      size={130}
+                      size={avatarSize}
                       hideScan={true}
                     />
-                    <CustomText variant="h2" style={styles.roleLabel}>
+                    <CustomText variant="h2" style={[styles.roleLabel, { fontSize: playerNameFontSize }]}>
                       {player.name.toUpperCase()}
                     </CustomText>
                   </View>
 
                   {/* --- CONTAINER DA ONDA --- */}
-                  <View style={styles.waveMask}>
+                  <View style={[styles.waveMask, { width: CARD_WIDTH, height: CARD_HEIGHT * 0.5 }]}>
                     {/* A ONDA (SVG que se move) */}
-                    <Animated.View style={[styles.waveAnimatedContainer, animatedWaveStyle]}>
+                    <Animated.View style={[styles.waveAnimatedContainer, animatedWaveStyle, { width: CARD_WIDTH * 2 }]}>
                       <Svg height="100%" width={CARD_WIDTH * 2} viewBox="0 0 1440 320" preserveAspectRatio="none">
                         <Path
                           fill={getWaveColor()}
@@ -335,8 +360,16 @@ export const RevealPhase = ({ player, data, isOnline, onNext, isLast, revealedAf
                       <CustomText>
                         {player.isImpostor ? t("games.impostor_reveal_youAre") : t("games.impostor_reveal_yourWordIs")}
                       </CustomText>
-                      <CustomText variant="h1" style={[styles.mainWord, { color: accentColor }]}>
-                        {player.isImpostor ? "IMPOSTOR" : player.word}
+                      <CustomText 
+                        variant="h1" 
+                        style={[
+                          styles.mainWord, 
+                          { 
+                            color: accentColor
+                          }
+                        ]}
+                      >
+                        {player.isImpostor ? t("games.impostor_title") : player.word}
                       </CustomText>
                     </View>
                     {player.isImpostor && player.hint && (
@@ -447,12 +480,7 @@ export const RevealPhase = ({ player, data, isOnline, onNext, isLast, revealedAf
               variant="h3"
               style={{
                 color: COLORS.white,
-                // Sombra com a cor do tema (ex: Ciano ou Vermelho)
-                textShadowColor: isFlipped ? player.color + "FF" : player.color,
-                textShadowOffset: { width: 0, height: 1 }, // Centralizada para brilhar ao redor
-                shadowOpacity: 0.5,
-                textShadowRadius: 5,
-                fontWeight: "900" // Letras mais grossas destacam melhor o brilho
+                fontWeight: "900"
               }}
             >
               {!isOnline ? (
@@ -501,7 +529,6 @@ export const RevealPhase = ({ player, data, isOnline, onNext, isLast, revealedAf
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   cardArea: { flex: 1, justifyContent: "center", alignItems: "center" },
-  cardContainer: { width: CARD_WIDTH, height: CARD_HEIGHT },
   cardBase: {
     ...StyleSheet.absoluteFillObject,
     backfaceVisibility: "hidden",
@@ -557,8 +584,6 @@ const styles = StyleSheet.create({
   waveMask: {
     position: "absolute",
     bottom: 0,
-    width: CARD_WIDTH,
-    height: 260,
     borderBottomLeftRadius: 31,
     borderBottomRightRadius: 31,
     overflow: "hidden",
@@ -569,8 +594,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 0,
     bottom: 0,
-    height: "100%",
-    width: CARD_WIDTH * 2
+    height: "100%"
   },
   staticContent: {
     ...StyleSheet.absoluteFillObject,
@@ -579,15 +603,22 @@ const styles = StyleSheet.create({
   },
 
   // Back Side
-  revealInfo: { alignItems: "center", marginTop: 30 },
+  revealInfo: {
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
+    width: "100%",
+    paddingBottom: 60
+  },
   roleLabel: {
-    backgroundColor: "rgba(0,0,0,0.3)",
+    backgroundColor: "rgba(0,0,0,0.2)",
     color: "#FFF",
-    paddingHorizontal: 15,
-    paddingVertical: 5,
-    borderRadius: 10,
-    marginTop: 5,
-    overflow: "hidden"
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 8,
+    marginTop: 8,
+    overflow: "hidden",
+    textAlign: "center"
   },
   wordSection: {
     alignItems: "center",
@@ -601,9 +632,21 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     width: "100%",
     alignItems: "center",
-    elevation: 5
+    overflow: "hidden"
   },
-  mainWord: { color: "#000", fontSize: 36, textAlign: "center" },
+  mainWord: { 
+    color: "#000", 
+    fontSize: 36, 
+    textAlign: "center",
+    textShadowColor: "transparent",
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 0,
+    shadowColor: "transparent",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0
+  },
 
   // Show impostor names
 

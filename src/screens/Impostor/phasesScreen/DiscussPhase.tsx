@@ -93,7 +93,11 @@ export const DiscussPhase = ({
                   {t("games.impostor_discuss_whoStart")}
                 </CustomText>
                 <CustomText variant="h2" style={styles.starterName}>
-                  {!isOnline ? data.whoStart : data.whoStart === onlinePlayer?.name ? "VOCÊ" : data.whoStart}
+                  {!isOnline
+                    ? data.whoStart
+                    : data.whoStart === onlinePlayer?.name
+                      ? t("games.impostor_lobby_you")
+                      : data.whoStart}
                 </CustomText>
               </View>
               <View style={styles.starterAvatarWrapper}>
@@ -140,7 +144,7 @@ export const DiscussPhase = ({
                   />
                   <View style={styles.nameBox}>
                     <CustomText variant="h3" style={styles.pName}>
-                      {!isOnline ? player.name : onlinePlayer?.id === player.id ? "VOCÊ" : player.name}
+                      {!isOnline ? player.name : onlinePlayer?.id === player.id ? t("games.impostor_lobby_you") : player.name}
                     </CustomText>
                     <CustomText variant="hint" style={styles.pStatus}>
                       {player.isAlive ? t("games.impostor_discuss_isAlive") : t("games.impostor_discuss_notAlive")}

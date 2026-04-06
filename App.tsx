@@ -16,9 +16,10 @@ import { OfflineImpostorGameScreen } from "@/screens/Impostor/gameScreen/Offline
 import { OnlineImpostorGameScreen } from "@/screens/Impostor/gameScreen/OnlineImpostorGameScreen";
 import { CryptographyLobby } from "@/screens/Criptography/lobby";
 import { OfflineCryptographyGameScreen } from "@/screens/Criptography/gameScreen/OfflineCryptographyGameScreen";
-import { AudioModule, InterruptionMode } from "expo-audio";
+import { AudioModule } from "expo-audio";
 import { AudioProvider } from "@/contexts/audioContext";
 import { WordData } from "@/games/common/data/words/types";
+import * as ScreenOrientation from "expo-screen-orientation"
 
 // Tipagem das rotas
 export type RootStackParamList = {
@@ -35,6 +36,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   useEffect(() => {
+    ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT)
     const setupAudio = async () => {
       try {
         await AudioModule.setAudioModeAsync({

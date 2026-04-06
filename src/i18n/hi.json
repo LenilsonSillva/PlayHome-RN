@@ -13,7 +13,26 @@
     "settings_clearDBTitle": "डेटा साफ़ करें",
     "settings_clearDBSub": "उपयोग किए गए शब्दों को साफ़ करता है",
     "header_protocol": "प्रोटोकॉल",
-    "loading": "लोड हो रहा है..."
+    "loading": "लोड हो रहा है...",
+    "card_suggestions": "सुझाव",
+    "card_subTitleImpostor": "सामाजिक कटौती",
+    "card_playerIdea": "क्या आपके पास नए गेम या सुधार के लिए कोई विचार है? इसे डेवलपर के साथ साझा करें!",
+    "card_subTitleCrypto": "तर्क और रणनीति",
+    "card_subTitleSuggestion": "फीडबैक",
+    "card_minSuggestion": "डायरेक्ट",
+    "card_min": "न्यूनतम",
+    "card_typeMystery": "रहस्य",
+    "card_typeParty": "पार्टी",
+    "card_typeTeams": "टीमें",
+    "card_typeCode": "कोड",
+    "card_typeCommu": "समुदाय",
+    "card_typeFuture": "जल्द आ रहा है",
+    "card_playBtn": "अभी खेलें",
+    "card_sendIdeaBtn": "सुझाव भेजें",
+    "modal_newIdea": "नया विचार",
+    "modal_sugDesc": "आपका सुझाव सीधे डेवलपर को भेजा जाएगा।",
+    "modal_playerDesc": "अपने सुझाव या सुधार का वर्णन करें...",
+    "modal_send": "भेजें"
   },
 
   "alerts": {
@@ -228,9 +247,9 @@
     "impostor_spectator_systemStatus": "सिस्टम की स्थिति:",
     "impostor_spectator_waitingEnd": "मिशन समाप्त होने की प्रतीक्षा है...",
 
-    "impostor_desc": "सतर्क रहें! पाखंडी को छोड़कर सभी सदस्यों को एक शब्द मिलता है। पता लगाएं कि कौन नाटक कर रहा है और उसे बाहर निकालें।",
+    "impostor_desc": "सतर्क रहें! पाखंडी (Impostor) को छोड़कर सभी को एक गुप्त शब्द मिलता है। इससे पहले कि देर हो जाए, घुसपैठिए को पहचानें। खेल तब समाप्त होता है जब सभी पाखंडी पकड़े जाते हैं या उनकी संख्या क्रू के बराबर हो जाती है।",
+    "cripto_desc": "रणनीतिक संचार! आपकी टीम को ऑपरेटर के सटीक संकेतों के माध्यम से शब्द को डिको드 करना होगा। सबसे अधिक सही उत्तर देने वाली टीम जीतती है।",
     "cripto_title": "क्रिप्टोग्राफी",
-    "cripto_desc": "रणनीतिक संचार! अपनी टीम को शब्द डिक्रिप्ट करने के लिए सटीक संकेत दें।",
 
     "cryptography_title": "क्रिप्टोग्राफी",
     "cryptography_phase_team_reveal": "परिभाषा",
@@ -325,7 +344,7 @@
     "cryptography_result_bestOp": "सर्वश्रेष्ठ ऑपरेटर",
     "cryptography_result_noWord": "कोई शब्द नहीं",
 
-    "cryptography_alert_emptyTeam": "ध्यान दें: सभी दस्तों में कम से कम 1 सदस्य होना चाहिए!",
+    "cryptography_alert_emptyTeam": "सभी दस्तों में कम से कम 2 सदस्य होना चाहिए!",
     "cryptography_alert_minPlayers": "अमान्य प्रोटोकॉल: 4 या अधिक खिलाड़ियों के साथ, प्रत्येक समूह में कम से कम 2 लोग होने चाहिए।"
   }
 }

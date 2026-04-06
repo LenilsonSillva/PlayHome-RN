@@ -287,7 +287,7 @@ export const EliminatedReport = ({ player, allPlayers, votes, wasVoting, onNext,
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   scrollContent: {
-    alignContent: "center",
+    alignItems: "center",
     justifyContent: "center",
     minHeight: "100%",
     width: "100%"
@@ -295,10 +295,11 @@ const styles = StyleSheet.create({
 
   // Estilos do Crachá
   badgeWrapper: {
-    height: 280,
+    aspectRatio: 2 / 1.4,
     width: "100%",
-    maxWidth: 450,
+    maxWidth: 600,
     marginBottom: 40,
+    maxHeight: 400,
     alignContent: "center",
     justifyContent: "center"
   },

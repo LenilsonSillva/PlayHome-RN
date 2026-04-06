@@ -54,12 +54,6 @@ export function OfflineCryptographyGameScreen() {
   // ⭐ Dependências Corrigidas (Inicia o jogo apenas 1x)
   useEffect(() => {
     if (route.params?.config && players.length > 0 && !gameState) {
-      console.log(
-        "🎮 Crypto: Iniciando jogo com wordDatabase?",
-        !!route.params?.wordDatabase,
-        "langCode:",
-        route.params?.langCode
-      );
       startGame(
         players,
         route.params.config,

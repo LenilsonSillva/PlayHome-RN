@@ -1,24 +1,70 @@
 {
   "home": {
-    "loading": "A carregar..."
+    "loading": "A carregar...",
+    "card_suggestions": "SUGESTÕES",
+    "card_subTitleImpostor": "DEDUÇÃO SOCIAL",
+    "card_playerIdea": "Tens alguma ideia para um novo jogo ou melhorias? Partilha com o desenvolvedor!",
+    "card_subTitleCrypto": "LÓGICA E ESTRATÉGIA",
+    "card_subTitleSuggestion": "FEEDBACK",
+    "card_minSuggestion": "DIRECT",
+    "card_min": "MÍN.",
+    "card_typeMystery": "MISTÉRIO",
+    "card_typeParty": "DINÂMICO",
+    "card_typeTeams": "EQUIPAS",
+    "card_typeCode": "CÓDIGO",
+    "card_typeCommu": "COMUNIDADE",
+    "card_typeFuture": "BREVEMENTE",
+    "card_playBtn": "JOGAR AGORA",
+    "card_sendIdeaBtn": "ENVIAR IDEIA",
+    "modal_newIdea": "NOVA IDEIA",
+    "modal_sugDesc": "A tua sugestão será enviada diretamente para o desenvolvedor.",
+    "modal_playerDesc": "Descreve a tua sugestão ou melhorias...",
+    "modal_send": "ENVIAR"
   },
   "alerts": {
     "noConnection": "Sem ligação ao servidor.",
     "lostConnection": "Sem ligação ao servidor. Verifique a sua internet ou aguarde um pouco.",
     "impostor_closingRoom": "Jogadores insuficientes. A voltar ao lobby.",
-    "impostor_waitOthers": "Aguarde que todos fiquem prontos.",
-    "header_quitGame": "Sair da partida"
+    "header_quitGame": "Sair da partida",
+    "impostor_newHost": "AGORA É O NOVO COMANDANTE!",
+    "impostor_lastHostLeft": "O comandante anterior desligou-se, agora assume o controlo.",
+    "impostor_waitOthers": "Aguarde que todos estejam prontos.",
+    "impostor_hostMustStart": "O anfitrião deve iniciar a partida.",
+    "impostor_crewmateName": "Introduza o seu nome de tripulante."
   },
   "games": {
     "impostor_lobby_VideoGame": "Videojogos",
+    "impostor_lobby_you_": "(TU)",
     "impostor_lobby_explainCreateRoom": "GERE UM CÓDIGO E CONVIDE A TRIPULAÇÃO PARA JOGAR CADA UM NO SEU TELEMÓVEL.",
-    "impostor_discuss_subtitle": "Debatam e analisem as dicas de cada tripulante. O infiltrado está entre vós.",
+    "impostor_lobby_explainJoinRoom": "INSIRA UM CÓDIGO DO SEU LÍDER PARA SINCRONIZAR O SEU DISPOSITIVO COM A ESTAÇÃO.",
+    "impostor_reveal_youStart": "COMEÇAS A PARTIDA!",
+    "impostor_reveal_youAre": "ÉS O",
+    "impostor_reveal_yourWordIs": "A TUA PALAVRA É:",
     "impostor_result_nextMission": "PRÓXIMA RONDA",
+    "impostor_discuss_subtitle": "Debatam e analisem as pistas de cada tripulante. O infiltrado está entre vós.",
+    "impostor_discuss_reviewClick": "CLICA NO TEU NOME",
+    "impostor_discuss__modalReview_youAre": "ÉS O",
+    "impostor_discuss_waitHost": "Aguarda que o anfitrião inicie a votação...",
+    "impostor_voting_youEliminated": "FOSTE ELIMINADO",
+    "impostor_voting_waitingOthers": "A aguardar que os outros jogadores votem...",
+
+    "impostor_eliminated_waitHost": "Aguarda pelo anfitrião para prosseguir...",
+    "impostor_desc": "Fica atento! Todos recebem uma palavra secreta, exceto o impostor. Descobre o infiltrado antes que seja tarde. O jogo termina quando os impostores são eliminados ou superam a tripulação.",
+    "cripto_desc": "Comunicação tática! A tua equipa deve decifrar a palavra através de dicas precisas do operador. Vence a equipa com mais acertos.",
+
+    "impostor_result_waitHost": "Aguarda que o anfitrião inicie outra partida...",
+    "impostor_newHost": "TU ÉS O NOVO COMANDANTE!",
+    "cryptography_lobby_playerName": "Nome do Jogador",
+    "cryptography_infiltration_desc": "Um operador recebe uma palavra e os seus colegas tentam adivinhá-la. Uma equipa de cada vez, acerta o máximo de palavras antes do tempo terminar.",
+    "cryptography_interception_desc": "Os operadores recebem a mesma palavra. Cada um dá uma pista de cada vez; vence a equipa que acertar primeiro.",
+    "cryptography_action_players": "Jogadores",
+    "cryptography_result_lobby": "VOLTAR AO LOBBY ⚙️",
+    "cryptography_alert_minPlayers": "Protocolo inválido: Com 4 ou mais jogadores, cada grupo deve ter no mínimo 2 pessoas.",
     "cryptography_lobby_crewmates": "Jogadores",
     "cryptography_action_team": "EQUIPA",
     "cryptography_result_round": "FIM DA RONDA",
     "cryptography_result_tie": "EMPATE NA RONDA",
     "cryptography_result_roundPts": "na ronda",
-    "cryptography_alert_emptyTeam": "Atenção: Todos os esquadrões precisam de pelo menos um membro da tripulação!"
+    "cryptography_alert_emptyTeam": "Todos os esquadrões precisam de pelo menos um membro da tripulação!"
   }
 }
