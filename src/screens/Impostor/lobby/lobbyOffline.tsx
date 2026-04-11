@@ -24,12 +24,15 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { useTranslation } from "react-i18next";
 import { loadGlobalUsedWords } from "@/games/common/utils/wordStorage";
 import { getWordDatabase } from "@/games/common/data/words";
+import { canShowAd, isRewardedAdReady, markAdAsShown, showRewardedAd } from "@/services/ads/adsService";
+import { useAlert } from "@/contexts/alertContext";
 
 export const LobbyOffline = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { players, addPlayer, removePlayer, updatePlayer } = usePlayers();
   const { playSound } = useAudio();
   const { t, i18n } = useTranslation();
+  const { showAlert } = useAlert();
   const { width } = useWindowDimensions();
   const isLargeScreen = width > 600;
 
@@ -110,6 +113,37 @@ export const LobbyOffline = () => {
   const handleChangeEmoji = (id: string) => {
     updatePlayer(id, { emoji: getUnusedEmoji() });
     playSound("click2");
+  };
+
+  const confirmStartWithAd = (callback: () => void) => {
+    if (!canShowAd()) {
+      callback();
+      return;
+    }
+
+    if (!isRewardedAdReady()) {
+      callback();
+      return;
+    }
+
+    // ✅ ALERTA CONTROLADO
+    impostorTrap || twoWords
+      ? showAlert(t("alerts.advancedMode"), t("alerts.advancedModeDesc"), undefined, [
+          {
+            text: t("alerts.cancel"),
+            style: "cancel"
+          },
+          {
+            text: t("alerts.watchAd"),
+            onPress: () => {
+              showRewardedAd(() => {
+                callback(); // 🔥 só aqui inicia
+              });
+              markAdAsShown();
+            }
+          }
+        ])
+      : callback();
   };
 
   const handleStartMission = async () => {
@@ -406,7 +440,7 @@ export const LobbyOffline = () => {
             style={[styles.startBtn, players.length < 3 && styles.startBtnDisabled]}
             disabled={players.length < 3}
             activeOpacity={0.8}
-            onPress={handleStartMission}
+            onPress={() => confirmStartWithAd(handleStartMission)}
           >
             <CustomText variant="h2" style={styles.startBtnText}>
               {t("games.impostor_lobby_startMission")}

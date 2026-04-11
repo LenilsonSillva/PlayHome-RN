@@ -10,6 +10,7 @@ import { clearGlobalUsedWords } from "@/games/common/utils/wordStorage";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useAudio } from "@/contexts/audioContext";
 import { ScrollView, GestureHandlerRootView } from "react-native-gesture-handler";
+import { PremiumModal } from "../AdsModal/PremiumModal";
 
 interface SettingsModalProps {
   visible: boolean;
@@ -55,6 +56,7 @@ export const SettingsModal = ({
   const [isLangListVisible, setIsLangListVisible] = useState(false); // Controle da tela de idiomas
   const [changeRevealIcon, setChangeRevealIcon] = useState(false);
   const [changeDBIcon, setChangeDBIcon] = useState(false);
+  const [isPremiumVisible, setIsPremiumVisible] = useState(false);
 
   // Alternar Áudio
   const handleToggleAudio = () => {
@@ -121,115 +123,139 @@ export const SettingsModal = ({
 
                 {!isLangListVisible ? (
                   // --- VISÃO ORIGINAL DAS CONFIGURAÇÕES ---
-                  <View style={styles.optionsBody}>
-                    {showChangeWordBtn && (
-                      <TouchableOpacity style={styles.optionRow} onPress={changeWordBtn}>
-                        <View>
-                          <CustomText variant="h3" style={styles.whiteText}>
-                            {t("games.impostor_reveal_changeWord")}
-                          </CustomText>
-                          <CustomText variant="hint">{t("games.impostor_reveal_changeWord_sub")}</CustomText>
-                        </View>
-                        <View style={styles.badge}>
-                          {changeRevealIcon ? (
-                            <MaterialIcons name="done-outline" size={24} color={COLORS.cyan} />
-                          ) : (
-                            <FontAwesome5 name="exchange-alt" size={24} color={COLORS.cyan} />
-                          )}
-                        </View>
-                      </TouchableOpacity>
-                    )}
+                  <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }} nestedScrollEnabled={true}>
+                    <View style={styles.optionsBody}>
+                      {showChangeWordBtn && (
+                        <TouchableOpacity style={styles.optionRow} onPress={changeWordBtn}>
+                          <View>
+                            <CustomText variant="h3" style={styles.whiteText}>
+                              {t("games.impostor_reveal_changeWord")}
+                            </CustomText>
+                            <CustomText variant="hint">{t("games.impostor_reveal_changeWord_sub")}</CustomText>
+                          </View>
+                          <View style={styles.badge}>
+                            {changeRevealIcon ? (
+                              <MaterialIcons name="done-outline" size={24} color={COLORS.cyan} />
+                            ) : (
+                              <FontAwesome5 name="exchange-alt" size={24} color={COLORS.cyan} />
+                            )}
+                          </View>
+                        </TouchableOpacity>
+                      )}
 
-                    {showReviewWordBtn && (
+                      {showReviewWordBtn && (
+                        <TouchableOpacity
+                          style={styles.optionRow}
+                          onPress={() => {
+                            onToggleReview?.(!reviewEnabled);
+                            playSound("click2");
+                          }}
+                        >
+                          <View>
+                            <CustomText variant="h3" style={styles.whiteText}>
+                              {t("games.impostor_discuss_reviewWord")}
+                            </CustomText>
+                            <CustomText variant="hint">{t("games.impostor_discuss_reviewClick")}</CustomText>
+                          </View>
+                          <View style={[styles.switch, { borderColor: reviewEnabled ? COLORS.success : COLORS.textSecondary }]}>
+                            <View
+                              style={[
+                                styles.switchDot,
+                                {
+                                  backgroundColor: reviewEnabled ? COLORS.success : COLORS.textSecondary,
+                                  marginLeft: reviewEnabled ? 22 : 2
+                                }
+                              ]}
+                            />
+                          </View>
+                        </TouchableOpacity>
+                      )}
+
+                      {/* REMOVER ANUNCIOS */}
+
                       <TouchableOpacity
                         style={styles.optionRow}
                         onPress={() => {
-                          onToggleReview?.(!reviewEnabled);
+                          setIsPremiumVisible(true);
                           playSound("click2");
                         }}
                       >
-                        <View>
-                          <CustomText variant="h3" style={styles.whiteText}>
-                            {t("games.impostor_discuss_reviewWord")}
-                          </CustomText>
-                          <CustomText variant="hint">{t("games.impostor_discuss_reviewClick")}</CustomText>
+                        <View style={{ flex: 1 }}>
+                          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                            <CustomText variant="h3" style={{ color: COLORS.amber }}>
+                              {t("home.settings_adsRemovalTitle")}
+                            </CustomText>
+                          </View>
+                          <CustomText variant="hint">{t("home.settings_adsRemovalSub")}</CustomText>
                         </View>
-                        <View style={[styles.switch, { borderColor: reviewEnabled ? COLORS.success : COLORS.textSecondary }]}>
-                          <View
-                            style={[
-                              styles.switchDot,
-                              {
-                                backgroundColor: reviewEnabled ? COLORS.success : COLORS.textSecondary,
-                                marginLeft: reviewEnabled ? 22 : 2
-                              }
-                            ]}
-                          />
+                        <View style={styles.badgePremium}>
+                          <MaterialCommunityIcons name="crown" size={30} color={COLORS.amber} />
                         </View>
                       </TouchableOpacity>
-                    )}
 
-                    {/* BOTÃO PARA ABRIR LISTA DE IDIOMAS */}
-                    <TouchableOpacity style={styles.optionRow} onPress={toggleLangList}>
-                      <View>
-                        <CustomText variant="h3" style={styles.whiteText}>
-                          {t("home.lang_label")}
-                        </CustomText>
-                        <CustomText variant="hint">{t("home.lang_sub_label")}</CustomText>
-                      </View>
-                      <View style={styles.badge}>
-                        <CustomText style={{ fontSize: 24 }}>
-                          {/* 
+                      {/* BOTÃO PARA ABRIR LISTA DE IDIOMAS */}
+                      <TouchableOpacity style={styles.optionRow} onPress={toggleLangList}>
+                        <View>
+                          <CustomText variant="h3" style={styles.whiteText}>
+                            {t("home.lang_label")}
+                          </CustomText>
+                          <CustomText variant="hint">{t("home.lang_sub_label")}</CustomText>
+                        </View>
+                        <View style={styles.badge}>
+                          <CustomText style={{ fontSize: 24 }}>
+                            {/* 
                           Procura o idioma atual. 
                           1. Tenta o código exato (ex: pt-PT)
                           2. Se não achar, tenta o simplificado (ex: pt)
                           3. Fallback para bandeira dos EUA
                       */}
-                          {LANGUAGES.find((l) => l.code === i18n.language)?.flag ||
-                            LANGUAGES.find((l) => l.code === i18n.language.split("-")[0])?.flag ||
-                            "🇺🇸"}
-                        </CustomText>
-                      </View>
-                    </TouchableOpacity>
-
-                    {/* CONFIGURAÇÃO DE ÁUDIO */}
-                    <TouchableOpacity style={styles.optionRow} onPress={handleToggleAudio}>
-                      <View>
-                        <CustomText variant="h3" style={styles.whiteText}>
-                          {t("home.settings_audioTitle")}
-                        </CustomText>
-                        <CustomText variant="hint">{t("home.settings_audioSubTitle")}</CustomText>
-                      </View>
-                      <View style={[styles.switch, { borderColor: isAudioEnabled ? COLORS.success : COLORS.textSecondary }]}>
-                        <View
-                          style={[
-                            styles.switchDot,
-                            {
-                              backgroundColor: isAudioEnabled ? COLORS.success : COLORS.textSecondary,
-                              marginLeft: isAudioEnabled ? 22 : 2
-                            }
-                          ]}
-                        />
-                      </View>
-                    </TouchableOpacity>
-
-                    {showResetWords && (
-                      <TouchableOpacity style={styles.optionRow} onPress={handleResetHistory}>
-                        <View style={{ width: "80%" }}>
-                          <CustomText variant="h3" style={styles.whiteText}>
-                            {t("home.settings_clearDBTitle")}
+                            {LANGUAGES.find((l) => l.code === i18n.language)?.flag ||
+                              LANGUAGES.find((l) => l.code === i18n.language.split("-")[0])?.flag ||
+                              "🇺🇸"}
                           </CustomText>
-                          <CustomText variant="hint">{t("home.settings_clearDBSub")}</CustomText>
-                        </View>
-                        <View style={styles.badge}>
-                          {changeDBIcon ? (
-                            <MaterialIcons name="done-outline" size={24} color={COLORS.cyan} />
-                          ) : (
-                            <MaterialCommunityIcons name="database-refresh" size={24} color={COLORS.danger} />
-                          )}
                         </View>
                       </TouchableOpacity>
-                    )}
-                  </View>
+
+                      {/* CONFIGURAÇÃO DE ÁUDIO */}
+                      <TouchableOpacity style={styles.optionRow} onPress={handleToggleAudio}>
+                        <View>
+                          <CustomText variant="h3" style={styles.whiteText}>
+                            {t("home.settings_audioTitle")}
+                          </CustomText>
+                          <CustomText variant="hint">{t("home.settings_audioSubTitle")}</CustomText>
+                        </View>
+                        <View style={[styles.switch, { borderColor: isAudioEnabled ? COLORS.success : COLORS.textSecondary }]}>
+                          <View
+                            style={[
+                              styles.switchDot,
+                              {
+                                backgroundColor: isAudioEnabled ? COLORS.success : COLORS.textSecondary,
+                                marginLeft: isAudioEnabled ? 22 : 2
+                              }
+                            ]}
+                          />
+                        </View>
+                      </TouchableOpacity>
+
+                      {showResetWords && (
+                        <TouchableOpacity style={styles.optionRow} onPress={handleResetHistory}>
+                          <View style={{ width: "80%" }}>
+                            <CustomText variant="h3" style={styles.whiteText}>
+                              {t("home.settings_clearDBTitle")}
+                            </CustomText>
+                            <CustomText variant="hint">{t("home.settings_clearDBSub")}</CustomText>
+                          </View>
+                          <View style={styles.badge}>
+                            {changeDBIcon ? (
+                              <MaterialIcons name="done-outline" size={24} color={COLORS.cyan} />
+                            ) : (
+                              <MaterialCommunityIcons name="database-refresh" size={24} color={COLORS.danger} />
+                            )}
+                          </View>
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  </ScrollView>
                 ) : (
                   // --- VISÃO DA LISTA DE IDIOMAS (SCROLL) ---
                   <View style={styles.langListContainer}>
@@ -273,6 +299,7 @@ export const SettingsModal = ({
             </Cards>
           </View>
         </View>
+        <PremiumModal visible={isPremiumVisible} onClose={() => setIsPremiumVisible(false)} />
       </GestureHandlerRootView>
     </Modal>
   );
@@ -311,6 +338,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     gap: 15
+  },
+  badgePremium: {
+    backgroundColor: "rgba(255, 191, 0, 0.1)",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "rgba(255, 191, 0, 0.3)"
   },
   langListContainer: {
     flex: 1,

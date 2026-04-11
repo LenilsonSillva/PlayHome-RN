@@ -19,7 +19,10 @@ import { OfflineCryptographyGameScreen } from "@/screens/Criptography/gameScreen
 import { AudioModule } from "expo-audio";
 import { AudioProvider } from "@/contexts/audioContext";
 import { WordData } from "@/games/common/data/words/types";
-import * as ScreenOrientation from "expo-screen-orientation"
+import * as ScreenOrientation from "expo-screen-orientation";
+import MobileAds from "react-native-google-mobile-ads";
+import { loadInterstitialAd, loadRewardedAd } from "@/services/ads/adsService";
+import { setupIAP } from "@/services/iap/iapService";
 
 // Tipagem das rotas
 export type RootStackParamList = {
@@ -27,7 +30,7 @@ export type RootStackParamList = {
   Home: undefined;
   ImpostorLobby: undefined;
   CryptographyLobby: undefined;
-  ImpostorGame: { config: any; globalUsedWords?: string[], wordList: WordData[], langCode: string }; // Você pode definir o tipo correto para config conforme necessário;
+  ImpostorGame: { config: any; globalUsedWords?: string[]; wordList: WordData[]; langCode: string }; // Você pode definir o tipo correto para config conforme necessário;
   OnlineImpostorGame: { config: any };
   OfflineCryptographyGame: { config: any; manualAssignments?: any; globalUsedWords?: string[] };
 };
@@ -36,7 +39,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   useEffect(() => {
-    ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT)
+    ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
     const setupAudio = async () => {
       try {
         await AudioModule.setAudioModeAsync({
@@ -54,6 +57,13 @@ export default function App() {
       }
     };
     setupAudio();
+  }, []);
+
+  useEffect(() => {
+    // setupIAP();
+    MobileAds().initialize();
+    loadRewardedAd();
+    loadInterstitialAd();
   }, []);
 
   return (

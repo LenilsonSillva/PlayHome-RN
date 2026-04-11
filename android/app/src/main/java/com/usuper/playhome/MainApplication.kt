@@ -1,4 +1,4 @@
-package com.anonymous.playHome
+package com.usuper.playhome
 
 import android.app.Application
 import android.content.res.Configuration

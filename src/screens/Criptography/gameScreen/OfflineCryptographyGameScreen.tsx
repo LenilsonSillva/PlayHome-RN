@@ -17,6 +17,15 @@ import { RoundResult } from "../phasesScreen/RoundResult";
 import { InterceptionAction } from "../phasesScreen/InterceptionAction";
 import { saveGlobalUsedWords } from "@/games/common/utils/wordStorage";
 import { useAudio } from "@/contexts/audioContext";
+import {
+  canShowAd,
+  isInterstitialReady,
+  isRewardedAdReady,
+  markAdAsShown,
+  shouldShowInterstitial,
+  showInterstitialAd,
+  showRewardedAd
+} from "@/services/ads/adsService";
 
 export function OfflineCryptographyGameScreen() {
   const route = useRoute<any>();
@@ -93,6 +102,32 @@ export function OfflineCryptographyGameScreen() {
     };
   }, [gameState?.usedWords]);
 
+  const confirmAd = async (callback: () => void, type: "rewarded" | "interstitial") => {
+    if (!canShowAd()) return callback();
+
+    if (type === "rewarded") {
+      if (!isRewardedAdReady()) return callback();
+
+      showAlert(t("alerts.advancedMode"), t("alerts.advancedModeDesc"), undefined, [
+        { text: t("alerts.cancel"), style: "cancel", onPress: () => {} },
+        {
+          text: t("alerts.watchAd"),
+          onPress: () => {
+            showRewardedAd(callback);
+            markAdAsShown();
+          }
+        }
+      ]);
+      return;
+    }
+
+    // interstitial
+    if (!isInterstitialReady()) return callback();
+
+    showInterstitialAd().then(callback).catch(callback);
+    markAdAsShown();
+  };
+
   const handleStartTimerWithSound = () => {
     playSound("alert");
     startTimer();
@@ -131,12 +166,14 @@ export function OfflineCryptographyGameScreen() {
           text: t("alerts.quit"),
           style: "destructive",
           onPress: () => {
-            quitGame();
-            // Como é offline, apenas destruímos a tela atual e forçamos o recarregamento do Lobby
-            navigation.reset({
-              index: 1,
-              routes: [{ name: "Home" }, { name: "CryptographyLobby" }]
-            });
+            confirmAd(() => {
+              quitGame();
+              // Como é offline, apenas destruímos a tela atual e forçamos o recarregamento do Lobby
+              navigation.reset({
+                index: 1,
+                routes: [{ name: "Home" }, { name: "CryptographyLobby" }]
+              });
+            }, "interstitial");
           }
         }
       ]);
@@ -231,7 +268,35 @@ export function OfflineCryptographyGameScreen() {
           />
         )}
 
-        {gameState.phase === "round-result" && <RoundResult gameState={gameState} onNextRound={nextRound} />}
+        {gameState.phase === "round-result" && (
+          <RoundResult
+            gameState={gameState}
+            onNextRound={async () => {
+              const needsAd =
+                (gameState.config.mode === "infiltration" && gameState.config.roundTime !== 60) ||
+                (gameState.config.mode === "interception" && gameState.config.wordLimit !== 5);
+
+              if (needsAd) {
+                confirmAd(() => nextRound(), "rewarded");
+                return;
+              }
+
+              // 🔥 Interstitial (caso normal)
+              if (shouldShowInterstitial()) {
+                try {
+                  await showInterstitialAd();
+                  markAdAsShown();
+                } catch (e) {
+                  console.log("Ad não mostrou");
+                }
+
+                nextRound();
+              } else {
+                nextRound();
+              }
+            }}
+          />
+        )}
       </View>
     </View>
   );

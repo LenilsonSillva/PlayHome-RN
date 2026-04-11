@@ -9,6 +9,14 @@ import { useAlert } from "@/contexts/alertContext";
 import { useTranslation } from "react-i18next";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { useAudio } from "@/contexts/audioContext";
+import {
+  canShowAd,
+  isInterstitialReady,
+  isRewardedAdReady,
+  markAdAsShown,
+  showInterstitialAd,
+  showRewardedAd
+} from "@/services/ads/adsService";
 
 export const LobbyOnline = () => {
   const { t, i18n } = useTranslation();
@@ -26,6 +34,35 @@ export const LobbyOnline = () => {
     return Array.from(new Set(currentWords.map((w) => w.category))).sort();
   }, [currentWords]);
 
+  const confirmAd = async (callback: () => void, type: "rewarded" | "interstitial") => {
+    if (!canShowAd()) return callback();
+
+    if (type === "rewarded") {
+      if (!isRewardedAdReady()) return callback();
+
+      showAlert(t("alerts.advancedMode"), t("alerts.advancedModeDesc"), undefined, [
+        { text: t("alerts.cancel"), style: "cancel", onPress: () => setIsWaiting(false) },
+        {
+          text: t("alerts.watchAd"),
+          onPress: () => {
+            showRewardedAd(callback);
+            markAdAsShown();
+            setIsWaiting(false);
+          }
+        }
+      ]);
+      setIsWaiting(false);
+      return;
+    }
+
+    // interstitial
+    if (!isInterstitialReady()) return callback();
+
+    showInterstitialAd().then(callback).catch(callback);
+    markAdAsShown();
+    setIsWaiting(false);
+  };
+
   // 🔥 1. Mudou a aba? Desliga o loading na hora!
   useEffect(() => {
     requestAnimationFrame(() => {
@@ -38,10 +75,12 @@ export const LobbyOnline = () => {
 
     try {
       if (action === "startGame")
-        await actions.startGame().finally(() => {
-          setIsWaiting(false);
-        });
-      if (action === "createRoom") await actions.handleCreate();
+        state.twoGroups || state.impostorTrap
+          ? await confirmAd(actions.startGame, "rewarded")
+          : await actions.startGame().finally(() => {
+              setIsWaiting(false);
+            });
+      if (action === "createRoom") await confirmAd(actions.handleCreate, "rewarded");
       if (action === "joinRoom") await actions.handleJoin();
       // Se der certo, a tela vai mudar sozinha, não precisa setIsWaiting(false)
     } catch (error) {
@@ -251,7 +290,7 @@ export const LobbyOnline = () => {
           <TouchableOpacity
             style={styles.leaveBtn}
             onPress={() => {
-              actions.leaveRoom();
+              confirmAd(actions.leaveRoom, "interstitial");
               playSound("click2");
             }}
           >

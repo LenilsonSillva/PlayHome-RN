@@ -22,6 +22,14 @@ import { CryptoConfig, CryptoMode } from "@/games/cryptography/types/game";
 import { PLAYER_ICONS } from "@/games/common/constants/icons";
 import { pickRandom } from "@/games/common/utils/array";
 import { useAudio } from "@/contexts/audioContext";
+import {
+  canShowAd,
+  isRewardedAdReady,
+  showRewardedAd,
+  markAdAsShown,
+  isInterstitialReady,
+  showInterstitialAd
+} from "@/services/ads/adsService";
 
 export const LobbyOffline = () => {
   const navigation = useNavigation<any>();
@@ -52,6 +60,32 @@ export const LobbyOffline = () => {
 
   const infiltrationTimes = [60, 90, 120];
   const interceptionTimes = [15, 30, 60];
+
+  const confirmAd = async (callback: () => void, type: "rewarded" | "interstitial") => {
+    if (!canShowAd()) return callback();
+
+    if (type === "rewarded") {
+      if (!isRewardedAdReady()) return callback();
+
+      showAlert(t("alerts.advancedMode"), t("alerts.advancedModeDesc"), undefined, [
+        { text: t("alerts.cancel"), style: "cancel", onPress: () => {} },
+        {
+          text: t("alerts.watchAd"),
+          onPress: () => {
+            showRewardedAd(callback);
+            markAdAsShown();
+          }
+        }
+      ]);
+      return;
+    }
+
+    // interstitial
+    if (!isInterstitialReady()) return callback();
+
+    showInterstitialAd().then(callback).catch(callback);
+    markAdAsShown();
+  };
 
   // Atualiza categorias selecionadas quando o idioma muda
   useEffect(() => {
@@ -138,13 +172,35 @@ export const LobbyOffline = () => {
     const globalUsedWords = await loadGlobalUsedWords();
     playSound("click");
 
-    navigation.navigate("OfflineCryptographyGame", {
-      config,
-      manualAssignments,
-      globalUsedWords,
-      wordDatabase: currentWords,
-      langCode: i18n.language
-    });
+    if (mode === "infiltration" && selectedTime !== 60) {
+      confirmAd(() => {
+        navigation.navigate("OfflineCryptographyGame", {
+          config,
+          manualAssignments,
+          globalUsedWords,
+          wordDatabase: currentWords,
+          langCode: i18n.language
+        });
+      }, "rewarded");
+    } else if (mode === "interception" && wordLimit !== 5) {
+      confirmAd(() => {
+        navigation.navigate("OfflineCryptographyGame", {
+          config,
+          manualAssignments,
+          globalUsedWords,
+          wordDatabase: currentWords,
+          langCode: i18n.language
+        });
+      }, "rewarded");
+    } else {
+      navigation.navigate("OfflineCryptographyGame", {
+        config,
+        manualAssignments,
+        globalUsedWords,
+        wordDatabase: currentWords,
+        langCode: i18n.language
+      });
+    }
   };
 
   return (

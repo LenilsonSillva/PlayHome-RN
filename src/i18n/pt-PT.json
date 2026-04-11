@@ -22,6 +22,7 @@
     "modal_send": "ENVIAR"
   },
   "alerts": {
+    "advancedModeDesc": "Para continuar, precisa de assistir a um anúncio. Deseja assisti-lo?",
     "noConnection": "Sem ligação ao servidor.",
     "lostConnection": "Sem ligação ao servidor. Verifique a sua internet ou aguarde um pouco.",
     "impostor_closingRoom": "Jogadores insuficientes. A voltar ao lobby.",

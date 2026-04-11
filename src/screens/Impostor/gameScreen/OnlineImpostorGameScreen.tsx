@@ -13,10 +13,20 @@ import { SpectatorView } from "../phasesScreen/components/SpectatorView";
 import { ReviewWordModal } from "../phasesScreen/components/ReviewWordModal";
 import { CustomText } from "@/styles/customText";
 import { COLORS } from "@/styles/theme";
+import {
+  canShowAd,
+  isInterstitialReady,
+  isRewardedAdReady,
+  markAdAsShown,
+  showInterstitialAd,
+  showRewardedAd
+} from "@/services/ads/adsService";
+import { useAlert } from "@/contexts/alertContext";
 
 export const OnlineImpostorGameScreen = () => {
   const { t } = useTranslation();
   const hook = useOnlineImpostorGame();
+  const { showAlert } = useAlert();
 
   if (!hook) return null; // Se for null, não renderiza nada
 
@@ -42,18 +52,38 @@ export const OnlineImpostorGameScreen = () => {
 
   if (!gameData || !localPlayer) return null;
 
+  const confirmAd = (callback: () => void, type: "rewarded" | "interstitial") => {
+    if (!canShowAd()) return callback();
+
+    if (type === "rewarded") {
+      if (!isRewardedAdReady()) return callback();
+
+      showAlert(t("alerts.advancedMode"), t("alerts.advancedModeDesc"), undefined, [
+        { text: t("alerts.cancel"), style: "cancel" },
+        {
+          text: t("alerts.watchAd"),
+          onPress: () => {showRewardedAd(callback); markAdAsShown()}
+        }
+      ]);
+
+      return;
+    }
+
+    // interstitial
+    if (!isInterstitialReady()) return callback();
+
+    showInterstitialAd().then(callback).catch(callback);
+    markAdAsShown();
+  };
+
   // ✅ Se é espectador e dados NÃO estão prontos, mostra loading
   if (gameData.isSpectator && !isDataReady) {
+    confirmAd(() => {}, "interstitial"); // Tenta mostrar um interstitial enquanto espera os dados, mas não bloqueia a renderização
     return (
       <View style={styles.container}>
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
           <ActivityIndicator size="large" color={COLORS.cyan} />
-          <CustomText
-            variant="label"
-            style={{ marginTop: 16, color: COLORS.textSecondary }}
-          >
+          <CustomText variant="label" style={{ marginTop: 16, color: COLORS.textSecondary }}>
             {t("loading")}
           </CustomText>
         </View>
@@ -68,10 +98,7 @@ export const OnlineImpostorGameScreen = () => {
         {t(`games.impostor_phase_header_title`)}
       </CustomText>
       <CustomText variant="label" style={{ fontSize: 14 }}>
-        <CustomText
-          variant="body"
-          style={{ color: COLORS.white, fontSize: 14 }}
-        >
+        <CustomText variant="body" style={{ color: COLORS.white, fontSize: 14 }}>
           SALA:{" "}
         </CustomText>
         {gameData.roomCode}
@@ -85,7 +112,7 @@ export const OnlineImpostorGameScreen = () => {
         centerElement={PhaseHeader}
         onOpenSettings={() => setOpenModal(true)}
         position="absolute"
-        onGoBack={actions.handleExitAttempt}
+        onGoBack={() => confirmAd(() => actions.handleExitAttempt(), "interstitial")}
       />
 
       <View style={{ flex: 1 }}>
@@ -95,55 +122,47 @@ export const OnlineImpostorGameScreen = () => {
           onClose={() => setOpenModal(false)}
           showChangeWordBtn={gameData.phase === "reveal" && localPlayer.isHost}
           onReroll={actions.handleReroll}
-          showReviewWordBtn={
-            gameData.phase === "discussion" && !gameData.isSpectator
-          }
+          showReviewWordBtn={gameData.phase === "discussion" && !gameData.isSpectator}
           reviewEnabled={reviewEnabled}
           onToggleReview={setReviewEnabled}
         />
 
         {/* Reveal Phase */}
-        {gameData.phase === "reveal" &&
-          !gameData.isSpectator &&
-          !showReport && (
-            <RevealPhase
-              player={localPlayer}
-              data={gameData}
-              isOnline
-              onNext={() => actions.handleNextPhase("discussion")}
-              isLast
-              onPlayerReady={actions.handleToggleReady}
-              revealedAfterReroll={reveal}
-            />
-          )}
+        {gameData.phase === "reveal" && !gameData.isSpectator && !showReport && (
+          <RevealPhase
+            player={localPlayer}
+            data={gameData}
+            isOnline
+            onNext={() => actions.handleNextPhase("discussion")}
+            isLast
+            onPlayerReady={actions.handleToggleReady}
+            revealedAfterReroll={reveal}
+          />
+        )}
 
         {/* Discussion Phase */}
-        {gameData.phase === "discussion" &&
-          !gameData.isSpectator &&
-          !showReport && (
-            <DiscussPhase
-              data={gameData}
-              onNextVotingBtn={() => actions.handleNextPhase("voting")}
-              reviewEnabled={reviewEnabled}
-              onPlayerPress={actions.playerHasSeenWord}
-              playerHasSeenWord={[]}
-              isOnline
-              onlinePlayer={localPlayer}
-            />
-          )}
+        {gameData.phase === "discussion" && !gameData.isSpectator && !showReport && (
+          <DiscussPhase
+            data={gameData}
+            onNextVotingBtn={() => actions.handleNextPhase("voting")}
+            reviewEnabled={reviewEnabled}
+            onPlayerPress={actions.playerHasSeenWord}
+            playerHasSeenWord={[]}
+            isOnline
+            onlinePlayer={localPlayer}
+          />
+        )}
 
         {/* Voting Phase */}
-        {gameData.phase === "voting" &&
-          !gameData.isSpectator &&
-          !showReport && (
-            <VotingPhase
-              data={gameData}
-              isOnline
-              player={localPlayer}
-              onCastVote={actions.handleCastVote}
-              onVoteEnded={() => setShowReport(true)}
-            />
-          )}
+        {gameData.phase === "voting" && !gameData.isSpectator && !showReport && (
+          <VotingPhase
+            data={gameData}
+            isOnline
+            player={localPlayer}
+            onCastVote={actions.handleCastVote}
+            onVoteEnded={() => confirmAd(() => setShowReport(true), "interstitial")}
+          />
+        )}
 
         {/* Eliminated Report */}
         {showReport && !gameData.isSpectator && (
@@ -164,26 +183,16 @@ export const OnlineImpostorGameScreen = () => {
         )}
 
         {/* Result Phase */}
-        {gameData.phase === "result" &&
-          !gameData.isSpectator &&
-          !showReport && (
-            <ResultPhase
-              data={gameData}
-              isOnline
-              onNextRound={actions.handleNextRound}
-            />
-          )}
+        {gameData.phase === "result" && !gameData.isSpectator && !showReport && (
+          <ResultPhase data={gameData} isOnline onNextRound={() => confirmAd(() => actions.handleNextRound(), "rewarded")} />
+        )}
 
         {/* Spectator View */}
         {gameData.isSpectator && <SpectatorView gameData={gameData} />}
       </View>
 
       {/* Review Word Modal */}
-      <ReviewWordModal
-        player={reviewPlayer}
-        onClose={() => setReviewPlayer(null)}
-        Onlinedata={gameData}
-      />
+      <ReviewWordModal player={reviewPlayer} onClose={() => setReviewPlayer(null)} Onlinedata={gameData} />
     </View>
   );
 };

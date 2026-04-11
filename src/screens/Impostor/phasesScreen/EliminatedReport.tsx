@@ -9,6 +9,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
 import { useAlert } from "@/contexts/alertContext";
 import { useAudio } from "@/contexts/audioContext";
+import { showInterstitialAd } from "@/services/ads/adsService";
 
 interface Props {
   player: ImpostorPlayer | null;
@@ -212,9 +213,15 @@ export const EliminatedReport = ({ player, allPlayers, votes, wasVoting, onNext,
 
             <TouchableOpacity
               style={styles.terminalBtn}
-              onPress={() => {
-                setShowLogs(!showLogs);
+              onPress={async () => {
                 playSound("click2");
+
+                try {
+                  await showInterstitialAd();
+                } catch (error) {
+                  console.log("Ad não disponível, continuando...");
+                }
+                setShowLogs(!showLogs);
               }}
             >
               <CustomText variant="label" style={styles.terminalBtnText}>

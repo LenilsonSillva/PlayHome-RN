@@ -18,14 +18,19 @@ import { ReviewWordModal } from "../phasesScreen/components/ReviewWordModal";
 import { useNavigation } from "expo-router";
 import { saveGlobalUsedWords } from "@/games/common/utils/wordStorage";
 import { useAlert } from "@/contexts/alertContext";
-import { useAudio } from "@/contexts/audioContext";
-import { showRewardedAd, canShowAd } from "@/services/ads/adsService";
+import {
+  showRewardedAd,
+  canShowAd,
+  isRewardedAdReady,
+  shouldShowInterstitial,
+  showInterstitialAd,
+  markAdAsShown
+} from "@/services/ads/adsService";
 
 export const OfflineImpostorGameScreen = ({ route }: any) => {
   const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const { showAlert } = useAlert();
-  const { playSound } = useAudio();
   const { players } = usePlayers();
   const {
     game,
@@ -50,16 +55,22 @@ export const OfflineImpostorGameScreen = ({ route }: any) => {
   const [storePlayer, setStorePlayer] = useState<string[]>([]); // 3. Player que já viu a palavra (pode ser usado para mostrar um indicador visual na lista de jogadores durante a discussão)
 
   const confirmAd = (callback: () => void) => {
-    showAlert("Modo avançado", "Este modo usa anúncios para continuar. Deseja assistir?", undefined, [
-      { text: "Cancelar", style: "cancel" },
+    if (!canShowAd()) {
+      callback();
+      return;
+    }
+
+    if (!isRewardedAdReady()) {
+      callback();
+      return;
+    }
+
+    showAlert(t("alerts.advancedMode"), t("alerts.advancedModeDesc"), undefined, [
+      { text: t("alerts.cancel"), style: "cancel" },
       {
-        text: "Assistir",
+        text: t("alerts.watchAd"),
         onPress: () => {
-          if (canShowAd()) {
-            showRewardedAd(callback);
-          } else {
-            callback(); // fallback sem anúncio
-          }
+          showRewardedAd(callback);
         }
       }
     ]);
@@ -76,15 +87,7 @@ export const OfflineImpostorGameScreen = ({ route }: any) => {
     const { config, globalUsedWords, wordList, langCode } = route.params || {};
 
     if (config && wordList && langCode && players.length > 0) {
-      const needsAd = config.twoWordsMode || config.impostorTrap;
-
-      if (needsAd) {
-        confirmAd(() => {
-          startGame(players, config, wordList, langCode, globalUsedWords);
-        });
-      } else {
         startGame(players, config, wordList, langCode, globalUsedWords);
-      }
     }
   }, [route.params]);
 
@@ -103,7 +106,13 @@ export const OfflineImpostorGameScreen = ({ route }: any) => {
         {
           text: t("alerts.quit"),
           style: "destructive",
-          onPress: () => {
+          onPress: async () => {
+            try {
+              await showInterstitialAd();
+              markAdAsShown();
+            } catch (e) {
+              console.log("Ad não mostrou");
+            }
             // Salva antes de sair
             if (game?.usedWords) saveGlobalUsedWords(game.usedWords);
 
@@ -265,13 +274,26 @@ export const OfflineImpostorGameScreen = ({ route }: any) => {
         {game.phase === "result" && (
           <ResultPhase
             data={game}
-            onNextRound={() => {
+            onNextRound={async () => {
               setCurrentPlayerIndex(0);
 
               const needsAd = game?.twoWordsMode || game?.impostorTrap;
 
               if (needsAd) {
                 confirmAd(() => startGame());
+                return;
+              }
+
+              // 🔥 Interstitial (caso normal)
+              if (shouldShowInterstitial()) {
+                try {
+                  await showInterstitialAd();
+                  markAdAsShown();
+                } catch (e) {
+                  console.log("Ad não mostrou");
+                }
+
+                startGame();
               } else {
                 startGame();
               }

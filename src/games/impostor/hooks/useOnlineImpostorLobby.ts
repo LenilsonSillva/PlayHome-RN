@@ -7,6 +7,7 @@ import { ICON_COLORS } from "../constants/colors";
 import { pickRandom } from "@/games/common/utils/array";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n";
+import { getWordDatabase } from "@/games/common/data/words";
 
 export function useOnlineImpostorLobby() {
   const socket = useSocket();
@@ -31,14 +32,15 @@ export function useOnlineImpostorLobby() {
   const [impostorHint, setImpostorHint] = useState(false);
   const [impostorTrap, setImpostorTrap] = useState(false);
   const [impostorCat, setImpostorCat] = useState(false);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([
-    "Objetos",
-    "Animais",
-    "Ciência",
-    "Natureza",
-    "Comida",
-    "Emoções"
-  ]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const currentWords = useMemo(() => getWordDatabase(i18n.language), [i18n.language]);
+  const ALL_CATEGORIES = useMemo(() => {
+    return Array.from(new Set(currentWords.map((w) => w.category))).sort();
+  }, [currentWords]);
+
+  useEffect(() => {
+    setSelectedCategories([...ALL_CATEGORIES]);
+  }, [ALL_CATEGORIES]);
 
   const generateId = () => Math.random().toString(36).substring(2, 9) + new Date().getTime().toString(36);
 
@@ -235,7 +237,7 @@ export function useOnlineImpostorLobby() {
       twoGroups,
       whoStart,
       impostorCanStart,
-      impostorsUnited, 
+      impostorsUnited,
       impostorHint,
       impostorCat,
       impostorTrap,
