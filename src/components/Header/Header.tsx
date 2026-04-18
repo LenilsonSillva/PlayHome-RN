@@ -47,7 +47,7 @@ export const Header = ({
             onPress={() => {
               handleBackPress();
               playSound("click2");
-            }} // 🔥 4. Usamos a nova função aqui
+            }} 
             style={styles.circleBtn}
           >
             <View style={styles.backArrow} />

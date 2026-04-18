@@ -14,7 +14,7 @@ let isAdLoaded = false;
 
 export const canShowAd = async () => {
   //const premium = await isUserPremium();
-  const premium = false;
+  const premium = true; // 🔥 TESTE: força como se fosse premium (sem anúncios)
   if (premium) return false;
   const now = Date.now();
   return now - lastAdTime >= 45000;

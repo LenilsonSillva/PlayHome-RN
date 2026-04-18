@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "playHome",
-    "slug": "playHome",
+    "name": "PlayHome",
+    "slug": "PlayHome",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
