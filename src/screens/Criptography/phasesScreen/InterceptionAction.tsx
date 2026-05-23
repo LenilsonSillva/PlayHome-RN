@@ -100,9 +100,16 @@ export const InterceptionAction = ({ gameState, onFinishMatch, onPassTurn, onSta
             <CustomText variant="h2">{t("games.cryptography_action_team")} </CustomText>
             {currentTeam.name}
           </CustomText>
-          <CustomText variant="hint" style={{ color: COLORS.textSecondary }}>
-            {currentTeam.players.length} {t("games.cryptography_action_players")}
-          </CustomText>
+          <View style={styles.statsCompact}>
+            <View style={styles.statCompactItem}>
+              <CustomText variant="hint" style={{ color: COLORS.success }}>
+                {t("games.cryptography_action_hits")}:
+              </CustomText>
+              <CustomText variant="label" style={{ color: COLORS.success, marginLeft: 4 }}>
+                {currentTeam.roundScore}
+              </CustomText>
+            </View>
+          </View>
         </View>
         <View style={styles.headerRight}>
           <CircularTimer timeLeft={timeLeft} totalTime={gameState.config.roundTime} />
@@ -149,23 +156,27 @@ export const InterceptionAction = ({ gameState, onFinishMatch, onPassTurn, onSta
             </TouchableOpacity>
           </View>
         ) : (
-          <View style={styles.statsRow}>
-            <View style={[styles.statBox, { alignItems: "center" }]}>
-              <CustomText variant="label" style={styles.statTitle}>
-                {t("games.cryptography_action_attempts")}
+          <View style={styles.actionButtonsRow}>
+            <TouchableOpacity
+              style={[styles.actionBtn, { backgroundColor: COLORS.danger }]}
+              onPress={() => handleAction("skip")}
+              activeOpacity={0.8}
+            >
+              <MaterialCommunityIcons name="skip-next" size={20} color={COLORS.background} />
+              <CustomText variant="label" style={{ color: COLORS.background, marginLeft: 6 }}>
+                {t("games.cryptography_card_skip")}
               </CustomText>
-              <CustomText variant="h1" style={{ color: COLORS.amber }}>
-                {currentTeam.roundErrors}
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.actionBtn, { backgroundColor: COLORS.success }]}
+              onPress={() => handleAction("correct")}
+              activeOpacity={0.8}
+            >
+              <MaterialCommunityIcons name="check-bold" size={20} color={COLORS.background} />
+              <CustomText variant="label" style={{ color: COLORS.background, marginLeft: 6 }}>
+                {t("games.cryptography_card_correct")}
               </CustomText>
-            </View>
-            <View style={styles.statBox}>
-              <CustomText variant="label" style={styles.statTitle}>
-                {t("games.cryptography_action_hits")}
-              </CustomText>
-              <CustomText variant="h1" style={{ color: COLORS.success }}>
-                {currentTeam.roundScore}
-              </CustomText>
-            </View>
+            </TouchableOpacity>
           </View>
         )}
       </View>
@@ -195,9 +206,20 @@ const styles = StyleSheet.create({
   headerLeft: { flex: 1 },
   headerRight: { alignItems: "flex-end", justifyContent: "center" },
 
+  statsCompact: { flexDirection: "row", gap: 5, marginTop: 8 },
+  statCompactItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.1)",
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    borderRadius: 12
+  },
+
   cardArea: { flex: 1, justifyContent: "center", alignItems: "center" },
 
-  footer: { gap: 5 },
+  footer: { gap: 5, marginBottom: 5 },
   queueIndicator: { flexDirection: "row", justifyContent: "center", gap: 12, marginBottom: 10 },
   queueDot: { width: 8, height: 8, borderRadius: 4 },
 
@@ -205,11 +227,24 @@ const styles = StyleSheet.create({
   startBtn: {
     backgroundColor: COLORS.cyan,
     flexDirection: "row",
-    padding: 20,
+    paddingVertical: 17,
+    paddingHorizontal: 15,
     borderRadius: 15,
     alignItems: "center",
     justifyContent: "center",
-    elevation: 8
+    elevation: 6
+  },
+
+  actionButtonsRow: { flexDirection: "row", gap: 10 },
+  actionBtn: {
+    width: "50%",
+    flexDirection: "row",
+    paddingVertical: 17,
+    paddingHorizontal: 15,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 6
   },
 
   statsRow: {

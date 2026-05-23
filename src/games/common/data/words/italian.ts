@@ -1007,3 +1007,6 @@ export const WORDS_IT: WordData[] = [
   { word: "Trinità", category: "Bibbia", related: ["Padre Figlio Spirito"], hint: "Il dogma cristiano dell'unità di tre persone in un solo Dio." },
   { word: "Getsemani", category: "Bibbia", related: ["Sudore di sangue"], hint: "Il luogo dell'agonia di Gesù prima della cattura." },
 ]
+
+
+export const EXCLUSIVE_CATEGORIES_IT = ["Bibbia"];

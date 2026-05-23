@@ -45,6 +45,8 @@
     "wait": "请稍候！",
     "gotIt": "明白",
     "warning": "警告！",
+    "success": "成功！",
+    "welldone": "干得好！",
     "watchAd": "观看广告",
     "advancedMode": "高级模式",
     "advancedModeDesc": "要继续，您需要观看一则广告。您想观看吗？",
@@ -66,7 +68,28 @@
     "header_quitGame": "退出比赛",
     "cryptography_lobby_fewPlayers": "玩家人数少于小队数量。",
     "cryptography_leaveGameTitle": "离开任务",
-    "cryptography_leaveGameMessage": "确定要放弃当前任务吗？"
+    "cryptography_leaveGameMessage": "确定要放弃当前任务吗？",
+
+    "purchase_error": "购买失败。",
+    "premium_success": "购买成功。",
+    "restore_success": "购买已恢复。",
+    "restore_not_found": "此账户未找到购买记录。",
+    "restore_error": "无法连接至商店。"
+  },
+
+  "premiumModal": {
+    "title": "移除广告",
+    "subtitle": "移除广告并支持 PlayHome 的持续开发。",
+    "cta": "立即移除",
+    "restore": "恢复历史购买",
+    "footerInfo": "通过 Google Play 商店安全购买。",
+    "monthly": "按月订阅",
+    "monthly_sub": "顶级游戏体验\n一个月无广告",
+    "lifetime": "终身访问",
+    "lifetime_sub": "永久无广告\n享受完全自由",
+    "week": "周卡",
+    "week_sub": "周末派对包\n7天无广告",
+    "pop": "热门"
   },
 
   "games": {

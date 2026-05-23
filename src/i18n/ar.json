@@ -48,6 +48,8 @@
     "wait": "انتظر!",
     "gotIt": "مفهوم",
     "warning": "تحذير!",
+    "success": "تم بنجاح!",
+    "welldone": "أحسنت!",
     "noConnection": "لا يوجد اتصال بالسيرفر.",
     "lostConnection": "انقطع الاتصال بالسيرفر. تحقق من الإنترنت أو انتظر قليلاً.",
     "fillIn": "يرجى ملء جميع الحقول.",
@@ -66,7 +68,28 @@
     "header_quitGame": "خروج من اللعبة",
     "cryptography_lobby_fewPlayers": "عدد اللاعبين أقل من عدد الفرق.",
     "cryptography_leaveGameTitle": "مغادرة المهمة",
-    "cryptography_leaveGameMessage": "هل تريد حقاً التخلي عن المهمة الحالية؟"
+    "cryptography_leaveGameMessage": "هل تريد حقاً التخلي عن المهمة الحالية؟",
+
+    "purchase_error": "فشلت عملية الشراء.",
+    "premium_success": "تمت عملية الشراء بنجاح.",
+    "restore_success": "تم استعادة المشتريات.",
+    "restore_not_found": "لم يتم العثور على مشتريات لهذا الحساب.",
+    "restore_error": "خطأ في الاتصال بالمتجر."
+  },
+
+  "premiumModal": {
+    "title": "إزالة الإعلانات",
+    "subtitle": "أزل الإعلانات وادعم استمرار تطوير PlayHome.",
+    "cta": "إزالة الآن",
+    "restore": "استعادة المشتريات السابقة",
+    "footerInfo": "شراء آمن عبر متجر Google Play.",
+    "monthly": "اشتراك شهري",
+    "monthly_sub": "تجربة لاعب كاملة\nشهر واحد بدون إعلانات",
+    "lifetime": "مدى الحياة",
+    "lifetime_sub": "بدون إعلانات للأبد\nالعب بحرية تامة",
+    "week": "تذكرة أسبوعية",
+    "week_sub": "باقة حفلة الويكند\n7 أيام بدون إعلانات",
+    "pop": "شائع"
   },
 
   "games": {

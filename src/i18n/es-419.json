@@ -21,8 +21,28 @@
     "modal_send": "ENVIAR"
   },
   "alerts": {
-    "lostConnection": "Sin conexión al servidor. Revisa tu internet o espera un poco."
+    "lostConnection": "Sin conexión al servidor. Revisa tu internet o espera un poco.",
+    "purchase_error": "No se pudo realizar la compra.",
+    "premium_success": "Compra realizada con éxito.",
+    "restore_success": "Compra restaurada.",
+    "restore_not_found": "No se encontraron compras en esta cuenta.",
+    "restore_error": "Error al conectar con la tienda."
   },
+
+  "premiumModal": {
+    "title": "QUITAR ANUNCIOS",
+    "subtitle": "Quita los anuncios y apoya el desarrollo continuo de PlayHome.",
+    "cta": "QUITAR AHORA",
+    "restore": "Restaurar Compra Anterior",
+    "footerInfo": "Compra segura por Google Play Store.",
+    "monthly": "Suscripción Mensual",
+    "monthly_sub": "Experiencia Gamer Full\nUn Mes Sin Anuncios",
+    "lifetime": "De por vida",
+    "lifetime_sub": "Sin Anuncios para Siempre\nJuega Totalmente Libre",
+    "week": "Pase Semanal",
+    "week_sub": "Fiesta de Fin de Semana\n7 Días Sin Anuncios"
+  },
+
   "games": {
     "impostor_lobby_VideoGame": "Videojuegos",
     "impostor_lobby_explainCreateRoom": "GENERA UN CÓDIGO E INVITA A LA TRIPULACIÓN A JUGAR CADA UNO EN SU CELULAR.",

@@ -45,6 +45,8 @@
     "wait": "Wait!",
     "gotIt": "GOT IT",
     "warning": "WARNING!",
+    "success": "DONE!",
+    "welldone": "WELL DONE!",
     "noConnection": "No connection to the server.",
     "watchAd": "WATCH AD",
     "advancedMode": "Advanced Mode",
@@ -66,7 +68,28 @@
     "header_quitGame": "Leave game",
     "cryptography_lobby_fewPlayers": "Number of players lower than the number of squads.",
     "cryptography_leaveGameTitle": "Leave Mission",
-    "cryptography_leaveGameMessage": "Do you really want to abandon the current mission?"
+    "cryptography_leaveGameMessage": "Do you really want to abandon the current mission?",
+
+    "purchase_error": "Purchase failed.",
+    "premium_success": "Purchase completed successfully.",
+    "restore_success": "Purchase restored.",
+    "restore_not_found": "No purchases found for this account.",
+    "restore_error": "Error connecting to the store."
+  },
+
+  "premiumModal": {
+    "title": "REMOVE ADS",
+    "subtitle": "Remove all ads and support the ongoing development of PlayHome.",
+    "cta": "REMOVE NOW",
+    "restore": "Restore Previous Purchase",
+    "footerInfo": "Secure purchase via Google Play Store.",
+    "monthly": "Monthly Subscription",
+    "monthly_sub": "Full Gamer Experience\nOne Month Ad-Free",
+    "lifetime": "Lifetime Access",
+    "lifetime_sub": "Ad-Free Forever\nPlay with Total Freedom",
+    "week": "Weekly Pass",
+    "week_sub": "Weekend Party Pack\n7 Days Ad-Free",
+    "pop": "POPULAR"
   },
 
   "games": {

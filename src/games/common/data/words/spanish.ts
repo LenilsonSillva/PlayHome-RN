@@ -1291,3 +1291,4 @@ const LATAM_ONLY: WordData[] = [
 
 export const WORDS_ES: WordData[] = [...COMMON_ES, ...ES_ONLY];
 export const WORDS_LATAM: WordData[] = [...COMMON_ES, ...LATAM_ONLY];
+export const EXCLUSIVE_CATEGORIES_ES = ["Biblia"];

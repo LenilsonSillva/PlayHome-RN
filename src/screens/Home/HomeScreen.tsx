@@ -240,7 +240,9 @@ export default function HomeScreen() {
                   playSound("click2");
                 }}
               >
-                <CustomText style={{ color: "#FFF" }}>{t("alerts.cancel")}</CustomText>
+                <CustomText variant="label" style={{ color: "#FFF" }}>
+                  {t("alerts.cancel")}
+                </CustomText>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.sendBtn, !suggestionText && { opacity: 0.5 }]}
@@ -250,7 +252,9 @@ export default function HomeScreen() {
                 }}
                 disabled={!suggestionText}
               >
-                <CustomText style={{ color: "#000", fontWeight: "900" }}>{t("home.modal_send")}</CustomText>
+                <CustomText variant="label" style={{ color: "#000", fontWeight: "900" }}>
+                  {t("home.modal_send")}
+                </CustomText>
               </TouchableOpacity>
             </View>
           </View>

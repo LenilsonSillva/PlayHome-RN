@@ -45,6 +45,8 @@
     "wait": "Warten!",
     "gotIt": "VERSTANDEN",
     "warning": "WARNUNG!",
+    "success": "ERLEDIGT!",
+    "welldone": "GUT GEMACHT!",
     "watchAd": "ANZEIGE",
     "advancedMode": "Erweiterter Modus",
     "advancedModeDesc": "Dieser Modus erfordert das Ansehen von Anzeigen, um fortzufahren. Möchten Sie eine Anzeige ansehen?",
@@ -66,7 +68,28 @@
     "header_quitGame": "Spiel verlassen",
     "cryptography_lobby_fewPlayers": "Spieleranzahl niedriger als Truppanzahl.",
     "cryptography_leaveGameTitle": "Mission verlassen",
-    "cryptography_leaveGameMessage": "Möchtest du die aktuelle Mission wirklich abbrechen?"
+    "cryptography_leaveGameMessage": "Möchtest du die aktuelle Mission wirklich abbrechen?",
+
+    "purchase_error": "Kauf fehlgeschlagen.",
+    "premium_success": "Kauf erfolgreich abgeschlossen.",
+    "restore_success": "Kauf wiederhergestellt.",
+    "restore_not_found": "Keine Käufe für dieses Konto gefunden.",
+    "restore_error": "Fehler beim Verbinden mit dem Store."
+  },
+
+  "premiumModal": {
+    "title": "WERBUNG ENTFERNEN",
+    "subtitle": "Entferne Werbung und unterstütze die Entwicklung von PlayHome.",
+    "cta": "JETZT ENTFERNEN",
+    "restore": "Kauf wiederherstellen",
+    "footerInfo": "Sicherer Kauf über Google Play Store.",
+    "monthly": "Monatsabo",
+    "monthly_sub": "Full Gamer Experience\nEin Monat ohne Werbung",
+    "lifetime": "Lebenslang",
+    "lifetime_sub": "Für immer werbefrei\nSpiele völlig frei",
+    "week": "Wochenpass",
+    "week_sub": "Wochenend-Party\n7 Tage ohne Werbung",
+    "pop": "BELIEBT"
   },
 
   "games": {

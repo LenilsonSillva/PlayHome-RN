@@ -932,3 +932,6 @@ export const WORDS_JA: WordData[] = [
   // falta mais palavras
 
 ]
+
+
+export const EXCLUSIVE_CATEGORIES_JA = [""];

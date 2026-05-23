@@ -316,7 +316,7 @@ export const LobbyOnline = () => {
                   ]}
                 />
                 <CustomText variant="h3" style={styles.playerName}>
-                  {p.name} {p.socketId === state.mySocketId ? t("games.impostor_lobby_you") : ""}
+                  {p.name} {p.socketId === state.mySocketId ? t("games.impostor_lobby_you_") : ""}
                 </CustomText>
                 {p.isHost && (
                   <View style={styles.hostBadge}>

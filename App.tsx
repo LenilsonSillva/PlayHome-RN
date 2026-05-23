@@ -60,7 +60,10 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    // setupIAP();
+    const init = async () => {
+      await setupIAP();
+    };
+    init();
     MobileAds().initialize();
     loadRewardedAd();
     loadInterstitialAd();

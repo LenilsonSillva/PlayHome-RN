@@ -1023,3 +1023,6 @@ export const WORDS_KO: WordData[] = [
   { word: "셀롯인 시몬", category: "성경", related: ["열혈당원"], hint: "예수님의 12제자 중 한 명으로, 로마로부터의 독립을 꿈꿨던 정치 단체 소속." },
   { word: "달란트 비유", category: "성경", related: ["충성"], hint: "주인이 종들에게 재능에 따라 돈을 맡기고 나중에 결산하는 이야기." },
 ]
+
+
+export const EXCLUSIVE_CATEGORIES_KO = [""];

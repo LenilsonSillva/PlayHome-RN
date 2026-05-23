@@ -795,3 +795,6 @@ export const WORDS_HI: WordData[] = [
 
 
 ]
+
+
+export const EXCLUSIVE_CATEGORIES_HI = [""];

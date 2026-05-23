@@ -812,3 +812,5 @@ export const WORDS_ZH: WordData[] = [
   { word: "象征", category: "各种名词", related: ["标志"], hint: "用具体事物表现某种抽象的意义（如鸽子是和平的象征）。" },
   { word: "巧合", category: "各种名词", related: ["偶然"], hint: "事情恰好相合，通常没有事先预定。" },
 ]
+
+export const EXCLUSIVE_CATEGORIES_ZH = [""];

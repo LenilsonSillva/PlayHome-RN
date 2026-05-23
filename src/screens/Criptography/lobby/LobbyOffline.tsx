@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import {
   View,
   StyleSheet,
@@ -12,7 +12,7 @@ import {
 import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
 import { usePlayers } from "@/contexts/contextHook";
-import { getWordDatabase } from "@/games/common/data/words";
+import { getExclusiveCategories, getWordDatabase } from "@/games/common/data/words";
 import { loadGlobalUsedWords } from "@/games/common/utils/wordStorage";
 import { useNavigation } from "@react-navigation/native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
@@ -30,6 +30,7 @@ import {
   isInterstitialReady,
   showInterstitialAd
 } from "@/services/ads/adsService";
+import { EmojiSelectorModal } from "@/components/EmojiSelectorModal/EmojiSelectorModal";
 
 export const LobbyOffline = () => {
   const navigation = useNavigation<any>();
@@ -57,6 +58,10 @@ export const LobbyOffline = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   const [manualAssignments, setManualAssignments] = useState<Record<string, number>>({});
+  const [emojiModalVisible, setEmojiModalVisible] = useState(false);
+  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
+  const isLongPressRef = useRef(false);
+  const [longPressTimer, setLongPressTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   const infiltrationTimes = [60, 90, 120];
   const interceptionTimes = [15, 30, 60];
@@ -89,7 +94,7 @@ export const LobbyOffline = () => {
 
   // Atualiza categorias selecionadas quando o idioma muda
   useEffect(() => {
-    setSelectedCategories([...ALL_CATEGORIES]);
+    setSelectedCategories([...ALL_CATEGORIES].filter((cat) => !getExclusiveCategories(i18n.language).includes(cat)));
   }, [ALL_CATEGORIES]);
 
   useEffect(() => {
@@ -124,9 +129,49 @@ export const LobbyOffline = () => {
     }
   };
 
-  const handleChangeEmoji = (id: string) => {
+  const handleEmojiPressIn = (id: string) => {
+    isLongPressRef.current = false;
+
+    const timer = setTimeout(() => {
+      const player = players.find((p) => p.id === id);
+      if (player) {
+        isLongPressRef.current = true;
+        setSelectedPlayerId(id);
+        setEmojiModalVisible(true);
+        playSound("click");
+      }
+    }, 300);
+
+    setLongPressTimer(timer);
+  };
+
+  const handleEmojiPressOut = () => {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      setLongPressTimer(null);
+    }
+  };
+
+  const handleQuickEmojiPress = (id: string) => {
+    if (isLongPressRef.current) {
+      isLongPressRef.current = false;
+      return; // 🔥 BLOQUEIA troca rápida
+    }
+
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      setLongPressTimer(null);
+    }
+
     updatePlayer(id, { emoji: getUnusedEmoji() });
     playSound("click2");
+  };
+
+  const handleEmojiSelect = (emoji: string) => {
+    if (selectedPlayerId) {
+      updatePlayer(selectedPlayerId, { emoji });
+      playSound("click2");
+    }
   };
 
   const cycleTeamAssignment = (playerId: string) => {
@@ -204,290 +249,305 @@ export const LobbyOffline = () => {
   };
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        {/* HEADER DE MODOS DE JOGO */}
-        <View style={styles.modeSelector}>
-          <TouchableOpacity
-            style={[styles.modeBtn, mode === "infiltration" && styles.modeActive]}
-            onPress={() => {
-              setMode("infiltration");
-              playSound("click2");
-            }}
-            activeOpacity={0.8}
-          >
-            <MaterialCommunityIcons
-              name="run-fast"
-              size={24}
-              color={mode === "infiltration" ? COLORS.cyan : COLORS.textSecondary}
-            />
-            <CustomText variant="label" style={{ color: mode === "infiltration" ? COLORS.cyan : COLORS.textSecondary }}>
-              {t("games.cryptography_phase_infiltration_action")}
-            </CustomText>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.modeBtn, mode === "interception" && styles.modeActive]}
-            onPress={() => {
-              setMode("interception");
-              playSound("click2");
-            }}
-            activeOpacity={0.8}
-          >
-            <MaterialCommunityIcons
-              name="crosshairs-gps"
-              size={24}
-              color={mode === "interception" ? COLORS.danger : COLORS.textSecondary}
-            />
-            <CustomText variant="label" style={{ color: mode === "interception" ? COLORS.danger : COLORS.textSecondary }}>
-              {t("games.cryptography_phase_interception_action")}
-            </CustomText>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.descBox}>
-          <CustomText variant="body" style={styles.descText}>
-            {mode === "infiltration" ? t("games.cryptography_infiltration_desc") : t("games.cryptography_interception_desc")}
-          </CustomText>
-        </View>
-
-        {/* DISTRIBUIÇÃO */}
-        <View style={styles.section}>
-          <CustomText variant="label" style={styles.cyanText}>
-            {t("games.cryptography_lobby_distribution")}
-          </CustomText>
-          <View style={styles.segmentedControl}>
+    <>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+          {/* HEADER DE MODOS DE JOGO */}
+          <View style={styles.modeSelector}>
             <TouchableOpacity
-              style={[styles.segBtn, distributionType === "random" && styles.activeSeg]}
+              style={[styles.modeBtn, mode === "infiltration" && styles.modeActive]}
               onPress={() => {
-                setDistributionType("random");
+                setMode("infiltration");
                 playSound("click2");
               }}
+              activeOpacity={0.8}
             >
-              <CustomText style={[styles.segText, distributionType === "random" && { color: COLORS.cyan }]}>
-                {t("games.cryptography_lobby_random")}
+              <MaterialCommunityIcons
+                name="run-fast"
+                size={24}
+                color={mode === "infiltration" ? COLORS.cyan : COLORS.textSecondary}
+              />
+              <CustomText variant="label" style={{ color: mode === "infiltration" ? COLORS.cyan : COLORS.textSecondary }}>
+                {t("games.cryptography_phase_infiltration_action")}
               </CustomText>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.segBtn, distributionType === "manual" && styles.activeSeg]}
-              onPress={() => {
-                setDistributionType("manual");
-                playSound("click2");
-              }}
-            >
-              <CustomText style={[styles.segText, distributionType === "manual" && { color: COLORS.cyan }]}>
-                {t("games.cryptography_lobby_manual")}
-              </CustomText>
-            </TouchableOpacity>
-          </View>
-        </View>
 
-        {/* QTD ESQUADRÕES */}
-        <View style={styles.settingCard}>
-          <View>
-            <CustomText variant="h3">{t("games.cryptography_lobby_groupCount")}</CustomText>
-          </View>
-          <View style={styles.counter}>
             <TouchableOpacity
+              style={[styles.modeBtn, mode === "interception" && styles.modeActive]}
               onPress={() => {
-                setTeamCount(Math.max(2, teamCount - 1));
+                setMode("interception");
                 playSound("click2");
               }}
-              style={[styles.cBtn, teamCount === 2 && styles.btnDisabled]}
-              disabled={teamCount === 2}
+              activeOpacity={0.8}
             >
-              <CustomText variant="h2" style={{ color: "#FFF" }}>
-                -
+              <MaterialCommunityIcons
+                name="crosshairs-gps"
+                size={24}
+                color={mode === "interception" ? COLORS.danger : COLORS.textSecondary}
+              />
+              <CustomText variant="label" style={{ color: mode === "interception" ? COLORS.danger : COLORS.textSecondary }}>
+                {t("games.cryptography_phase_interception_action")}
               </CustomText>
             </TouchableOpacity>
-            <CustomText variant="h2" style={styles.cValue}>
-              {teamCount}
+          </View>
+
+          <View style={styles.descBox}>
+            <CustomText variant="body" style={styles.descText}>
+              {mode === "infiltration" ? t("games.cryptography_infiltration_desc") : t("games.cryptography_interception_desc")}
             </CustomText>
-            <TouchableOpacity
-              onPress={() => {
-                // Regra: Máximo de times é total de jogadores / 2
-                const maxPossibleTeams = Math.floor(players.length / 2);
-                if (teamCount < maxPossibleTeams) {
-                  setTeamCount(teamCount + 1);
-                  playSound("click2");
-                } else {
-                  showAlert(t("alerts.warning"), t("alerts.cryptography_max_teams_reached"));
-                }
-              }}
-              // Desabilita se aumentar o time for violar a regra de 2 por grupo
-              style={[styles.cBtn, teamCount >= Math.floor(players.length / 2) && styles.btnDisabled]}
-              disabled={teamCount >= Math.floor(players.length / 2)}
-            >
-              <CustomText variant="h2" style={{ color: "#FFF" }}>
-                +
-              </CustomText>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* ADICIONAR JOGADORES */}
-        <View style={styles.section}>
-          <CustomText variant="label" style={styles.cyanText}>
-            {t("games.cryptography_lobby_crewmates")} ({players.length}/20)
-          </CustomText>
-          <View style={styles.inputGroup}>
-            <TextInput
-              style={styles.input}
-              placeholder={t("games.cryptography_lobby_playerName")}
-              placeholderTextColor={COLORS.textSecondary}
-              value={name}
-              onChangeText={setName}
-              maxLength={15}
-              onSubmitEditing={handleAddPlayer}
-            />
-            <TouchableOpacity style={styles.addBtn} onPress={handleAddPlayer}>
-              <CustomText variant="h2" style={{ color: COLORS.background }}>
-                +
-              </CustomText>
-            </TouchableOpacity>
           </View>
 
-          {/* 🔥 NOVA LISTA DE JOGADORES (Igual a do Impostor) */}
-          <View style={styles.playerList}>
-            {players.map((p) => (
-              <View key={p.id} style={[styles.playerCard, { width: isLargeScreen ? "48.5%" : "100%" }]}>
-                <TouchableOpacity style={styles.emojiCircle} onPress={() => handleChangeEmoji(p.id)}>
-                  <CustomText style={{ fontSize: 34 }}>{p.emoji || "👤"}</CustomText>
-                  <View style={styles.editIconBadge}>
-                    <MaterialCommunityIcons name="reload" size={11} color={COLORS.cyan} />
-                  </View>
-                </TouchableOpacity>
-
-                <CustomText variant="h3" style={styles.playerName}>
-                  {p.name}
-                </CustomText>
-
-                <View style={styles.playerActions}>
-                  {distributionType === "manual" && (
-                    <TouchableOpacity style={styles.teamTag} onPress={() => cycleTeamAssignment(p.id)}>
-                      <CustomText variant="label" style={{ color: COLORS.background }}>
-                        {t("games.cryptography_lobby_group")} {(manualAssignments[p.id] || 0) + 1} ↻
-                      </CustomText>
-                    </TouchableOpacity>
-                  )}
-
-                  {/* Se for manual o botão vira apenas um "X", se for aleatório, mostra o botão "REMOVER" completo */}
-                  <TouchableOpacity
-                    onPress={() => {
-                      removePlayer(p.id);
-                      playSound("click2");
-                    }}
-                    style={[styles.removeBtn, distributionType === "manual" && styles.removeBtnSmall]}
-                  >
-                    <CustomText style={styles.removeText}>
-                      {distributionType === "manual" ? "X" : t("games.cryptography_lobby_remove")}
-                    </CustomText>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ))}
-          </View>
-        </View>
-
-        {/* CRONÔMETRO E PALAVRAS */}
-        <View style={styles.section}>
-          <CustomText variant="label" style={styles.cyanText}>
-            {t("games.cryptography_lobby_timer")}
-          </CustomText>
-          <CustomText variant="body" style={styles.optText}>
-            {t("games.cryptography_lobby_timeLimitText")}
-          </CustomText>
-          <View style={styles.optionsRow}>
-            {(mode === "infiltration" ? infiltrationTimes : interceptionTimes).map((t) => (
+          {/* DISTRIBUIÇÃO */}
+          <View style={styles.section}>
+            <CustomText variant="label" style={styles.cyanText}>
+              {t("games.cryptography_lobby_distribution")}
+            </CustomText>
+            <View style={styles.segmentedControl}>
               <TouchableOpacity
-                key={t}
-                style={[styles.optionChip, selectedTime === t && styles.optionActive]}
+                style={[styles.segBtn, distributionType === "random" && styles.activeSeg]}
                 onPress={() => {
-                  setSelectedTime(t);
+                  setDistributionType("random");
                   playSound("click2");
                 }}
               >
-                <CustomText variant="h3" style={{ color: selectedTime === t ? COLORS.background : COLORS.textSecondary }}>
-                  {t}s
+                <CustomText style={[styles.segText, distributionType === "random" && { color: COLORS.cyan }]}>
+                  {t("games.cryptography_lobby_random")}
                 </CustomText>
               </TouchableOpacity>
-            ))}
+              <TouchableOpacity
+                style={[styles.segBtn, distributionType === "manual" && styles.activeSeg]}
+                onPress={() => {
+                  setDistributionType("manual");
+                  playSound("click2");
+                }}
+              >
+                <CustomText style={[styles.segText, distributionType === "manual" && { color: COLORS.cyan }]}>
+                  {t("games.cryptography_lobby_manual")}
+                </CustomText>
+              </TouchableOpacity>
+            </View>
           </View>
 
-          {mode === "interception" && (
-            <View style={{ marginTop: 25 }}>
-              <CustomText variant="label" style={styles.cyanText}>
-                {t("games.cryptography_lobby_wordLimit")}
-              </CustomText>
-              <CustomText variant="body" style={styles.optText}>
-                {t("games.cryptography_lobby_wordLimitText")}
-              </CustomText>
-              <View style={styles.optionsRow}>
-                {[5, 10, 20].map((w) => (
-                  <TouchableOpacity
-                    key={w}
-                    style={[styles.optionChip, wordLimit === w && styles.optionActive]}
-                    onPress={() => {
-                      setWordLimit(w);
-                      playSound("click2");
-                    }}
-                  >
-                    <CustomText variant="h3" style={{ color: wordLimit === w ? COLORS.background : COLORS.textSecondary }}>
-                      {w}
-                    </CustomText>
-                  </TouchableOpacity>
-                ))}
-              </View>
+          {/* QTD ESQUADRÕES */}
+          <View style={styles.settingCard}>
+            <View>
+              <CustomText variant="h3">{t("games.cryptography_lobby_groupCount")}</CustomText>
             </View>
-          )}
-        </View>
+            <View style={styles.counter}>
+              <TouchableOpacity
+                onPress={() => {
+                  setTeamCount(Math.max(2, teamCount - 1));
+                  playSound("click2");
+                }}
+                style={[styles.cBtn, teamCount === 2 && styles.btnDisabled]}
+                disabled={teamCount === 2}
+              >
+                <CustomText variant="h2" style={{ color: "#FFF" }}>
+                  -
+                </CustomText>
+              </TouchableOpacity>
+              <CustomText variant="h2" style={styles.cValue}>
+                {teamCount}
+              </CustomText>
+              <TouchableOpacity
+                onPress={() => {
+                  // Regra: Máximo de times é total de jogadores / 2
+                  const maxPossibleTeams = Math.floor(players.length / 2);
+                  if (teamCount < maxPossibleTeams) {
+                    setTeamCount(teamCount + 1);
+                    playSound("click2");
+                  } else {
+                    showAlert(t("alerts.warning"), t("alerts.cryptography_max_teams_reached"));
+                  }
+                }}
+                // Desabilita se aumentar o time for violar a regra de 2 por grupo
+                style={[styles.cBtn, teamCount >= Math.floor(players.length / 2) && styles.btnDisabled]}
+                disabled={teamCount >= Math.floor(players.length / 2)}
+              >
+                <CustomText variant="h2" style={{ color: "#FFF" }}>
+                  +
+                </CustomText>
+              </TouchableOpacity>
+            </View>
+          </View>
 
-        {/* BANCO DE DADOS */}
-        <View style={styles.section}>
+          {/* ADICIONAR JOGADORES */}
+          <View style={styles.section}>
+            <CustomText variant="label" style={styles.cyanText}>
+              {t("games.cryptography_lobby_crewmates")} ({players.length}/20)
+            </CustomText>
+            <View style={styles.inputGroup}>
+              <TextInput
+                style={styles.input}
+                placeholder={t("games.cryptography_lobby_playerName")}
+                placeholderTextColor={COLORS.textSecondary}
+                value={name}
+                onChangeText={setName}
+                maxLength={15}
+                onSubmitEditing={handleAddPlayer}
+              />
+              <TouchableOpacity style={styles.addBtn} onPress={handleAddPlayer}>
+                <CustomText variant="h2" style={{ color: COLORS.background }}>
+                  +
+                </CustomText>
+              </TouchableOpacity>
+            </View>
+
+            {/* 🔥 NOVA LISTA DE JOGADORES (Igual a do Impostor) */}
+            <View style={styles.playerList}>
+              {players.map((p) => (
+                <View key={p.id} style={[styles.playerCard, { width: isLargeScreen ? "48.5%" : "100%" }]}>
+                  <TouchableOpacity
+                    style={styles.emojiCircle}
+                    onPress={() => handleQuickEmojiPress(p.id)}
+                    onPressIn={() => handleEmojiPressIn(p.id)}
+                    onPressOut={handleEmojiPressOut}
+                    activeOpacity={0.7}
+                  >
+                    <CustomText style={{ fontSize: 34 }}>{p.emoji || "👤"}</CustomText>
+                    <View style={styles.editIconBadge}>
+                      <MaterialCommunityIcons name="reload" size={11} color={COLORS.cyan} />
+                    </View>
+                  </TouchableOpacity>
+
+                  <CustomText variant="h3" style={styles.playerName}>
+                    {p.name}
+                  </CustomText>
+
+                  <View style={styles.playerActions}>
+                    {distributionType === "manual" && (
+                      <TouchableOpacity style={styles.teamTag} onPress={() => cycleTeamAssignment(p.id)}>
+                        <CustomText variant="label" style={{ color: COLORS.background }}>
+                          {t("games.cryptography_lobby_group")} {(manualAssignments[p.id] || 0) + 1} ↻
+                        </CustomText>
+                      </TouchableOpacity>
+                    )}
+
+                    {/* Se for manual o botão vira apenas um "X", se for aleatório, mostra o botão "REMOVER" completo */}
+                    <TouchableOpacity
+                      onPress={() => {
+                        removePlayer(p.id);
+                        playSound("click2");
+                      }}
+                      style={[styles.removeBtn, distributionType === "manual" && styles.removeBtnSmall]}
+                    >
+                      <CustomText style={styles.removeText}>
+                        {distributionType === "manual" ? "X" : t("games.cryptography_lobby_remove")}
+                      </CustomText>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))}
+            </View>
+          </View>
+
+          {/* CRONÔMETRO E PALAVRAS */}
+          <View style={styles.section}>
+            <CustomText variant="label" style={styles.cyanText}>
+              {t("games.cryptography_lobby_timer")}
+            </CustomText>
+            <CustomText variant="body" style={styles.optText}>
+              {t("games.cryptography_lobby_timeLimitText")}
+            </CustomText>
+            <View style={styles.optionsRow}>
+              {(mode === "infiltration" ? infiltrationTimes : interceptionTimes).map((t) => (
+                <TouchableOpacity
+                  key={t}
+                  style={[styles.optionChip, selectedTime === t && styles.optionActive]}
+                  onPress={() => {
+                    setSelectedTime(t);
+                    playSound("click2");
+                  }}
+                >
+                  <CustomText variant="h3" style={{ color: selectedTime === t ? COLORS.background : COLORS.textSecondary }}>
+                    {t}s
+                  </CustomText>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {mode === "interception" && (
+              <View style={{ marginTop: 25 }}>
+                <CustomText variant="label" style={styles.cyanText}>
+                  {t("games.cryptography_lobby_wordLimit")}
+                </CustomText>
+                <CustomText variant="body" style={styles.optText}>
+                  {t("games.cryptography_lobby_wordLimitText")}
+                </CustomText>
+                <View style={styles.optionsRow}>
+                  {[5, 10, 20].map((w) => (
+                    <TouchableOpacity
+                      key={w}
+                      style={[styles.optionChip, wordLimit === w && styles.optionActive]}
+                      onPress={() => {
+                        setWordLimit(w);
+                        playSound("click2");
+                      }}
+                    >
+                      <CustomText variant="h3" style={{ color: wordLimit === w ? COLORS.background : COLORS.textSecondary }}>
+                        {w}
+                      </CustomText>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            )}
+          </View>
+
+          {/* BANCO DE DADOS */}
+          <View style={styles.section}>
+            <TouchableOpacity
+              style={[styles.categoryToggle, showCategories && styles.categoryToggleActive]}
+              onPress={() => {
+                setShowCategories(!showCategories);
+                playSound("click2");
+              }}
+            >
+              <CustomText variant="label" style={{ color: showCategories ? COLORS.black : COLORS.cyan }}>
+                {showCategories ? t("games.cryptography_lobby_close") + " ⇡" : t("games.cryptography_lobby_db") + " ⇣"}
+              </CustomText>
+            </TouchableOpacity>
+
+            {showCategories && (
+              <View style={styles.categoryGrid}>
+                {ALL_CATEGORIES.map((cat) => {
+                  const isSelected = selectedCategories.includes(cat);
+                  return (
+                    <TouchableOpacity
+                      key={cat}
+                      style={[styles.categoryChip, isSelected && styles.activeChip]}
+                      onPress={() => toggleCategory(cat)}
+                    >
+                      <CustomText style={[styles.categoryText, isSelected && styles.activeCategoryText]}>{cat}</CustomText>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            )}
+          </View>
+        </ScrollView>
+
+        {/* BOTÃO FIXO NO RODAPÉ */}
+        <View style={styles.footer}>
           <TouchableOpacity
-            style={[styles.categoryToggle, showCategories && styles.categoryToggleActive]}
-            onPress={() => {
-              setShowCategories(!showCategories);
-              playSound("click2");
-            }}
+            style={[styles.startBtn, players.length < teamCount && { opacity: 0.5 }]}
+            disabled={players.length < 4 || players.length < teamCount * 2}
+            onPress={handleStartMission}
           >
-            <CustomText variant="label" style={{ color: showCategories ? COLORS.black : COLORS.cyan }}>
-              {showCategories ? t("games.cryptography_lobby_close") + " ⇡" : t("games.cryptography_lobby_db") + " ⇣"}
+            <CustomText variant="h2" style={styles.startBtnText}>
+              {t("games.cryptography_lobby_start")}
             </CustomText>
           </TouchableOpacity>
-
-          {showCategories && (
-            <View style={styles.categoryGrid}>
-              {ALL_CATEGORIES.map((cat) => {
-                const isSelected = selectedCategories.includes(cat);
-                return (
-                  <TouchableOpacity
-                    key={cat}
-                    style={[styles.categoryChip, isSelected && styles.activeChip]}
-                    onPress={() => toggleCategory(cat)}
-                  >
-                    <CustomText style={[styles.categoryText, isSelected && styles.activeCategoryText]}>{cat}</CustomText>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          )}
         </View>
-      </ScrollView>
-
-      {/* BOTÃO FIXO NO RODAPÉ */}
-      <View style={styles.footer}>
-        <TouchableOpacity
-          style={[styles.startBtn, players.length < teamCount && { opacity: 0.5 }]}
-          disabled={players.length < 4 || players.length < teamCount * 2}
-          onPress={handleStartMission}
-        >
-          <CustomText variant="h2" style={styles.startBtnText}>
-            {t("games.cryptography_lobby_start")}
-          </CustomText>
-        </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+      <EmojiSelectorModal
+        visible={emojiModalVisible}
+        onClose={() => setEmojiModalVisible(false)}
+        onSelectEmoji={handleEmojiSelect}
+        usedEmojis={players.map((p) => p.emoji).filter((e): e is string => !!e)}
+        playerName={selectedPlayerId ? players.find((p) => p.id === selectedPlayerId)?.name : undefined}
+      />
+    </>
   );
 };
 

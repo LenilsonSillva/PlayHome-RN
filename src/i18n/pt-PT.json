@@ -31,8 +31,27 @@
     "impostor_lastHostLeft": "O comandante anterior desligou-se, agora assume o controlo.",
     "impostor_waitOthers": "Aguarde que todos estejam prontos.",
     "impostor_hostMustStart": "O anfitrião deve iniciar a partida.",
-    "impostor_crewmateName": "Introduza o seu nome de tripulante."
+    "impostor_crewmateName": "Introduza o seu nome de tripulante.",
+
+    "purchase_error": "Compra não realizada.",
+    "premium_success": "Compra realizada com sucesso.",
+    "restore_success": "Compra restaurada.",
+    "restore_not_found": "Nenhuma compra encontrada nesta conta.",
+    "restore_error": "Erro ao ligar à loja."
   },
+
+  "premiumModal": {
+    "title": "REMOVER ANÚNCIOS",
+    "subtitle": "Remove os anúncios e apoia o desenvolvimento contínuo do PlayHome.",
+    "cta": "REMOVER AGORA",
+    "restore": "Restaurar Compra Anterior",
+    "footerInfo": "Compra segura via Google Play Store.",
+    "monthly": "Assinatura Mensal",
+    "monthly_sub": "Experiência Gamer Full\nUm Mês Sem Anúncios",
+    "lifetime": "Vitalício",
+    "lifetime_sub": "Para Sempre Sem Anúncios\nJoga Totalmente Livre"
+  },
+
   "games": {
     "impostor_lobby_VideoGame": "Videojogos",
     "impostor_lobby_you_": "(TU)",

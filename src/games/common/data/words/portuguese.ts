@@ -1558,3 +1558,4 @@ const PT_ONLY: WordData[] = [
 
 export const WORDS_BR: WordData[] = [...COMMON, ...BR_ONLY];
 export const WORDS_PT: WordData[] = [...COMMON, ...PT_ONLY];
+export const EXCLUSIVE_CATEGORIES_PT = ["Bíblia"];

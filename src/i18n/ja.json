@@ -45,6 +45,8 @@
     "wait": "待機してください",
     "gotIt": "了解",
     "warning": "注意！",
+    "success": "完了！",
+    "welldone": "おめでとう！",
     "watchAd": "広告を見る",
     "advancedMode": "高度なモード",
     "advancedModeDesc": "続行するには広告を見る必要があります。広告を見ますか？",
@@ -66,7 +68,28 @@
     "header_quitGame": "ゲームを終了",
     "cryptography_lobby_fewPlayers": "プレイヤー数が分隊数より少ないです。",
     "cryptography_leaveGameTitle": "ミッション放棄",
-    "cryptography_leaveGameMessage": "現在のミッションを本当に終了しますか？"
+    "cryptography_leaveGameMessage": "現在のミッションを本当に終了しますか？",
+
+    "purchase_error": "購入に失敗しました。",
+    "premium_success": "購入が正常に完了しました。",
+    "restore_success": "購入を復元しました。",
+    "restore_not_found": "このアカウントに購入履歴はありません。",
+    "restore_error": "ストアへの接続エラー。"
+  },
+
+  "premiumModal": {
+    "title": "広告を消す",
+    "subtitle": "広告を削除してPlayHomeの開発をサポートしましょう。",
+    "cta": "今すぐ削除",
+    "restore": "以前の購入を復元",
+    "footerInfo": "Google Play ストア経由の安全な決済。",
+    "monthly": "月間サブスクリプション",
+    "monthly_sub": "フルゲーマー体験\n1ヶ月間広告なし",
+    "lifetime": "買い切り（永続）",
+    "lifetime_sub": "永久に広告なし\n完全に自由に遊ぶ",
+    "week": "週間パス",
+    "week_sub": "週末パーティーパック\n7日間広告なし",
+    "pop": "人気"
   },
 
   "games": {

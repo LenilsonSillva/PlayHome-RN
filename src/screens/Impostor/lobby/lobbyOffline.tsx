@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import {
   View,
   StyleSheet,
@@ -23,9 +23,10 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { useTranslation } from "react-i18next";
 import { loadGlobalUsedWords } from "@/games/common/utils/wordStorage";
-import { getWordDatabase } from "@/games/common/data/words";
+import { getExclusiveCategories, getWordDatabase } from "@/games/common/data/words";
 import { canShowAd, isRewardedAdReady, markAdAsShown, showRewardedAd } from "@/services/ads/adsService";
 import { useAlert } from "@/contexts/alertContext";
+import { EmojiSelectorModal } from "@/components/EmojiSelectorModal/EmojiSelectorModal";
 
 export const LobbyOffline = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -49,6 +50,10 @@ export const LobbyOffline = () => {
   const [showOptions, setShowOptions] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [impostorsUnited, setImpostorsUnited] = useState(false);
+  const [emojiModalVisible, setEmojiModalVisible] = useState(false);
+  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
+  const isLongPressRef = useRef(false);
+  const [longPressTimer, setLongPressTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
   // Calcula o limite máximo permitido de impostores
   const maxImpostors = useMemo(() => getImpostorCount(players.length), [players.length]);
 
@@ -64,7 +69,7 @@ export const LobbyOffline = () => {
 
   // 3. Reseta categorias selecionadas se mudar o idioma (opcional)
   useEffect(() => {
-    setSelectedCategories(ALL_CATEGORIES);
+    setSelectedCategories(ALL_CATEGORIES.filter((cat) => !getExclusiveCategories(i18n.language).includes(cat)));
   }, [ALL_CATEGORIES]);
 
   // Efeito para ajustar a contagem se jogadores forem removidos
@@ -110,9 +115,49 @@ export const LobbyOffline = () => {
     return available.length > 0 ? pickRandom(available) : "❓";
   }, [players]);
 
-  const handleChangeEmoji = (id: string) => {
+  const handleEmojiPressIn = (id: string) => {
+    isLongPressRef.current = false;
+
+    const timer = setTimeout(() => {
+      const player = players.find((p) => p.id === id);
+      if (player) {
+        isLongPressRef.current = true;
+        setSelectedPlayerId(id);
+        setEmojiModalVisible(true);
+        playSound("click");
+      }
+    }, 300);
+
+    setLongPressTimer(timer);
+  };
+
+  const handleEmojiPressOut = () => {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      setLongPressTimer(null);
+    }
+  };
+
+  const handleQuickEmojiPress = (id: string) => {
+    if (isLongPressRef.current) {
+      isLongPressRef.current = false;
+      return; // 🔥 BLOQUEIA troca rápida
+    }
+
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      setLongPressTimer(null);
+    }
+
     updatePlayer(id, { emoji: getUnusedEmoji() });
     playSound("click2");
+  };
+
+  const handleEmojiSelect = (emoji: string) => {
+    if (selectedPlayerId) {
+      updatePlayer(selectedPlayerId, { emoji });
+      playSound("click2");
+    }
   };
 
   const confirmStartWithAd = (callback: () => void) => {
@@ -284,7 +329,13 @@ export const LobbyOffline = () => {
                     { width: isLargeScreen ? "48.5%" : "100%" } // 🔥 2 colunas se for tela larga
                   ]}
                 >
-                  <TouchableOpacity style={styles.emojiCircle} onPress={() => handleChangeEmoji(p.id)}>
+                  <TouchableOpacity
+                    style={styles.emojiCircle}
+                    onPress={() => handleQuickEmojiPress(p.id)}
+                    onPressIn={() => handleEmojiPressIn(p.id)}
+                    onPressOut={handleEmojiPressOut}
+                    activeOpacity={0.7}
+                  >
                     <CustomText style={{ fontSize: 34 }}>{p.emoji || "👤"}</CustomText>
                     <View style={styles.editIconBadge}>
                       <MaterialCommunityIcons name="reload" size={11} color={COLORS.cyan} />
@@ -453,6 +504,14 @@ export const LobbyOffline = () => {
           </TouchableOpacity>
         </View>
       </View>
+
+      <EmojiSelectorModal
+        visible={emojiModalVisible}
+        onClose={() => setEmojiModalVisible(false)}
+        onSelectEmoji={handleEmojiSelect}
+        usedEmojis={players.map((p) => p.emoji).filter((e): e is string => !!e)}
+        playerName={selectedPlayerId ? players.find((p) => p.id === selectedPlayerId)?.name : undefined}
+      />
     </KeyboardAvoidingView>
   );
 };

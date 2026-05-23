@@ -46,6 +46,8 @@
     "wait": "Aguarde!",
     "gotIt": "ENTENDIDO",
     "warning": "AVISO!",
+    "success": "FEITO!",
+    "welldone": "PARABÉNS!",
     "noConnection": "Sem conexão com o servidor.",
     "lostConnection": "Sem conexão com o servidor. Verifique sua internet ou aguarde um pouco.",
     "advancedMode": "Modo avançado",
@@ -66,7 +68,28 @@
     "header_quitGame": "Sair da partida",
     "cryptography_lobby_fewPlayers": "Número de jogadores inferior ao número de grupos.",
     "cryptography_leaveGameTitle": "Sair da Missão",
-    "cryptography_leaveGameMessage": "Deseja realmente abandonar a partida atual?"
+    "cryptography_leaveGameMessage": "Deseja realmente abandonar a partida atual?",
+    
+    "purchase_error": "Compra não realizada.",
+    "premium_success": "Compra realizada com sucesso.",
+    "restore_success": "Compra restaurada.",
+    "restore_not_found": "Nenhuma compra encontrada nesta conta.",
+    "restore_error": "Erro ao conectar com a loja."
+  },
+
+  "premiumModal": {
+    "title": "REMOVA ANÚNCIOS",
+    "subtitle": "Remova anúncios e apoie o desenvolvimento contínuo do PlayHome.",
+    "cta": "REMOVER AGORA",
+    "restore": "Restaurar Compra Anterior",
+    "footerInfo": "Compra segura via Google Play Store.",
+    "monthly": "Assinatura Mensal",
+    "monthly_sub": "Experiência Gamer Full\nUm Mês Sem Anúncios",
+    "lifetime": "Vitalício",
+    "lifetime_sub": "Para Sempre Sem Anúncios\nJogue Totalmente Livre",
+    "week": "Passe Semanal",
+    "week_sub": "Festa de Final de Semana\n7 Dias Sem Anúncios",
+    "pop": "POPULAR"
   },
 
   "games": {

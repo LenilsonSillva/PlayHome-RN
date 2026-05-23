@@ -45,6 +45,8 @@
     "wait": "Attendez !",
     "gotIt": "COMPRIS",
     "warning": "AVERTISSEMENT !",
+    "success": "RÉUSSI !",
+    "welldone": "BRAVO !",
     "watchAd": "REGARDER L'ANNONCE",
     "advancedMode": "Mode Avancé",
     "advancedModeDesc": "Pour continuer, vous devez regarder une annonce. Voulez-vous la regarder ?",
@@ -66,7 +68,28 @@
     "header_quitGame": "Quitter la partie",
     "cryptography_lobby_fewPlayers": "Nombre de joueurs inférieur au nombre d'escouades.",
     "cryptography_leaveGameTitle": "Abandonner la Mission",
-    "cryptography_leaveGameMessage": "Voulez-vous vraiment abandonner la mission en cours ?"
+    "cryptography_leaveGameMessage": "Voulez-vous vraiment abandonner la mission en cours ?",
+
+    "purchase_error": "Achat non effectué.",
+    "premium_success": "Achat réussi.",
+    "restore_success": "Achat restauré.",
+    "restore_not_found": "Aucun achat trouvé pour ce compte.",
+    "restore_error": "Erreur de connexion à la boutique."
+  },
+
+  "premiumModal": {
+    "title": "SUPPRIMER PUBS",
+    "subtitle": "Supprimez les publicités et soutenez le développement de PlayHome.",
+    "cta": "SUPPRIMER",
+    "restore": "Restaurer l'achat",
+    "footerInfo": "Achat sécurisé via Google Play Store.",
+    "monthly": "Abonnement Mensuel",
+    "monthly_sub": "Expérience Gamer Full\nUn Mois Sans Pubs",
+    "lifetime": "À Vie",
+    "lifetime_sub": "Sans Pubs à Jamais\nJouez en Toute Liberté",
+    "week": "Pass Hebdomadaire",
+    "week_sub": "Fête du Week-end\n7 Jours Sans Pubs",
+    "pop": "POPULAIRE"
   },
 
   "games": {

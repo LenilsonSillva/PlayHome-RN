@@ -45,6 +45,8 @@
     "wait": "प्रतीक्षा करें!",
     "gotIt": "समझ गया",
     "warning": "चेतावनी!",
+    "success": "सफल!",
+    "welldone": "बधाई हो!",
     "noConnection": "सर्वर से कोई कनेक्शन नहीं है।",
     "watchAd": "विज्ञापन देखें",
     "advancedMode": "उन्नत मोड",
@@ -66,7 +68,28 @@
     "header_quitGame": "गेम से बाहर निकलें",
     "cryptography_lobby_fewPlayers": "खिलाड़ियों की संख्या समूहों से कम है।",
     "cryptography_leaveGameTitle": "मिशन छोड़ें",
-    "cryptography_leaveGameMessage": "क्या आप वाकई वर्तमान गेम को छोड़ना चाहते हैं?"
+    "cryptography_leaveGameMessage": "क्या आप वाकई वर्तमान गेम को छोड़ना चाहते हैं?",
+
+    "purchase_error": "खरीद विफल रही।",
+    "premium_success": "खरीद सफलतापूर्वक पूरी हुई।",
+    "restore_success": "खरीद बहाल कर दी गई।",
+    "restore_not_found": "इस खाते पर कोई खरीद नहीं मिली।",
+    "restore_error": "स्टोर से जुड़ने में त्रुटि।"
+  },
+
+  "premiumModal": {
+    "title": "विज्ञापन हटाएँ",
+    "subtitle": "विज्ञापन हटाएँ और PlayHome के विकास में सहायता करें।",
+    "cta": "अभी हटाएँ",
+    "restore": "पुरानी खरीद बहाल करें",
+    "footerInfo": "Google Play स्टोर के माध्यम से सुरक्षित भुगतान।",
+    "monthly": "मासिक सदस्यता",
+    "monthly_sub": "फुल गेमर अनुभव\nएक महीना बिना विज्ञापन",
+    "lifetime": "आजीवन एक्सेस",
+    "lifetime_sub": "हमेशा के लिए विज्ञापन मुक्त\nपूरी आज़ादी से खेलें",
+    "week": "साप्ताहिक पास",
+    "week_sub": "वीकेंड पार्टी पैक\n7 दिन बिना विज्ञापन",
+    "pop": "लोकप्रिय"
   },
 
   "games": {

@@ -45,6 +45,8 @@
     "wait": "Attendi!",
     "gotIt": "RICEVUTO",
     "warning": "AVVISO!",
+    "success": "FATTO!",
+    "welldone": "BEN FATTO!",
     "watchAd": "GUARDA ANNUNCIO",
     "advancedMode": "Modalità Avanzata",
     "advancedModeDesc": "Per continuare, devi guardare un annuncio. Vuoi guardarlo?",
@@ -66,7 +68,28 @@
     "header_quitGame": "Esci dalla partita",
     "cryptography_lobby_fewPlayers": "Numero di giocatori inferiore al numero di squadriglie.",
     "cryptography_leaveGameTitle": "Abbandona Missione",
-    "cryptography_leaveGameMessage": "Desideri davvero abbandonare la missione attuale?"
+    "cryptography_leaveGameMessage": "Desideri davvero abbandonare la missione attuale?",
+
+    "purchase_error": "Acquisto non riuscito.",
+    "premium_success": "Acquisto completato con successo.",
+    "restore_success": "Acquisto ripristinato.",
+    "restore_not_found": "Nessun acquisto trovato su questo account.",
+    "restore_error": "Errore di connessione allo store."
+  },
+
+  "premiumModal": {
+    "title": "RIMUOVI ANNUNCI",
+    "subtitle": "Rimuovi la pubblicità e sostieni lo sviluppo di PlayHome.",
+    "cta": "RIMUOVI ORA",
+    "restore": "Ripristina acquisto",
+    "footerInfo": "Acquisto sicuro via Google Play Store.",
+    "monthly": "Abbonamento Mensile",
+    "monthly_sub": "Esperienza Gamer Full\nUn Mese Senza Annunci",
+    "lifetime": "A Vita",
+    "lifetime_sub": "Senza Annunci per Sempre\nGioca in Piena Libertà",
+    "week": "Pass Settimanale",
+    "week_sub": "Festa del Weekend\n7 Giorni Senza Annunci",
+    "pop": "POPOLARE"
   },
 
   "games": {

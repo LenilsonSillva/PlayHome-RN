@@ -1385,3 +1385,4 @@ const GB_ONLY: WordData[] = [
 
 export const WORDS_US: WordData[] = [...COMMON_EN, ...US_ONLY];
 export const WORDS_GB: WordData[] = [...COMMON_EN, ...GB_ONLY];
+export const EXCLUSIVE_CATEGORIES_EN = ["Bible"];

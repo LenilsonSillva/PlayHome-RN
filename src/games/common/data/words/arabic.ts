@@ -794,3 +794,6 @@ export const WORDS_AR: WordData[] = [
   { word: "نصيحة", category: "مفاهيم متنوعة", related: ["إرشاد"], hint: "قول يقدم للآخرين بهدف مساعدتهم أو توجيههم للصواب." },
   { word: "تراث", category: "مفاهيم متنوعة", related: ["أصالة"], hint: "ما يتركه الأجداد للأبناء من ثقافة وفنون ومعتقدات." },
 ]
+
+
+export const EXCLUSIVE_CATEGORIES_AR = [""];

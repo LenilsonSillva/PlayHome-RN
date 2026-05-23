@@ -45,6 +45,8 @@
     "wait": "¡Espera!",
     "gotIt": "ENTENDIDO",
     "warning": "¡AVISO!",
+    "success": "¡HECHO!",
+    "welldone": "¡BIEN HECHO!",
     "watchAd": "VER ANUNCIO",
     "advancedMode": "Modo Avanzado",
     "advancedModeDesc": "Para continuar, necesitas ver un anuncio. ¿Deseas verlo?",
@@ -66,7 +68,28 @@
     "header_quitGame": "Salir de la partida",
     "cryptography_lobby_fewPlayers": "Número de jugadores inferior al número de escuadrones.",
     "cryptography_leaveGameTitle": "Abandonar Misión",
-    "cryptography_leaveGameMessage": "¿Deseas realmente abandonar la misión actual?"
+    "cryptography_leaveGameMessage": "¿Deseas realmente abandonar la misión actual?",
+
+    "purchase_error": "Compra no realizada.",
+    "premium_success": "Compra realizada con éxito.",
+    "restore_success": "Compra restaurada.",
+    "restore_not_found": "No se han encontrado compras en esta cuenta.",
+    "restore_error": "Error al conectar con la tienda."
+  },
+
+  "premiumModal": {
+    "title": "ELIMINAR ANUNCIOS",
+    "subtitle": "Elimina los anuncios y apoya el desarrollo continuo de PlayHome.",
+    "cta": "ELIMINAR AHORA",
+    "restore": "Restaurar Compra Anterior",
+    "footerInfo": "Compra segura a través de Google Play Store.",
+    "monthly": "Suscripción Mensual",
+    "monthly_sub": "Experiencia Gamer Total\nUn Mes Sin Anuncios",
+    "lifetime": "Vitalicio",
+    "lifetime_sub": "Sin Anuncios Para Siempre\nJuega con Total Libertad",
+    "week": "Pase Semanal",
+    "week_sub": "Fiesta de Fin de Semana\n7 Días Sin Anuncios",
+    "pop": "POPULAR"
   },
 
   "games": {

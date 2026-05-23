@@ -962,3 +962,6 @@ export const WORDS_DE: WordData[] = [
   { word: "Streik", category: "Verschiedene Begriffe", related: ["Protest"], hint: "Die gemeinsame Arbeitsniederlegung von Arbeitnehmern." },
   { word: "Anspruch", category: "Verschiedene Begriffe", related: ["Recht"], hint: "Die Forderung, die man aufgrund eines Rechts stellt." }
 ]
+
+
+export const EXCLUSIVE_CATEGORIES_DE = [""];

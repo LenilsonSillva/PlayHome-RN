@@ -1,21 +1,28 @@
-import { RewardedAd, RewardedAdEventType, AdEventType, InterstitialAd, TestIds } from "react-native-google-mobile-ads";
-// import { isUserPremium } from "../iap/iapService";
+import { RewardedAd, RewardedAdEventType, AdEventType, InterstitialAd } from "react-native-google-mobile-ads";
+import { isUserPremium } from "../iap/iapService";
 
-const rewardedAdUnitId = "ca-app-pub-1764610529859221/4735804620"; // REAL
-
-const rewardedAdUnitIdTeste = __DEV__
-  ? "ca-app-pub-3940256099942544/5224354917" // TESTE
-  : "ca-app-pub-1764610529859221/4735804620"; // REAL
+const rewardedAdUnitId = "ca-app-pub-1764610529859221/4735804620";
+const interstitialAdUnitId = "ca-app-pub-1764610529859221/5454824074";
 
 let rewardedAd: RewardedAd | null = null;
-// 🔥 CONTROLE DE SPAM
+let interstitial: InterstitialAd | null = null;
 let lastAdTime = 0;
+let lastShownTime = 0;
 let isAdLoaded = false;
+let isLoaded = false;
+let roundCount = 0;
+
+// --- EXPORTS DE ESTADO (Para os botões da UI não quebrarem) ---
+
+export const isRewardedAdReady = () => isAdLoaded;
+export const isInterstitialReady = () => isLoaded;
+
+// --- RECOMPENSADOS ---
 
 export const canShowAd = async () => {
-  //const premium = await isUserPremium();
-  const premium = true; // 🔥 TESTE: força como se fosse premium (sem anúncios)
+  const premium = await isUserPremium();
   if (premium) return false;
+
   const now = Date.now();
   return now - lastAdTime >= 45000;
 };
@@ -24,158 +31,100 @@ export const markAdAsShown = () => {
   lastAdTime = Date.now();
 };
 
-// 🔥 PRELOAD
-export const loadRewardedAd = () => {
-  rewardedAd = RewardedAd.createForAdRequest(rewardedAdUnitId);
+export const loadRewardedAd = async () => {
+  // Se for premium, nem tenta carregar
+  if (await isUserPremium()) return;
 
+  rewardedAd = RewardedAd.createForAdRequest(rewardedAdUnitId);
   rewardedAd.addAdEventListener(RewardedAdEventType.LOADED, () => {
     isAdLoaded = true;
   });
-
   rewardedAd.addAdEventListener(AdEventType.CLOSED, () => {
     isAdLoaded = false;
-    loadRewardedAd(); // carrega próximo
+    loadRewardedAd();
   });
-
   rewardedAd.load();
 };
 
-export const isRewardedAdReady = () => isAdLoaded;
-
-// 🔥 SHOW (CORRETO)
-export const showRewardedAd = (onReward: () => void) => {
-  console.log("🎬 Tentando mostrar anúncio...");
+export const showRewardedAd = async (onReward: () => void) => {
+  const premium = await isUserPremium();
+  if (premium) {
+    onReward(); // Dá a recompensa direto para o premium
+    return;
+  }
 
   const ad = RewardedAd.createForAdRequest(rewardedAdUnitId);
-
   let rewarded = false;
 
-  const unsubscribeLoaded = ad.addAdEventListener(RewardedAdEventType.LOADED, () => {
-    console.log("✅ Anúncio carregado");
-    ad.show();
-  });
-
-  const unsubscribeEarned = ad.addAdEventListener(RewardedAdEventType.EARNED_REWARD, () => {
-    console.log("🎁 Recompensa concedida");
+  ad.addAdEventListener(RewardedAdEventType.LOADED, () => ad.show());
+  ad.addAdEventListener(RewardedAdEventType.EARNED_REWARD, () => {
     rewarded = true;
     onReward();
   });
-
-  const unsubscribeClosed = ad.addAdEventListener(AdEventType.CLOSED, () => {
-    console.log("❌ Anúncio fechado");
-
-    if (!rewarded) {
-      onReward(); // fallback
-    }
-
-    // prepara próximo
+  ad.addAdEventListener(AdEventType.CLOSED, () => {
+    if (!rewarded) onReward();
     loadRewardedAd();
-
-    unsubscribeLoaded();
-    unsubscribeEarned();
-    unsubscribeClosed();
   });
-
-  const unsubscribeError = ad.addAdEventListener(AdEventType.ERROR, (error) => {
-    console.log("❌ Erro no anúncio:", error);
-    onReward(); // fallback
-  });
-
+  ad.addAdEventListener(AdEventType.ERROR, () => onReward());
   ad.load();
-
-  return () => {
-    unsubscribeLoaded();
-    unsubscribeEarned();
-    unsubscribeClosed();
-    unsubscribeError();
-  };
 };
 
-// INTERSTITIAL
+// --- INTERSTITIAL ---
 
-const interstitialAdUnitId = "ca-app-pub-1764610529859221/5454824074";
-const interstitialAdUnitIdTeste = __DEV__ ? TestIds.INTERSTITIAL : "ca-app-pub-1764610529859221/5454824074";
-
-let interstitial: InterstitialAd | null = null;
-let isLoaded = false;
-
-// 🚀 CARREGAR ANÚNCIO
-export const loadInterstitialAd = () => {
-  if (interstitial) return;
-
-  console.log("📥 Carregando interstitial...");
+export const loadInterstitialAd = async () => {
+  if (await isUserPremium()) return;
 
   interstitial = InterstitialAd.createForAdRequest(interstitialAdUnitId);
-
   interstitial.addAdEventListener(AdEventType.LOADED, () => {
-    console.log("✅ Interstitial carregado");
     isLoaded = true;
   });
-
-  interstitial.addAdEventListener(AdEventType.ERROR, (error) => {
-    console.log("❌ Erro interstitial:", error);
-
+  interstitial.addAdEventListener(AdEventType.ERROR, () => {
     interstitial = null;
     isLoaded = false;
-
-    setTimeout(loadInterstitialAd, 2000); // retry automático 🔥
+    setTimeout(loadInterstitialAd, 5000);
   });
-
   interstitial.addAdEventListener(AdEventType.CLOSED, () => {
-    console.log("❌ Interstitial fechado");
-
-    interstitial = null;
     isLoaded = false;
-
+    interstitial = null;
     loadInterstitialAd();
   });
-
   interstitial.load();
 };
 
-// 🔎 VERIFICAR SE ESTÁ PRONTO
-export const isInterstitialReady = () => isLoaded && interstitial !== null;
+export const canShowInterstitial = async () => {
+  const premium = await isUserPremium();
+  if (premium) return false;
 
-// 🎬 MOSTRAR ANÚNCIO
-export const showInterstitialAd = (): Promise<void> => {
-  return new Promise((resolve) => {
-    if (!interstitial || !isLoaded) {
-      resolve(); // fallback silencioso
+  const now = Date.now();
+  return now - lastShownTime >= 60000;
+};
+
+export const shouldShowInterstitial = async () => {
+  const premium = await isUserPremium();
+  if (premium) return false;
+
+  roundCount++;
+  if (roundCount % 2 !== 0) return false;
+
+  const ready = await canShowInterstitial();
+  return ready && isLoaded;
+};
+
+export const showInterstitialAd = async (): Promise<void> => {
+  return new Promise(async (resolve) => {
+    const premium = await isUserPremium();
+
+    if (premium || !interstitial || !isLoaded) {
+      resolve();
       return;
     }
 
     const unsubscribe = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
       unsubscribe();
+      lastShownTime = Date.now();
       resolve();
     });
 
     interstitial.show();
   });
-};
-
-// ⏱️ CONTROLE DE TEMPO (ANTI-SPAM)
-let lastShownTime = 0;
-
-export const canShowInterstitial = () => {
-  const now = Date.now();
-
-  // mínimo 60 segundos entre anúncios
-  if (now - lastShownTime < 60000) return false;
-
-  lastShownTime = now;
-  return true;
-};
-
-// 🎯 REGRA DE EXIBIÇÃO (ex: a cada 2 rodadas)
-let roundCount = 0;
-
-export const shouldShowInterstitial = () => {
-  roundCount++;
-
-  console.log("🔄 Rodada:", roundCount);
-
-  // mostra a cada 2 rodadas
-  if (roundCount % 2 !== 0) return false;
-
-  return canShowInterstitial() && isInterstitialReady();
 };

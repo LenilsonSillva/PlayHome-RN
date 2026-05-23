@@ -851,3 +851,6 @@ export const WORDS_FR: WordData[] = [
   { word: "Emploi", category: "Substantifs Variés", related: ["Métier"], hint: "Travail rémunéré au service d'un employeur." },
   { word: "Grève", category: "Substantifs Variés", related: ["Manifestation"], hint: "Arrêt collectif du travail pour exprimer une revendication." },
 ];
+
+
+export const EXCLUSIVE_CATEGORIES_FR = [""];

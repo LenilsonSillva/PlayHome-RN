@@ -829,3 +829,6 @@ export const WORDS_RU: WordData[] = [
   { word: "Характер", category: "Разные понятия", related: ["Личность"], hint: "Совокупность устойчивых психических особенностей человека." },
   { word: "Личность", category: "Разные понятия", related: ["Индивидуальность"], hint: "Человек как носитель сознания и социальных качеств." },
 ]
+
+
+export const EXCLUSIVE_CATEGORIES_RU = [""];

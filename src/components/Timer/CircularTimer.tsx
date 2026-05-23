@@ -26,7 +26,8 @@ export const CircularTimer = ({ timeLeft, totalTime = 60 }: Props) => {
   useEffect(() => {
     // Sincroniza o progresso com o tempo restante
     progress.value = withTiming(timeLeft / totalTime, { duration: 1000 });
-    timeLeft === 10 && playSound("alert");
+    ((timeLeft > 0) && (timeLeft <= 5)) && playSound("alert");
+
   }, [timeLeft]);
 
   const animatedProps = useAnimatedProps(() => {

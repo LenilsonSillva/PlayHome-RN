@@ -45,6 +45,8 @@
     "wait": "잠시만 기다려주세요!",
     "gotIt": "확인",
     "warning": "주의!",
+    "success": "성공!",
+    "welldone": "잘했어요!",
     "watchAd": "광고 보기",
     "advancedMode": "고급 모드",
     "advancedModeDesc": "계속하려면 광고를 시청해야 합니다. 시청하시겠습니까?",
@@ -66,7 +68,28 @@
     "header_quitGame": "게임 종료",
     "cryptography_lobby_fewPlayers": "플레이어 수가 분대 수보다 적습니다.",
     "cryptography_leaveGameTitle": "미션 포기",
-    "cryptography_leaveGameMessage": "현재 미션을 정말로 종료하시겠습니까?"
+    "cryptography_leaveGameMessage": "현재 미션을 정말로 종료하시겠습니까?",
+
+    "purchase_error": "구매에 실패했습니다.",
+    "premium_success": "구매가 성공적으로 완료되었습니다.",
+    "restore_success": "구매가 복구되었습니다.",
+    "restore_not_found": "이 계정으로 구매한 내역이 없습니다.",
+    "restore_error": "스토어 연결 오류."
+  },
+
+  "premiumModal": {
+    "title": "광고 제거",
+    "subtitle": "광고를 제거하고 PlayHome의 지속적인 개발을 응원해 주세요.",
+    "cta": "지금 제거하기",
+    "restore": "이전 구매 복구",
+    "footerInfo": "Google Play 스토어를 통한 안전한 결제.",
+    "monthly": "월간 구독",
+    "monthly_sub": "풀 게이머 경험\n한 달간 광고 없음",
+    "lifetime": "평생 소장",
+    "lifetime_sub": "영원히 광고 없이\n완전한 자유를 즐기세요",
+    "week": "주간 패스",
+    "week_sub": "주말 파티 팩\n7일간 광고 없음",
+    "pop": "인기"
   },
 
   "games": {
