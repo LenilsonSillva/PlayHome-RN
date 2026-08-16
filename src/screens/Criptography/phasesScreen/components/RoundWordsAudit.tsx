@@ -43,8 +43,8 @@ export const RoundWordsAuditModal = ({ visible, onClose, gameState, onReassign, 
       if (item.winnerTeamIndex !== null && item.winnerTeamIndex !== item.ownerTeamIndex) {
         showAlert(
           t("alerts.error"),
-          `${t("games.cryptography_audit_assign_title", "ATRIBUIR PONTO")}: ${ownerTeam.name.toUpperCase()} ${t(
-            "games.cryptography_audit_assign_desc",
+          `${t("games.cryptography_result_audit_assign_title")}: ${ownerTeam.name.toUpperCase()} ${t(
+            "games.cryptography_result_audit_assign_desc",
             "é a equipe responsável por essa palavra."
           )}`
         );
@@ -54,14 +54,14 @@ export const RoundWordsAuditModal = ({ visible, onClose, gameState, onReassign, 
       if (item.winnerTeamIndex !== null) {
         const used = ownerTeam.manualAdjustmentRemoveCount ?? 0;
         if (used >= ownerLimit) {
-          showAlert(t("alerts.error"), t("games.cryptography_audit_limit_reached", { team: ownerTeam.name }));
+          showAlert(t("alerts.error"), t("games.cryptography_result_audit_limit_reached", { team: ownerTeam.name }));
           return;
         }
 
         showAlert(
-          t("games.cryptography_audit_remove_title", "REMOVER PONTO"),
-          t("games.cryptography_audit_remove_desc", { team: ownerTeam.name }),
-          "alert-circle-outline",
+          t("games.cryptography_result_audit_remove_title"),
+          `${t("games.cryptography_result_audit_remove_desc")} ${ownerTeam.name.toUpperCase()}?`,
+          "✏️",
           [
             { text: t("alerts.cancel"), style: "cancel" },
             { text: t("alerts.confirm"), style: "destructive", onPress: () => onReassign(wordIndex, null) }
@@ -72,14 +72,14 @@ export const RoundWordsAuditModal = ({ visible, onClose, gameState, onReassign, 
 
       const addUsed = ownerTeam.manualAdjustmentAddCount ?? 0;
       if (addUsed >= ownerLimit) {
-        showAlert(t("alerts.error"), t("games.cryptography_audit_limit_reached", { team: ownerTeam.name }));
+        showAlert(t("alerts.error"), t("games.cryptography_result_audit_limit_reached", { team: ownerTeam.name }));
         return;
       }
 
       showAlert(
-        t("games.cryptography_audit_assign_title", "ATRIBUIR PONTO"),
-        `${ownerTeam.name.toUpperCase()} ${t("games.cryptography_audit_assign_desc", "foi a equipe que usou esta palavra.")}`,
-        "plus-circle-outline",
+        t("games.cryptography_result_audit_assign_title"),
+        `${t("games.cryptography_result_audit_assign_desc_inf")} ${ownerTeam.name.toUpperCase()} ${t("games.cryptography_result_audit_assign_desc_inf_confirm")}`,
+        "✏️",
         [
           { text: t("alerts.cancel"), style: "cancel" },
           { text: t("alerts.confirm"), onPress: () => onReassign(wordIndex, item.ownerTeamIndex) }
@@ -94,14 +94,14 @@ export const RoundWordsAuditModal = ({ visible, onClose, gameState, onReassign, 
       const used = team.manualAdjustmentRemoveCount ?? 0;
 
       if (used >= limit) {
-        showAlert(t("alerts.error"), t("games.cryptography_audit_limit_reached", { team: team.name }));
+        showAlert(t("alerts.error"), t("games.cryptography_result_audit_limit_reached", { team: team.name }));
         return;
       }
 
       showAlert(
-        t("games.cryptography_audit_remove_title", "REMOVER PONTO"),
-        t("games.cryptography_audit_remove_desc", { team: team.name }),
-        "alert-circle-outline",
+        t("games.cryptography_result_audit_remove_title"),
+        t("games.cryptography_result_audit_remove_desc", { team: team.name }),
+        "✏️",
         [
           { text: t("alerts.cancel"), style: "cancel" },
           { text: t("alerts.confirm"), style: "destructive", onPress: () => onReassign(wordIndex, null) }
@@ -116,7 +116,7 @@ export const RoundWordsAuditModal = ({ visible, onClose, gameState, onReassign, 
           text: `${team.name.toUpperCase()} (A ${addUsed}/${limit})`,
           onPress: () => {
             if (addUsed >= limit) {
-              showAlert(t("alerts.error"), t("games.cryptography_audit_limit_reached", { team: team.name }));
+              showAlert(t("alerts.error"), t("games.cryptography_result_audit_limit_reached", { team: team.name }));
             } else {
               onReassign(wordIndex, tIdx);
             }
@@ -124,12 +124,10 @@ export const RoundWordsAuditModal = ({ visible, onClose, gameState, onReassign, 
         };
       });
 
-      showAlert(
-        t("games.cryptography_audit_assign_title", "ATRIBUIR PONTO"),
-        t("games.cryptography_audit_assign_desc", "Qual equipe realmente acertou esta palavra?"),
-        "plus-circle-outline",
-        [...teamOptions, { text: t("alerts.cancel"), style: "cancel" }]
-      );
+      showAlert(t("games.cryptography_result_audit_assign_title"), t("games.cryptography_result_audit_assign_desc"), "✏️", [
+        ...teamOptions,
+        { text: t("alerts.cancel"), style: "cancel" }
+      ]);
     }
   };
 
@@ -140,10 +138,10 @@ export const RoundWordsAuditModal = ({ visible, onClose, gameState, onReassign, 
           <View style={styles.header}>
             <View>
               <CustomText variant="h2" style={styles.title}>
-                {t("games.cryptography_audit_main_title", "AUDITORIA")}
+                {t("games.cryptography_result_audit_title")}
               </CustomText>
               <CustomText variant="label" style={styles.subtitle}>
-                {t("games.cryptography_audit_sub_title", "EDITE O RESULTADO")}
+                {t("games.cryptography_result_audit_subtitle")}
               </CustomText>
             </View>
             <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
@@ -153,15 +151,13 @@ export const RoundWordsAuditModal = ({ visible, onClose, gameState, onReassign, 
 
           <View style={styles.editTitle}>
             <CustomText variant="hint" style={styles.subtitle}>
-              {t("games.cryptography_audit_assign_editTitle", "Clique para reatribuir pontos")}
+              {t("games.cryptography_result_audit_clickToEdit")}
             </CustomText>
           </View>
 
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.list}>
             {gameState.roundHistory.length === 0 ? (
-              <CustomText style={styles.emptyText}>
-                {t("games.cryptography_audit_empty", "Nenhuma palavra registrada.")}
-              </CustomText>
+              <CustomText style={styles.emptyText}>{t("games.cryptography_result_audit_empty")}</CustomText>
             ) : (
               gameState.roundHistory.map((item, index) => {
                 const winnerTeam = item.winnerTeamIndex !== null ? gameState.teams[item.winnerTeamIndex] : null;
@@ -198,8 +194,8 @@ export const RoundWordsAuditModal = ({ visible, onClose, gameState, onReassign, 
                         {ownerTeam && (
                           <CustomText style={styles.ownerLabel}>
                             {isInfiltrationLock
-                              ? `USADA POR ${ownerTeam.name.toUpperCase()}`
-                              : `RESPONSÁVEL: ${ownerTeam.name.toUpperCase()}`}
+                              ? `${t("games.cryptography_result_audit_usedBy")} ${ownerTeam.name.toUpperCase()}`
+                              : `${t("games.cryptography_result_audit_responsible")} ${ownerTeam.name.toUpperCase()}`}
                           </CustomText>
                         )}
                       </View>
@@ -218,7 +214,7 @@ export const RoundWordsAuditModal = ({ visible, onClose, gameState, onReassign, 
 
           <TouchableOpacity style={styles.footerBtn} onPress={onClose}>
             <CustomText variant="h3" style={styles.footerBtnText}>
-              {t("alerts.confirm")}
+              {t("home.back_btn")}
             </CustomText>
           </TouchableOpacity>
         </View>

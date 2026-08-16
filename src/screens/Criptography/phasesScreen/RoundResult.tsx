@@ -16,7 +16,7 @@ import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
 import { useTranslation } from "react-i18next";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { CryptoGameState, CryptoPlayer, CryptoTeam } from "@/games/cryptography/types/game";
+import { CryptoGameState, CryptoTeam } from "@/games/cryptography/types/game";
 import { ImpostorBackground } from "@/components/Background/Background";
 import { useAudio } from "@/contexts/audioContext";
 import { useOfflineCryptography } from "@/games/cryptography/hooks/useOfflineCryptography";
@@ -242,7 +242,7 @@ export const RoundResult = ({ gameState, onNextRound, onReassign }: Props) => {
           <TouchableOpacity style={styles.auditButton} onPress={() => setAuditVisible(true)}>
             <MaterialCommunityIcons name="history" size={20} color={COLORS.cyan} />
             <CustomText variant="label" style={{ color: COLORS.cyan, marginLeft: 10 }}>
-              {t("games.cryptography_view_round_words", "VER PALAVRAS DA RODADA")}
+              {t("games.cryptography_result_roundWords")}
             </CustomText>
           </TouchableOpacity>
 
@@ -359,9 +359,6 @@ const TeamReportCard = ({ team, rank }: { team: CryptoTeam; rank: number }) => {
           <CustomText variant="label" style={styles.membersList} numberOfLines={2}>
             {memberNames}
           </CustomText>
-          {/*<CustomText variant="hint" style={{ color: COLORS.success, marginTop: 4, fontSize: 16 }}>
-            {team.score} {t("games.cryptography_result_totalPts")} ({roundHits} {t("games.cryptography_result_roundPts")})
-          </CustomText>*/}
         </View>
         <View style={[styles.totalPts, { borderColor: team.color }]}>
           <CustomText variant="label" style={{ color: COLORS.textSecondary, textAlign: "center", fontSize: 8 }}>

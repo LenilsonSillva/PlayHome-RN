@@ -38,6 +38,7 @@
   },
 
   "alerts": {
+    "confirm": "CONFIRMAR",
     "alert": "ALERTA!",
     "error": "Erro",
     "cancel": "CANCELAR",
@@ -375,6 +376,24 @@
     "cryptography_result_avarageTime": "TEMPO MÉDIO",
     "cryptography_result_bestOp": "MELHOR OPERADOR",
     "cryptography_result_noWord": "NENHUMA PALAVRA",
+    "cryptography_result_roundWords": "VER PALAVRAS DA RODADA",
+    "cryptography_result_audit_title": "AUDITORIA",
+    "cryptography_result_audit_subtitle": "AJUSTE O RESULTADO",
+    "cryptography_result_audit_clickToEdit": "Clique para reatribuir pontos",
+    "cryptography_result_audit_editBtn": "EDITAR RESULTADO",
+    "cryptography_result_audit_confirmBtn": "CONFIRMAR",
+    "cryptography_result_audit_cancelBtn": "CANCELAR",
+    "cryptography_result_audit_assign_desc": "Qual equipe realmente acertou esta palavra?",
+    "cryptography_result_audit_limit_reached": "Limite de ajustes atingido para a equipe.",
+    "cryptography_result_audit_assign_title": "ATRIBUIR PONTO",
+    "cryptography_result_audit_empty": "Nenhuma palavra registrada.",
+    "cryptography_result_audit_remove_title": "REMOVER PONTO",
+    "cryptography_result_audit_remove_desc": "Deseja realmente remover o ponto da equipe: ",
+    "cryptography_result_total": "TOTAL",
+    "cryptography_result_audit_usedBy": "USADA POR",
+    "cryptography_result_audit_responsible": "RESPONSÁVEL:",
+    "cryptography_result_audit_assign_desc_inf": "Palavra usada pela equipe: ",
+    "cryptography_result_audit_assign_desc_inf_confirm": "\nDeseja realmente atribuir o ponto à equipe?",
 
     "cryptography_alert_emptyTeam": "Todos os esquadrões precisam de pelo menos 2 tripulante!",
     "cryptography_alert_minPlayers": "Protocolo Inválido: Com 4 ou mais jogadores, cada grupo deve ser composto por no mínimo 2 pessoas."
