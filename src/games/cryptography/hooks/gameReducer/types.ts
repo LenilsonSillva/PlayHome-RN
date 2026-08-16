@@ -17,6 +17,7 @@ export type GameAction =
   | { type: "BEGIN_ACTION_PHASE" }
   | { type: "START_TIMER" }
   | { type: "REROLL_WORD" }
+  | { type: "REASSIGN_WORD"; wordIndex: number; newWinnerIndex: number | null }
   | { type: "NEXT_ROUND" }
   | { type: "QUIT_GAME" }
   // Ações Infiltração

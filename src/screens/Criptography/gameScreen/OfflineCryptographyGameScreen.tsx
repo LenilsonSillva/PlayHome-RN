@@ -48,6 +48,7 @@ export function OfflineCryptographyGameScreen() {
     handleInterceptionResult,
     passInterceptionTurn,
     rerollWord,
+    reassignWord,
     nextRound,
     quitGame
   } = useOfflineCryptography();
@@ -282,7 +283,7 @@ export function OfflineCryptographyGameScreen() {
               }
 
               // 🔥 Interstitial (caso normal)
-              if (shouldShowInterstitial()) {
+              if (await shouldShowInterstitial()) {
                 try {
                   await showInterstitialAd();
                   markAdAsShown();
@@ -295,6 +296,7 @@ export function OfflineCryptographyGameScreen() {
                 nextRound();
               }
             }}
+            onReassign={reassignWord}
           />
         )}
       </View>

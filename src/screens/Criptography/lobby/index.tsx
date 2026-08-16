@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
   },
   titleContainer: { alignItems: "center" },
   toggleWrapper: {
-    display: "none", // 🔥 MÁGICA AQUI: Esconde o botão e ajusta o layout!
+    display: "flex",
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 10

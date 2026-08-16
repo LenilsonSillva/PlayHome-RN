@@ -23,7 +23,10 @@ export function createTeams(
     totalErrors: 0,
     roundTimeSpent: 0,
     totalTimeSpent: 0,
-    operatorStats: {}
+    operatorStats: {},
+    manualAdjustmentCount: 0,
+    manualAdjustmentAddCount: 0,
+    manualAdjustmentRemoveCount: 0
   }));
 
   // 🔥 2. Atribui Cores Únicas e Aleatórias aos Jogadores

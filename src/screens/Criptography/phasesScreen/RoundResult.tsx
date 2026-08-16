@@ -19,10 +19,14 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { CryptoGameState, CryptoPlayer, CryptoTeam } from "@/games/cryptography/types/game";
 import { ImpostorBackground } from "@/components/Background/Background";
 import { useAudio } from "@/contexts/audioContext";
+import { useOfflineCryptography } from "@/games/cryptography/hooks/useOfflineCryptography";
+import { useAlert } from "@/contexts/alertContext";
+import { RoundWordsAuditModal } from "./components/RoundWordsAudit";
 
 interface Props {
   gameState: CryptoGameState;
   onNextRound: () => void;
+  onReassign: (wordIndex: number, newWinnerIndex: number | null) => void; // 🔥 Recebe do pai
 }
 
 const { width, height } = Dimensions.get("window");
@@ -79,9 +83,12 @@ const AnimatedEmoji = ({ emoji, index, teamColor }: { emoji: string; index: numb
   );
 };
 
-export const RoundResult = ({ gameState, onNextRound }: Props) => {
+export const RoundResult = ({ gameState, onNextRound, onReassign }: Props) => {
   const { t, i18n } = useTranslation();
   const { playSound } = useAudio();
+  const [auditVisible, setAuditVisible] = useState(false);
+  const { reassignWord } = useOfflineCryptography(); // Use o hook
+  const { showAlert } = useAlert(); // Use seu context de alerta
   const scrollY = useSharedValue(0);
 
   const scrollHandler = useAnimatedScrollHandler((event) => {
@@ -231,6 +238,23 @@ export const RoundResult = ({ gameState, onNextRound }: Props) => {
             </CustomText>
           </View>
 
+          {/* BOTÃO DE AUDITORIA */}
+          <TouchableOpacity style={styles.auditButton} onPress={() => setAuditVisible(true)}>
+            <MaterialCommunityIcons name="history" size={20} color={COLORS.cyan} />
+            <CustomText variant="label" style={{ color: COLORS.cyan, marginLeft: 10 }}>
+              {t("games.cryptography_view_round_words", "VER PALAVRAS DA RODADA")}
+            </CustomText>
+          </TouchableOpacity>
+
+          {/* MODAL DE AUDITORIA */}
+          <RoundWordsAuditModal
+            visible={auditVisible}
+            onClose={() => setAuditVisible(false)}
+            gameState={gameState}
+            onReassign={onReassign}
+            showAlert={showAlert}
+          />
+
           <View style={styles.rankingList}>
             {sortedTeams.map((team, index) => (
               <TeamReportCard key={team.id} team={team} rank={index + 1} />
@@ -335,13 +359,24 @@ const TeamReportCard = ({ team, rank }: { team: CryptoTeam; rank: number }) => {
           <CustomText variant="label" style={styles.membersList} numberOfLines={2}>
             {memberNames}
           </CustomText>
-          <CustomText variant="hint" style={{ color: COLORS.success, marginTop: 4, fontSize: 16 }}>
+          {/*<CustomText variant="hint" style={{ color: COLORS.success, marginTop: 4, fontSize: 16 }}>
             {team.score} {t("games.cryptography_result_totalPts")} ({roundHits} {t("games.cryptography_result_roundPts")})
+          </CustomText>*/}
+        </View>
+        <View style={[styles.totalPts, { borderColor: team.color }]}>
+          <CustomText variant="label" style={{ color: COLORS.textSecondary, textAlign: "center", fontSize: 8 }}>
+            {t("games.cryptography_result_total", "TOTAL")}
+          </CustomText>
+          <CustomText variant="h2" style={[styles.rankNumber, { color: COLORS.success, textAlign: "center" }]}>
+            {team.score}
           </CustomText>
         </View>
       </View>
 
       {/* Grid de Estatísticas */}
+      <CustomText variant="label" style={styles.thisRnd}>
+        {t("games.cryptography_result_roundPts")}
+      </CustomText>
       <View style={styles.statsGrid}>
         <View style={styles.statItem}>
           <CustomText variant="label" style={styles.statLabel}>
@@ -511,7 +546,7 @@ const styles = StyleSheet.create({
   },
   listHeader: { alignItems: "center", marginBottom: 25 },
   handle: { width: 45, height: 5, backgroundColor: "rgba(255,255,255,0.1)", borderRadius: 10, marginBottom: 15 },
-  listTitle: { color: COLORS.cyan, opacity: 0.6, letterSpacing: 3, fontSize: 12 },
+  listTitle: { color: COLORS.cyan, letterSpacing: 3, fontSize: 12 },
 
   rankingList: { paddingHorizontal: 20, gap: 15 },
 
@@ -532,13 +567,46 @@ const styles = StyleSheet.create({
   rankNumber: { fontSize: 24, color: COLORS.textSecondary, width: 45 },
   membersList: { color: "rgba(255,255,255,0.4)", fontSize: 10, marginTop: 2, textTransform: "uppercase" },
 
+  totalPts: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 10,
+    borderWidth: 2,
+    padding: 3,
+    borderTopRightRadius: 7
+  },
+
+  auditButton: {
+    display: "flex",
+    alignSelf: "center",
+    flexDirection: "row",
+    width: "90%",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 15,
+    borderWidth: 1,
+    borderColor: COLORS.cyan + "40",
+    borderRadius: 15,
+    marginBottom: 25,
+    borderStyle: "dashed"
+  },
+
+  thisRnd: {
+    color: COLORS.textSecondary,
+    marginTop: 10,
+    alignSelf: "center",
+    textAlign: "center",
+    borderTopWidth: 1,
+    borderTopColor: "rgba(255,255,255,0.05)"
+  },
+
   statsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     padding: 15,
-    gap: 10,
-    borderTopWidth: 1,
-    borderTopColor: "rgba(255,255,255,0.05)"
+    gap: 10
   },
   statItem: { width: "47%", backgroundColor: "rgba(0,0,0,0.2)", padding: 10, borderRadius: 8, alignItems: "center" },
   statLabel: { fontSize: 10, color: COLORS.textSecondary, marginBottom: 5 },

@@ -22,6 +22,8 @@ export function gameReducer(state: CryptoGameState | null, action: GameAction): 
     case "BEGIN_ACTION_PHASE":
     case "START_TIMER":
     case "REROLL_WORD":
+    case "REASSIGN_WORD":
+      return commonReducer(state, action);
     case "NEXT_ROUND":
       return commonReducer(state, action);
 

@@ -54,6 +54,7 @@ export const LobbyOffline = () => {
   const [teamCount, setTeamCount] = useState(2);
   const [selectedTime, setSelectedTime] = useState(60);
   const [wordLimit, setWordLimit] = useState(5);
+  const [skipLimit, setSkipLimit] = useState(3);
   const [showCategories, setShowCategories] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
@@ -211,6 +212,7 @@ export const LobbyOffline = () => {
       distributionType,
       roundTime: selectedTime,
       wordLimit,
+      skipLimit,
       categories: selectedCategories
     };
 
@@ -466,7 +468,8 @@ export const LobbyOffline = () => {
               ))}
             </View>
 
-            {mode === "interception" && (
+            {mode === "interception" ? (
+              // Box 2, quantidade de palavras
               <View style={{ marginTop: 25 }}>
                 <CustomText variant="label" style={styles.cyanText}>
                   {t("games.cryptography_lobby_wordLimit")}
@@ -486,6 +489,32 @@ export const LobbyOffline = () => {
                     >
                       <CustomText variant="h3" style={{ color: wordLimit === w ? COLORS.background : COLORS.textSecondary }}>
                         {w}
+                      </CustomText>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            ) : (
+              // Box 2, quantidade de pulos
+              <View style={{ marginTop: 25 }}>
+                <CustomText variant="label" style={styles.cyanText}>
+                  {t("games.cryptography_lobby_skipLimit")}
+                </CustomText>
+                <CustomText variant="body" style={styles.optText}>
+                  {t("games.cryptography_lobby_skipLimitText")}
+                </CustomText>
+                <View style={styles.optionsRow}>
+                  {[3, 5, 999].map((w) => (
+                    <TouchableOpacity
+                      key={w}
+                      style={[styles.optionChip, skipLimit === w && styles.optionActive]}
+                      onPress={() => {
+                        setSkipLimit(w);
+                        playSound("click2");
+                      }}
+                    >
+                      <CustomText variant="h3" style={{ color: skipLimit === w ? COLORS.background : COLORS.textSecondary }}>
+                        {w <= 5 ? w : "∞"}
                       </CustomText>
                     </TouchableOpacity>
                   ))}

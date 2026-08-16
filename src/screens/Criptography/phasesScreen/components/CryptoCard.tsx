@@ -31,7 +31,7 @@ interface CryptoCardProps {
   teamColor: string;
   isTimerRunning: boolean;
   isRoundActive: boolean;
-  skipsLeft?: number;
+  skipsLeft?: number | null;
   onAction: (type: "correct" | "skip") => void;
   onStartTimer?: () => void;
 }
@@ -98,7 +98,7 @@ export const CryptoCard = ({
     .onUpdate((e) => {
       if (!isRoundActive) return;
 
-      if (e.translationX < 0 && skipsLeft === 0) {
+      if (e.translationX < 0 && (skipsLeft === 0 || skipsLeft === null)) {
         translateX.value = e.translationX * 0.15;
       } else {
         translateX.value = e.translationX;
@@ -116,7 +116,7 @@ export const CryptoCard = ({
         translateX.value = withTiming(width * 1.5, { duration: 200 }, () => {
           runOnJS(handleAction)("correct");
         });
-      } else if ((e.translationX < -SWIPE_THRESHOLD || e.velocityX < -800) && skipsLeft && skipsLeft > 0) {
+      } else if ((e.translationX < -SWIPE_THRESHOLD || e.velocityX < -800) && skipsLeft !== 0 && skipsLeft !== null) {
         translateX.value = withTiming(-width * 1.5, { duration: 200 }, () => {
           runOnJS(handleAction)("skip");
         });

@@ -28,6 +28,9 @@ export interface CryptoTeam {
   roundTimeSpent: number; // Tempo em milissegundos
   totalTimeSpent: number; // Tempo total gasto (em milissegundos)
   operatorStats: Record<string, number>; // Ex: { "id_do_lucas": 14 }
+  manualAdjustmentCount: number;
+  manualAdjustmentAddCount?: number;
+  manualAdjustmentRemoveCount?: number;
 }
 
 export interface CryptoConfig {
@@ -36,6 +39,7 @@ export interface CryptoConfig {
   distributionType: "random" | "manual";
   roundTime: number; // Infiltration (60, 90, 120) ou Interception (15, 30, 60)
   wordLimit: number; // Interception (5, 10, 20)
+  skipLimit: number; // Infiltration (5, 10, null)
   categories: string[];
 }
 
@@ -49,9 +53,10 @@ export interface CryptoGameState {
   usedWords: string[];
   roundNumber: number;
   currentMatchIndex: number; // Usado para a contagem de palavras do modo Interception
-  skipsLeft: number; // Controle de pulos do modo Infiltration (Começa sempre em 3)
+  skipsLeft: number; // Controle de pulos do modo Infiltration
   roundEndTime?: number; // 🔥 NOVO: Timestamp de fim do turno para o Timer Seguro
   lastActionTime?: number; // 🔥 NOVO: Marca a hora em que a palavra apareceu na tela
   wordDatabase: any[]; // Banco de palavras travado para o jogo
   wordsLanguage: string; // Idioma do jogo travado
+  roundHistory: { word: string; winnerTeamIndex: number | null; ownerTeamIndex?: number | null }[]; // Histórico de palavras, vencedores e time que usou a palavra
 }

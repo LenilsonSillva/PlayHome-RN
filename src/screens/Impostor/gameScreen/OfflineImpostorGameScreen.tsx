@@ -87,7 +87,7 @@ export const OfflineImpostorGameScreen = ({ route }: any) => {
     const { config, globalUsedWords, wordList, langCode } = route.params || {};
 
     if (config && wordList && langCode && players.length > 0) {
-        startGame(players, config, wordList, langCode, globalUsedWords);
+      startGame(players, config, wordList, langCode, globalUsedWords);
     }
   }, [route.params]);
 
@@ -285,7 +285,7 @@ export const OfflineImpostorGameScreen = ({ route }: any) => {
               }
 
               // 🔥 Interstitial (caso normal)
-              if (shouldShowInterstitial()) {
+              if (await shouldShowInterstitial()) {
                 try {
                   await showInterstitialAd();
                   markAdAsShown();

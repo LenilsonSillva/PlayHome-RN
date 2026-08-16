@@ -78,10 +78,10 @@ export const InfiltrationAction = ({ gameState, onAction, onTimeUp, onStartTimer
             </View>
             <View style={styles.statCompactItem}>
               <CustomText variant="hint" style={{ color: COLORS.amber }}>
-                {t("games.cryptography_action_skips")}:
+                {gameState.skipsLeft === 999 ? t("games.cryptography_action_skip") : t("games.cryptography_action_skips")}:
               </CustomText>
               <CustomText variant="label" style={{ color: COLORS.amber, marginLeft: 4 }}>
-                {gameState.skipsLeft}
+                {gameState.skipsLeft === 999 ? "∞" : gameState.skipsLeft}
               </CustomText>
             </View>
           </View>

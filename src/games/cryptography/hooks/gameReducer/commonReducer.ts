@@ -1,9 +1,22 @@
 import { createTeams } from "../../logic/createTeams";
 import { getUniqueWord } from "../../logic/wordSelector";
-import { CryptoGameState } from "../../types/game";
+import { CryptoConfig, CryptoGameState } from "../../types/game";
 import { GameAction } from "./types";
 
-const MAX_SKIPS = 3;
+// Limite por equipe, baseado na quantidade de palavras realmente usadas por ela na rodada
+const getTeamAdjustmentLimit = (config: CryptoConfig, team: CryptoGameState["teams"][number]) => {
+  const wordsUsed = Math.max((team.roundScore || 0) + (team.roundErrors || 0), 0);
+
+  if (config.mode === "infiltration") {
+    if (wordsUsed <= 5) return 1;
+    if (wordsUsed <= 10) return 2;
+    return 3;
+  }
+
+  if (config.wordLimit <= 5) return 1;
+  if (config.wordLimit <= 10) return 2;
+  return 3;
+};
 
 export function commonReducer(state: CryptoGameState | null, action: GameAction): CryptoGameState | null {
   switch (action.type) {
@@ -13,7 +26,12 @@ export function commonReducer(state: CryptoGameState | null, action: GameAction)
         action.config.teamCount,
         action.config.distributionType,
         action.manualAssignments
-      );
+      ).map((t) => ({
+        ...t,
+        manualAdjustmentCount: 0,
+        manualAdjustmentAddCount: 0,
+        manualAdjustmentRemoveCount: 0
+      }));
 
       const initialTeamIndex = Math.floor(Math.random() * teams.length);
 
@@ -27,10 +45,11 @@ export function commonReducer(state: CryptoGameState | null, action: GameAction)
         usedWords: action.globalUsedWords || [],
         roundNumber: 1,
         currentMatchIndex: 0,
-        skipsLeft: MAX_SKIPS,
         roundEndTime: undefined,
+        skipsLeft: action.config.skipLimit,
         wordDatabase: action.wordDatabase || [],
-        wordsLanguage: action.langCode || ""
+        wordsLanguage: action.langCode || "",
+        roundHistory: []
       };
     }
 
@@ -73,7 +92,7 @@ export function commonReducer(state: CryptoGameState | null, action: GameAction)
         phase: state.config.mode === "infiltration" ? "infiltration-action" : "interception-action",
         currentWord: firstWord.word,
         usedWords: firstWord.didReset ? [firstWord.word] : [...state.usedWords, firstWord.word],
-        skipsLeft: MAX_SKIPS,
+        skipsLeft: state.config.skipLimit,
         roundEndTime: undefined,
         // 🔥 CORRIGIDO: Limpa os scores apenas se for o primeiro turno da primeira rodada
         // indepedente de qual grupo for o "Grupo 0"
@@ -107,6 +126,70 @@ export function commonReducer(state: CryptoGameState | null, action: GameAction)
         currentWord: nextWord.word,
         usedWords: nextWord.didReset ? [nextWord.word] : [...state.usedWords, nextWord.word]
       };
+    }
+
+    case "REASSIGN_WORD": {
+      if (!state) return state;
+
+      const { wordIndex, newWinnerIndex } = action;
+      const item = state.roundHistory[wordIndex];
+      if (!item) return state;
+
+      const oldWinnerIndex = item.winnerTeamIndex;
+
+      if (state.config.mode === "infiltration" && item.ownerTeamIndex !== null && item.ownerTeamIndex !== undefined) {
+        if (newWinnerIndex !== null && newWinnerIndex !== item.ownerTeamIndex) return state;
+      }
+
+      if (newWinnerIndex !== null && oldWinnerIndex !== newWinnerIndex) {
+        const newTeamLimit = getTeamAdjustmentLimit(state.config, state.teams[newWinnerIndex]);
+        if ((state.teams[newWinnerIndex].manualAdjustmentAddCount ?? 0) >= newTeamLimit) {
+          return state;
+        }
+      }
+
+      if (oldWinnerIndex !== null && oldWinnerIndex !== newWinnerIndex) {
+        const oldTeamLimit = getTeamAdjustmentLimit(state.config, state.teams[oldWinnerIndex]);
+        if ((state.teams[oldWinnerIndex].manualAdjustmentRemoveCount ?? 0) >= oldTeamLimit) {
+          return state;
+        }
+      }
+
+      const newHistory = [...state.roundHistory];
+      newHistory[wordIndex] = { ...item, winnerTeamIndex: newWinnerIndex };
+
+      const updatedTeams = state.teams.map((team, idx) => {
+        let scoreChange = 0;
+        let errorChange = 0;
+        let addChange = 0;
+        let removeChange = 0;
+
+        if (idx === oldWinnerIndex && idx !== newWinnerIndex) {
+          scoreChange = -1;
+          errorChange = 1;
+          removeChange = 1;
+        } else if (idx === newWinnerIndex && idx !== oldWinnerIndex) {
+          scoreChange = 1;
+          errorChange = -1;
+          addChange = 1;
+        } else {
+          return team;
+        }
+
+        return {
+          ...team,
+          score: Math.max(0, team.score + scoreChange),
+          roundScore: Math.max(0, team.roundScore + scoreChange),
+          roundErrors: Math.max(0, team.roundErrors + errorChange),
+          totalErrors: Math.max(0, team.totalErrors + errorChange),
+          manualAdjustmentCount: (team.manualAdjustmentCount || 0) + 1,
+          manualAdjustmentAddCount: (team.manualAdjustmentAddCount ?? 0) + addChange,
+          manualAdjustmentRemoveCount: (team.manualAdjustmentRemoveCount ?? 0) + removeChange,
+          wordsGuessed: newHistory.filter((h) => h.winnerTeamIndex === idx).map((h) => h.word)
+        };
+      });
+
+      return { ...state, roundHistory: newHistory, teams: updatedTeams };
     }
 
     case "NEXT_ROUND": {
@@ -160,6 +243,7 @@ export function commonReducer(state: CryptoGameState | null, action: GameAction)
         startingTeamIndex: nextStartingTeam,
         currentMatchIndex: 0,
         roundNumber: state.roundNumber + 1,
+        roundHistory: [],
         roundEndTime: undefined,
         lastActionTime: undefined,
         teams: state.teams.map((t) => ({
@@ -167,7 +251,10 @@ export function commonReducer(state: CryptoGameState | null, action: GameAction)
           operatorId: null,
           roundScore: 0,
           roundErrors: 0, // Reseta pro relatório da nova rodada
-          roundTimeSpent: 0 // Reseta pro relatório da nova rodada
+          roundTimeSpent: 0, // Reseta pro relatório da nova rodada
+          manualAdjustmentCount: 0,
+          manualAdjustmentAddCount: 0,
+          manualAdjustmentRemoveCount: 0
         }))
       };
     }

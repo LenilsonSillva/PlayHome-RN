@@ -46,7 +46,7 @@ export const AlertsModal = ({ visible, emoji, title, message, buttons, onClose }
           </CustomText>
 
           {/* 🔥 Container dinâmico para os botões */}
-          <View style={styles.buttonRow}>
+          <View style={activeButtons.length > 2 ? styles.buttonStack : styles.buttonRow}>
             {activeButtons.map((btn, index) => {
               const isCancel = btn.style === "cancel";
               const isDestructive = btn.style === "destructive";
@@ -56,22 +56,21 @@ export const AlertsModal = ({ visible, emoji, title, message, buttons, onClose }
                   key={index}
                   style={[
                     styles.btnBase,
-                    isCancel ? styles.btnCancel : isDestructive ? styles.btnDestructive : styles.btnDefault,
-                    activeButtons.length === 2 && {
-                      flex: 1,
-                      marginHorizontal: 5
-                    } // Se tiver 2 botões, ficam lado a lado!
+                    activeButtons.length === 2 && styles.btnHalf,
+                    activeButtons.length > 2 && styles.btnFull,
+                    isCancel ? styles.btnCancel : isDestructive ? styles.btnDestructive : styles.btnDefault
                   ]}
                   onPress={() => {
-                    if (btn.onPress) btn.onPress(); // Roda a função do botão (se existir)
-                    onClose(); // Fecha o modal sempre
+                    if (btn.onPress) btn.onPress();
+                    onClose();
                     playSound("click2");
                   }}
                 >
                   <CustomText
                     variant="label"
                     style={{
-                      color: isCancel ? COLORS.textPrimary : COLORS.background
+                      color: isCancel ? COLORS.textPrimary : COLORS.background,
+                      textAlign: "center"
                     }}
                   >
                     {btn.text}
@@ -115,14 +114,30 @@ const styles = StyleSheet.create({
   buttonRow: {
     flexDirection: "row",
     width: "100%",
-    justifyContent: "center"
+    justifyContent: "center",
+    alignItems: "stretch",
+    gap: 10
+  },
+  buttonStack: {
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "stretch",
+    gap: 10
   },
   btnBase: {
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderRadius: 12,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
+    minHeight: 48
+  },
+  btnHalf: {
+    flex: 1,
+    marginHorizontal: 4
+  },
+  btnFull: {
+    width: "100%"
   },
   btnDefault: {
     backgroundColor: COLORS.amber

@@ -39,6 +39,11 @@ export function interceptionReducer(state: CryptoGameState | null, action: GameA
       const isRoundOver = nextMatchIndex >= state.config.wordLimit;
       const newCurrentTeamIndex = action.winnerTeamIndex !== null ? action.winnerTeamIndex : state.currentTeamIndex;
 
+      const newHistoryItem = {
+        word: state.currentWord!,
+        winnerTeamIndex: action.winnerTeamIndex
+      };
+
       if (isRoundOver) {
         return {
           ...state,
@@ -46,14 +51,21 @@ export function interceptionReducer(state: CryptoGameState | null, action: GameA
           phase: "round-result",
           currentTeamIndex: newCurrentTeamIndex,
           roundEndTime: undefined,
-          lastActionTime: undefined
+          lastActionTime: undefined,
+          roundHistory: [...state.roundHistory, newHistoryItem]
         };
       }
 
       const result = getUniqueWord(state.config.categories, state.usedWords, state.wordDatabase);
 
       if (!result.word) {
-        return { ...state, phase: "round-result", roundEndTime: undefined, lastActionTime: undefined };
+        return {
+          ...state,
+          phase: "round-result",
+          roundEndTime: undefined,
+          lastActionTime: undefined,
+          roundHistory: [...state.roundHistory, newHistoryItem]
+        };
       }
 
       return {
@@ -64,7 +76,8 @@ export function interceptionReducer(state: CryptoGameState | null, action: GameA
         usedWords: result.didReset ? [result.word] : [...state.usedWords, result.word],
         currentTeamIndex: newCurrentTeamIndex,
         roundEndTime: undefined,
-        lastActionTime: undefined
+        lastActionTime: undefined,
+        roundHistory: [...state.roundHistory, newHistoryItem]
       };
     }
 

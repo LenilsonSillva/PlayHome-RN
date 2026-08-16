@@ -73,6 +73,10 @@ export function useOfflineCryptography() {
     dispatch({ type: "REROLL_WORD" });
   }, []);
 
+  const reassignWord = useCallback((wordIndex: number, newWinnerIndex: number | null) => {
+    dispatch({ type: "REASSIGN_WORD", wordIndex, newWinnerIndex });
+  }, []);
+
   const nextRound = useCallback(() => {
     dispatch({ type: "NEXT_ROUND" });
   }, []);
@@ -95,6 +99,7 @@ export function useOfflineCryptography() {
     handleInterceptionResult,
     passInterceptionTurn,
     rerollWord,
+    reassignWord,
     nextRound,
     persistWords,
     quitGame

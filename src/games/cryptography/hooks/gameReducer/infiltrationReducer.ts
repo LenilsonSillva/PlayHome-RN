@@ -2,8 +2,6 @@ import { CryptoGameState } from "../../types/game";
 import { getUniqueWord } from "../../logic/wordSelector";
 import { GameAction } from "./types";
 
-const MAX_SKIPS = 3;
-
 export function infiltrationReducer(state: CryptoGameState | null, action: GameAction): CryptoGameState | null {
   if (!state || state.config.mode !== "infiltration") return state;
 
@@ -23,8 +21,11 @@ export function infiltrationReducer(state: CryptoGameState | null, action: GameA
         newScore = 1;
         if (state.currentWord) newWords.push(state.currentWord);
       } else {
-        if (state.skipsLeft === 0) return state;
-        newSkips = state.skipsLeft - 1;
+        if (state.config.skipLimit !== 999) {
+          if (state.skipsLeft === 0) return state; // Bloqueia o pulo se acabou
+          newSkips = state.skipsLeft - 1;
+        }
+        // Se for 999, newSkips continua sendo 999 e o erro é contado
         newErrors = 1;
       }
 
@@ -49,7 +50,14 @@ export function infiltrationReducer(state: CryptoGameState | null, action: GameA
         };
       });
 
-      // 🔥 CORREÇÃO: Lê o 'result.word' do novo formato
+      const newHistoryItem = {
+        word: state.currentWord!,
+        winnerTeamIndex: action.success ? state.currentTeamIndex : null,
+        ownerTeamIndex: state.currentTeamIndex
+      };
+
+      const historyWithCurrentWord = [...state.roundHistory, newHistoryItem];
+
       const result = getUniqueWord(state.config.categories, state.usedWords, state.wordDatabase);
 
       if (!result.word) {
@@ -58,7 +66,8 @@ export function infiltrationReducer(state: CryptoGameState | null, action: GameA
           teams: updatedTeams,
           phase: "round-result",
           roundEndTime: undefined,
-          lastActionTime: undefined
+          lastActionTime: undefined,
+          roundHistory: historyWithCurrentWord
         };
       }
 
@@ -66,25 +75,42 @@ export function infiltrationReducer(state: CryptoGameState | null, action: GameA
         ...state,
         teams: updatedTeams,
         currentWord: result.word,
-        // 🔥 Se o banco zerou (didReset), a lista de usadas começa limpa só com essa palavra!
         usedWords: result.didReset ? [result.word] : [...state.usedWords, result.word],
         skipsLeft: newSkips,
-        lastActionTime: now
+        lastActionTime: now,
+        roundHistory: historyWithCurrentWord
       };
     }
 
     case "FINISH_INFILTRATION_TURN": {
       const nextTeamIndex = (state.currentTeamIndex + 1) % state.teams.length;
       const isLastTeam = nextTeamIndex === state.startingTeamIndex;
+      const currentHistoryItem = {
+        word: state.currentWord!,
+        winnerTeamIndex: null,
+        ownerTeamIndex: state.currentTeamIndex
+      };
 
       if (isLastTeam) {
-        return { ...state, phase: "round-result", roundEndTime: undefined, lastActionTime: undefined };
+        return {
+          ...state,
+          phase: "round-result",
+          roundEndTime: undefined,
+          lastActionTime: undefined,
+          roundHistory: [...state.roundHistory, currentHistoryItem]
+        };
       }
 
       const result = getUniqueWord(state.config.categories, state.usedWords, state.wordDatabase);
 
       if (!result.word) {
-        return { ...state, phase: "round-result", roundEndTime: undefined, lastActionTime: undefined };
+        return {
+          ...state,
+          phase: "round-result",
+          roundEndTime: undefined,
+          lastActionTime: undefined,
+          roundHistory: [...state.roundHistory, currentHistoryItem]
+        };
       }
 
       return {
@@ -92,9 +118,10 @@ export function infiltrationReducer(state: CryptoGameState | null, action: GameA
         currentTeamIndex: nextTeamIndex,
         currentWord: result.word,
         usedWords: result.didReset ? [result.word] : [...state.usedWords, result.word],
-        skipsLeft: MAX_SKIPS,
+        skipsLeft: state.config.skipLimit,
         roundEndTime: undefined,
-        lastActionTime: undefined
+        lastActionTime: undefined,
+        roundHistory: [...state.roundHistory, currentHistoryItem]
       };
     }
 
