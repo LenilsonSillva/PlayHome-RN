@@ -30,7 +30,7 @@ const LANGUAGES = [
   { code: "pt", label: "Português", flag: "🇧🇷" },
   { code: "pt-PT", label: "Português (PT)", flag: "🇵🇹" },
   { code: "es", label: "Español", flag: "🇪🇸" },
-  { code: "es-419", label: "Español (LATAM)", flag: "🇲🇽" },
+  { code: "es-419", label: "Español (LATAM)", flag: "🌎" },
   { code: "fr", label: "Français", flag: "🇫🇷" },
   { code: "de", label: "Deutsch", flag: "🇩🇪" },
   { code: "it", label: "Italiano", flag: "🇮🇹" },
@@ -87,7 +87,10 @@ export const SettingsModal = ({
     playSound("click2");
     setChangeRevealIcon(true);
     onReroll && onReroll();
-    setTimeout(() => setChangeRevealIcon(false), 2000);
+    setTimeout(() => {
+      setChangeRevealIcon(false);
+      onClose();
+    }, 2000);
   };
 
   const handleResetHistory = () => {

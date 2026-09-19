@@ -14,9 +14,16 @@ interface Props {
   onAction: (type: "correct" | "skip") => void;
   onTimeUp: () => void;
   onStartTimer: () => void;
+  /** ONLINE: o servidor é a fonte do tempo (roundEndTime) e encerra o
+   * turno sozinho quando ele zera — o contador local é só visual e
+   * NUNCA chama onTimeUp por conta própria. */
+  serverDriven?: boolean;
+  /** ONLINE: skew de relógio (serverTime - Date.now() da view) p/ o
+   * cronômetro exibir o tempo certo (padrão do Impostor online). */
+  serverOffset?: number;
 }
 
-export const InfiltrationAction = ({ gameState, onAction, onTimeUp, onStartTimer }: Props) => {
+export const InfiltrationAction = ({ gameState, onAction, onTimeUp, onStartTimer, serverDriven, serverOffset = 0 }: Props) => {
   const { t } = useTranslation();
   const currentTeam = gameState.teams[gameState.currentTeamIndex];
 
@@ -41,17 +48,19 @@ export const InfiltrationAction = ({ gameState, onAction, onTimeUp, onStartTimer
     if (!gameState.roundEndTime) return;
 
     const interval = setInterval(() => {
-      const remaining = Math.max(0, Math.ceil((gameState.roundEndTime! - Date.now()) / 1000));
+      const remaining = Math.max(0, Math.ceil((gameState.roundEndTime! - (Date.now() + serverOffset)) / 1000));
       setTimeLeft(remaining);
 
       if (remaining <= 0) {
         clearInterval(interval);
+        // ONLINE: o servidor encerra o turno e manda a nova view.
+        if (!serverDriven) onTimeUp();
         onTimeUp();
       }
     }, 250);
 
     return () => clearInterval(interval);
-  }, [gameState.roundEndTime, onTimeUp]);
+  }, [gameState.roundEndTime, onTimeUp, serverDriven, serverOffset]);
 
   return (
     <GestureHandlerRootView style={styles.container}>

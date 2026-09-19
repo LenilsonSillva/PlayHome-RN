@@ -27,6 +27,8 @@ interface Props {
   gameState: CryptoGameState;
   onNextRound: () => void;
   onReassign: (wordIndex: number, newWinnerIndex: number | null) => void; // 🔥 Recebe do pai
+  /** ONLINE: só o host avança a rodada e ajusta pontos (offline: true) */
+  canNextRound?: boolean;
 }
 
 const { width, height } = Dimensions.get("window");
@@ -83,13 +85,15 @@ const AnimatedEmoji = ({ emoji, index, teamColor }: { emoji: string; index: numb
   );
 };
 
-export const RoundResult = ({ gameState, onNextRound, onReassign }: Props) => {
+export const RoundResult = ({ gameState, onNextRound, onReassign, canNextRound }: Props) => {
   const { t, i18n } = useTranslation();
   const { playSound } = useAudio();
   const [auditVisible, setAuditVisible] = useState(false);
   const { reassignWord } = useOfflineCryptography(); // Use o hook
   const { showAlert } = useAlert(); // Use seu context de alerta
   const scrollY = useSharedValue(0);
+  // ONLINE: auditoria/avanço só para o host (offline: true)
+  const canControl = canNextRound !== false;
 
   const scrollHandler = useAnimatedScrollHandler((event) => {
     scrollY.value = event.contentOffset.y;
@@ -238,22 +242,26 @@ export const RoundResult = ({ gameState, onNextRound, onReassign }: Props) => {
             </CustomText>
           </View>
 
-          {/* BOTÃO DE AUDITORIA */}
-          <TouchableOpacity style={styles.auditButton} onPress={() => setAuditVisible(true)}>
-            <MaterialCommunityIcons name="history" size={20} color={COLORS.cyan} />
-            <CustomText variant="label" style={{ color: COLORS.cyan, marginLeft: 10 }}>
-              {t("games.cryptography_result_roundWords")}
-            </CustomText>
-          </TouchableOpacity>
+          {/* BOTÃO DE AUDITORIA (offline: todos · online: só o host) */}
+          {canControl && (
+            <TouchableOpacity style={styles.auditButton} onPress={() => setAuditVisible(true)}>
+              <MaterialCommunityIcons name="history" size={20} color={COLORS.cyan} />
+              <CustomText variant="label" style={{ color: COLORS.cyan, marginLeft: 10 }}>
+                {t("games.cryptography_result_roundWords")}
+              </CustomText>
+            </TouchableOpacity>
+          )}
 
-          {/* MODAL DE AUDITORIA */}
-          <RoundWordsAuditModal
-            visible={auditVisible}
-            onClose={() => setAuditVisible(false)}
-            gameState={gameState}
-            onReassign={onReassign}
-            showAlert={showAlert}
-          />
+          {/* MODAL DE AUDITORIA (offline: todos · online: só o host) */}
+          {canControl && (
+            <RoundWordsAuditModal
+              visible={auditVisible}
+              onClose={() => setAuditVisible(false)}
+              gameState={gameState}
+              onReassign={onReassign}
+              showAlert={showAlert}
+            />
+          )}
 
           <View style={styles.rankingList}>
             {sortedTeams.map((team, index) => (
@@ -264,20 +272,29 @@ export const RoundResult = ({ gameState, onNextRound, onReassign }: Props) => {
       </Animated.ScrollView>
 
       <View style={styles.footer}>
-        <TouchableOpacity
-          style={styles.nextBtn}
-          onPress={() => {
-            playSound("click");
-            setTimeout(() => {
-              onNextRound();
-            }, 100);
-          }}
-          activeOpacity={0.8}
-        >
-          <CustomText variant="h3" style={styles.btnText}>
-            {t("games.cryptography_result_nextMission")} 🚀
-          </CustomText>
-        </TouchableOpacity>
+        {canControl ? (
+          <TouchableOpacity
+            style={styles.nextBtn}
+            onPress={() => {
+              playSound("click");
+              setTimeout(() => {
+                onNextRound();
+              }, 100);
+            }}
+            activeOpacity={0.8}
+          >
+            <CustomText variant="h3" style={styles.btnText}>
+              {t("games.cryptography_result_nextMission")} 🚀
+            </CustomText>
+          </TouchableOpacity>
+        ) : (
+          /* ONLINE: o resto da sala só acompanha o resultado */
+          <View style={styles.waitingBox}>
+            <CustomText variant="label" style={{ color: COLORS.textSecondary, textAlign: "center", lineHeight: 20 }}>
+              ⏳ {t("games.cryptography_online_game_waitingHostNextRound")}
+            </CustomText>
+          </View>
+        )}
       </View>
     </View>
   );
@@ -648,5 +665,15 @@ const styles = StyleSheet.create({
 
   footer: { position: "absolute", bottom: 0, left: 0, right: 0, padding: 25, paddingBottom: 45, backgroundColor: COLORS.surface },
   nextBtn: { backgroundColor: COLORS.cyan, padding: 22, borderRadius: 20, alignItems: "center", elevation: 10 },
-  btnText: { color: COLORS.background, fontWeight: "900", letterSpacing: 1, fontSize: 18 }
+  btnText: { color: COLORS.background, fontWeight: "900", letterSpacing: 1, fontSize: 18 },
+  waitingBox: {
+    padding: 22,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.03)",
+    borderWidth: 1,
+    borderColor: "rgba(0, 242, 255, 0.2)",
+    borderStyle: "dashed",
+    alignItems: "center",
+    justifyContent: "center"
+  }
 });

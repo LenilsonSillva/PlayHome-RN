@@ -7,6 +7,7 @@ import { Header } from "@/components/Header/Header";
 import { SettingsModal } from "@/components/SettingsModal/SettingsModal";
 import { useTranslation } from "react-i18next";
 import { ImpostorBackground } from "@/components/Background/Background";
+import { LobbyOnline } from "./LobbyOnline";
 // import { LobbyOnline } from "./LobbyOnline"; // 🔥 Descomente no futuro!
 
 export function CryptographyLobby() {
@@ -61,20 +62,7 @@ export function CryptographyLobby() {
         </View>
 
         {/* CONTEÚDO: Renderiza a tela baseada na escolha */}
-        <View style={styles.content}>
-          {!isOnlineMode ? (
-            <LobbyOffline />
-          ) : (
-            <View style={styles.onlinePlaceholder}>
-              <CustomText variant="h2" style={{ color: COLORS.cyan }}>
-                MODO REDE
-              </CustomText>
-              <CustomText variant="label" style={{ color: COLORS.textSecondary, marginTop: 10 }}>
-                (Em desenvolvimento...)
-              </CustomText>
-            </View>
-          )}
-        </View>
+        <View style={styles.content}>{!isOnlineMode ? <LobbyOffline /> : <LobbyOnline />}</View>
       </View>
     </View>
   );

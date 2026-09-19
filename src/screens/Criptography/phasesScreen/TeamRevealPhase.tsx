@@ -4,7 +4,7 @@ import { COLORS } from "@/styles/theme";
 import { CustomText } from "@/styles/customText";
 import { useTranslation } from "react-i18next";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { CryptoGameState } from "@/games/cryptography/types/game";
+import { CryptoGameState, CryptoTeam } from "@/games/cryptography/types/game";
 import { useAlert } from "@/contexts/alertContext";
 import { useAudio } from "@/contexts/audioContext";
 
@@ -14,6 +14,13 @@ interface TeamRevealProps {
   onRandomizeOperators: () => void;
   onSetStartingTeam: (teamIndex: number) => void;
   onConfirm: () => void;
+  // ---------------- ONLINE (opcional; offline = padrão atual) ----------------
+  // Quem pode definir o operador de cada time (offline: todo mundo — 1 dispositivo)
+  canChooseOperator?: (team: CryptoTeam) => boolean;
+  // Quem vê os botões de ação (sortear/iniciar). Offline: true
+  canAct?: boolean;
+  // Quem pode definir o 1º time (offline: true)
+  canSetStartingTeam?: boolean;
 }
 
 export const TeamRevealPhase = ({
@@ -21,11 +28,15 @@ export const TeamRevealPhase = ({
   onSelectOperator,
   onRandomizeOperators,
   onSetStartingTeam,
-  onConfirm
+  onConfirm,
+  canChooseOperator,
+  canAct,
+  canSetStartingTeam
 }: TeamRevealProps) => {
   const { t } = useTranslation();
   const { playSound } = useAudio();
   const { showAlert } = useAlert();
+  const isActionUser = canAct !== false;
 
   const handleConfirm = () => {
     // Valida se todos os times tem operador antes de prosseguir
@@ -122,6 +133,8 @@ export const TeamRevealPhase = ({
               <View style={styles.playersGrid}>
                 {team.players.map((player) => {
                   const isOperator = team.operatorId === player.id;
+                  // ONLINE: só o host ou o subHost do próprio time escolhe
+                  const canPick = canChooseOperator ? canChooseOperator(team) : true;
 
                   return (
                     <TouchableOpacity
@@ -130,7 +143,8 @@ export const TeamRevealPhase = ({
                         styles.gridItem,
                         isOperator
                           ? { backgroundColor: team.color + "20", borderColor: team.color, borderWidth: 2, borderTopWidth: 2 }
-                          : { borderTopWidth: 1, borderTopColor: player.color }
+                          : { borderTopWidth: 1, borderTopColor: player.color },
+                        !canPick && { opacity: 0.55 }
                       ]}
                       onPress={() => {
                         onSelectOperator(team.id, player.id);
@@ -169,11 +183,20 @@ export const TeamRevealPhase = ({
       </ScrollView>
 
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.confirmBtn} onPress={handleConfirm} activeOpacity={0.9}>
-          <CustomText variant="h2" style={{ color: COLORS.background }}>
-            {t("games.cryptography_reveal_confirmBtn")}
-          </CustomText>
-        </TouchableOpacity>
+        {isActionUser ? (
+          <TouchableOpacity style={styles.confirmBtn} onPress={handleConfirm} activeOpacity={0.9}>
+            <CustomText variant="h2" style={{ color: COLORS.background }}>
+              {t("games.cryptography_reveal_confirmBtn")}
+            </CustomText>
+          </TouchableOpacity>
+        ) : (
+          /* ONLINE: quem não é o host só acompanha a definição */
+          <View style={styles.waitingBox}>
+            <CustomText variant="label" style={{ color: COLORS.textSecondary, textAlign: "center", lineHeight: 20 }}>
+              ⏳ {t("games.cryptography_online_game_revealWaitingHost")}
+            </CustomText>
+          </View>
+        )}
       </View>
     </View>
   );
@@ -296,5 +319,16 @@ const styles = StyleSheet.create({
     shadowColor: COLORS.cyan,
     shadowRadius: 15,
     shadowOpacity: 0.4
+  },
+  waitingBox: {
+    flex: 1,
+    padding: 22,
+    borderRadius: 15,
+    backgroundColor: "rgba(255,255,255,0.03)",
+    borderWidth: 1,
+    borderColor: "rgba(0, 242, 255, 0.2)",
+    borderStyle: "dashed",
+    alignItems: "center",
+    justifyContent: "center"
   }
 });

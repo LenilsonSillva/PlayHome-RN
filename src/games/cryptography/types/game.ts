@@ -31,6 +31,8 @@ export interface CryptoTeam {
   manualAdjustmentCount: number;
   manualAdjustmentAddCount?: number;
   manualAdjustmentRemoveCount?: number;
+  // ONLINE: personalizado pelo servidor — host ou subHost do próprio grupo
+  canSetOperator?: boolean;
 }
 
 export interface CryptoConfig {

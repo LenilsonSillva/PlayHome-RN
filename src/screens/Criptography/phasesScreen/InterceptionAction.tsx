@@ -14,9 +14,23 @@ interface Props {
   onFinishMatch: (winnerTeamIdx: number | null) => void;
   onPassTurn: () => void;
   onStartTimer: () => void;
+  /** ONLINE: o servidor é a fonte do tempo (roundEndTime) e encerra a
+   * vez sozinho quando ele zera — o contador local é só visual e NUNCA
+   * chama onPassTurn por conta própria. */
+  serverDriven?: boolean;
+  /** ONLINE: skew de relógio (serverTime - Date.now() da view) p/ o
+   * cronômetro exibir o tempo certo (padrão do Impostor online). */
+  serverOffset?: number;
 }
 
-export const InterceptionAction = ({ gameState, onFinishMatch, onPassTurn, onStartTimer }: Props) => {
+export const InterceptionAction = ({
+  gameState,
+  onFinishMatch,
+  onPassTurn,
+  onStartTimer,
+  serverDriven,
+  serverOffset = 0
+}: Props) => {
   const { t } = useTranslation();
   const currentTeam = gameState.teams[gameState.currentTeamIndex];
 
@@ -28,8 +42,13 @@ export const InterceptionAction = ({ gameState, onFinishMatch, onPassTurn, onSta
   // ⏱️ TIMER DO DUELO
   // ==========================================
   const [timeLeft, setTimeLeft] = useState(gameState.config.roundTime);
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [localIsTimerRunning, setIsTimerRunning] = useState(false);
   const [turnEndTime, setTurnEndTime] = useState<number | null>(null);
+
+  // ONLINE: o "rodando" vem do servidor (roundEndTime na view)
+  const serverEndTime = serverDriven ? (gameState.roundEndTime ?? null) : null;
+  const isTimerRunning = serverDriven ? serverEndTime != null : localIsTimerRunning;
+  const effectiveEndTime = serverDriven ? serverEndTime : turnEndTime;
 
   // Reseta o timer toda vez que a palavra ou o time mudar
   useEffect(() => {
@@ -39,6 +58,11 @@ export const InterceptionAction = ({ gameState, onFinishMatch, onPassTurn, onSta
   }, [gameState.currentWord, gameState.currentTeamIndex, gameState.config.roundTime]);
 
   const startTurnTimer = () => {
+    if (serverDriven) {
+      // O servidor define o roundEndTime e devolve a view via crypto:game-update
+      onStartTimer();
+      return;
+    }
     setIsTimerRunning(true);
     setTurnEndTime(Date.now() + gameState.config.roundTime * 1000);
     onStartTimer();
@@ -46,21 +70,22 @@ export const InterceptionAction = ({ gameState, onFinishMatch, onPassTurn, onSta
 
   // Loop do Cronômetro
   useEffect(() => {
-    if (!isTimerRunning || !turnEndTime) return;
+    if (!isTimerRunning || !effectiveEndTime) return;
 
+    const end = effectiveEndTime;
     const interval = setInterval(() => {
-      const remaining = Math.max(0, Math.ceil((turnEndTime - Date.now()) / 1000));
+      const remaining = Math.max(0, Math.ceil((end - (Date.now() + serverOffset)) / 1000));
       setTimeLeft(remaining);
 
       if (remaining <= 0) {
         clearInterval(interval);
-        onPassTurn(); // Tempo acabou = Errou/Passou a vez automaticamente
+        // ONLINE: o servidor encerra a vez e manda a nova view.
+        if (!serverDriven) onPassTurn(); // Tempo acabou = Errou/Passou a vez automaticamente
       }
     }, 250);
 
     return () => clearInterval(interval);
-  }, [isTimerRunning, turnEndTime, onPassTurn]);
-
+  }, [isTimerRunning, effectiveEndTime, onPassTurn, serverDriven, serverOffset]);
   // ==========================================
   // 🏆 AÇÕES (Interligadas com a Carta)
   // ==========================================

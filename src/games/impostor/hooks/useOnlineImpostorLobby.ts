@@ -84,7 +84,6 @@ export function useOnlineImpostorLobby() {
     };
 
     const onDisconnect = () => {
-      // 🔥 A SOLUÇÃO ESTÁ AQUI:
       // Só executa o bloco de limpeza e redirecionamento se você
       // realmente estiver em uma sala (inRoom).
       // Isso impede que jogadores no modo offline sejam chutados pro Lobby!

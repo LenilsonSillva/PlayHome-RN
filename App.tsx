@@ -23,6 +23,7 @@ import * as ScreenOrientation from "expo-screen-orientation";
 import MobileAds from "react-native-google-mobile-ads";
 import { loadInterstitialAd, loadRewardedAd } from "@/services/ads/adsService";
 import { setupIAP } from "@/services/iap/iapService";
+import { OnlineCryptographyGameScreen } from "@/screens/Criptography/gameScreen/OnlineCryptographyGameScreen";
 
 // Tipagem das rotas
 export type RootStackParamList = {
@@ -32,6 +33,7 @@ export type RootStackParamList = {
   CryptographyLobby: undefined;
   ImpostorGame: { config: any; globalUsedWords?: string[]; wordList: WordData[]; langCode: string }; // Você pode definir o tipo correto para config conforme necessário;
   OnlineImpostorGame: { config: any };
+  OnlineCryptographyGame: { data: any };
   OfflineCryptographyGame: { config: any; manualAssignments?: any; globalUsedWords?: string[] };
 };
 
@@ -89,6 +91,7 @@ export default function App() {
                 <Stack.Screen name="ImpostorLobby" component={ImpostorLobby} />
                 <Stack.Screen name="CryptographyLobby" component={CryptographyLobby} />
                 <Stack.Screen name="OfflineCryptographyGame" component={OfflineCryptographyGameScreen} />
+                <Stack.Screen name="OnlineCryptographyGame" component={OnlineCryptographyGameScreen} />
                 <Stack.Screen name="ImpostorGame" component={OfflineImpostorGameScreen} />
                 <Stack.Screen name="OnlineImpostorGame" component={OnlineImpostorGameScreen} />
               </Stack.Navigator>

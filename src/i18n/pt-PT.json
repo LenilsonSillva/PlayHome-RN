@@ -37,7 +37,37 @@
     "premium_success": "Compra realizada com sucesso.",
     "restore_success": "Compra restaurada.",
     "restore_not_found": "Nenhuma compra encontrada nesta conta.",
-    "restore_error": "Erro ao ligar à loja."
+    "restore_error": "Erro ao ligar à loja.",
+
+    "cryptography_nameAlreadyUsed": "Este nome já está a ser utilizado na sala.",
+    "cryptography_roomFull": "Sala cheia (máximo de 20 jogadores).",
+    "cryptography_needsAtLeast": "precisa de pelo menos",
+    "cryptography_players": "jogadores",
+    "cryptography_playersWithoutGroup": "jogadores sem grupo",
+    "cryptography_matchStarted": "A partida já está a decorrer",
+    "cryptography_operatorsStartOnly": "Os operadores só podem ser trocados no início da ronda",
+    "cryptography_cannotSetOperator": "Não tem permissão para definir o operador",
+    "cryptography_presentOperatorDevice": "O operador presencial precisa do dispositivo online do líder do grupo",
+    "cryptography_notTeamRecognition": "Esta ação não está disponível durante o reconhecimento dos grupos",
+    "cryptography_startingGroupAutomatic": "O grupo que inicia é definido pelo vencedor da ronda anterior",
+    "cryptography_operatorDevice": "Todos os operadores precisam de um dispositivo disponível",
+    "cryptography_groupOperator": "Todos os grupos precisam de um operador definido",
+    "cryptography_waitOperators": "Aguarde que todos os operadores aceitem a troca de palavra",
+    "cryptography_timerRunning": "O cronómetro já está a funcionar",
+    "cryptography_startTimerFirst": "Inicie primeiro o cronómetro",
+    "cryptography_wordChangeTimerStopped": "As trocas de palavra só podem ser feitas com o cronómetro parado",
+    "cryptography_requestPending": "O seu pedido já está a aguardar os outros operadores",
+    "cryptography_wordChangeUnavailable": "Não é possível solicitar a troca de palavra neste momento",
+    "cryptography_approvalTimerStopped": "A troca só pode ser aceite com o cronómetro parado",
+    "cryptography_rejectionTimerStopped": "A troca só pode ser recusada com o cronómetro parado",
+    "cryptography_removedFromRoom": "Foi removido desta sala",
+    "cryptography_notInRoom": "Não está na sala",
+    "cryptography_alreadyLeader": "Já é líder de um grupo e não pode criar outro",
+    "cryptography_noPermissionDeleteGroup": "Não tem permissão para eliminar este grupo",
+    "cryptography_roomInLobby": "A sala ainda está no lobby",
+    "cryptography_noPermissionManageGroup": "Não tem permissão para gerir este grupo",
+    "cryptography_playerNotFoundOrPermissionDenied": "Jogador não encontrado ou permissão negada",
+    "cryptography_groupNotExists": "O grupo não existe"
   },
 
   "premiumModal": {
@@ -106,6 +136,14 @@
     "cryptography_result_audit_assign_desc_inf_confirm": "\nDeseja realmente atribuir o ponto à equipa?",
     "cryptography_result_audit_usedBy": "UTILIZADA POR",
     "cryptography_result_audit_responsible": "RESPONSÁVEL:",
-    "cryptography_alert_emptyTeam": "Todos os esquadrões precisam de pelo menos um membro da tripulação!"
+    "cryptography_alert_emptyTeam": "Todos os esquadrões precisam de pelo menos um membro da tripulação!",
+
+    "cryptography_online_lobby_kickConfirm": "Remover este jogador da sala?",
+    "cryptography_online_lobby_othersSeeWordSub": "Infiltração: os outros esquadrões e espectadores veem a palavra da ronda.",
+    "cryptography_online_lobby_operatorsSeeWordOnStandbySub": "Interceptação: os operadores veem a palavra enquanto o cronómetro está parado.",
+    "cryptography_online_lobby_waitingHost": "A AGUARDAR QUE O HOST CONFIGURE A MISSÃO...",
+    "cryptography_online_lobby_you": "(TU)",
+    "cryptography_online_lobby_playerKicked": "foi expulso da sala.",
+    "cryptography_online_lobby_newHost": "O host saiu. Agora é o novo HOST!"
   }
 }
